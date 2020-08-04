@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainMenu">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <LinearLayout
+            android:id="@+id/main_menu_LL_distance_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Runs: "
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:id="@+id/main_menu_LBL_num_runs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="Total Distance: "
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:id="@+id/main_menu_LBL_total_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="18sp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" km"
+                android:textSize="18sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/main_menu_LL_pace_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@+id/main_menu_LL_distance_stats"
+            android:layout_marginTop="20dp"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Average Pace: "
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:id="@+id/main_menu_LBL_avg_pace"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.00"
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" km/h"
+                android:textSize="18sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/main_menu_LL_activity_btns"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@+id/main_menu_LL_pace_stats"
+            android:layout_marginTop="20dp"
+            >
+            <Button
+                android:id="@+id/main_menu_BTN_new_activity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/main_menu_LL_pace_stats"
+                android:text="Start New Activity"
+                android:layout_weight="1"
+                />
+
+            <Button
+                android:id="@+id/main_menu_BTN_manual_activity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/main_menu_LL_pace_stats"
+                android:text="Manually Add Activity"
+                android:layout_weight="1"
+                />
+
+        </LinearLayout>
+        <com.jjoe64.graphview.GraphView
+            android:id="@+id/main_menu_graph"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main_menu_LL_activity_btns"
+            android:layout_marginTop="20dp"
+            />
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
