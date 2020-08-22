@@ -8,38 +8,27 @@ import java.util.Arrays;
 public class RunDetails implements Parcelable {
 
     private String[] date;
-    private String[] startTime;
-    private String[] endTime;
+    private String activityDuration;
     private double distance;
+    private double pace;
 
-    public RunDetails(String[] date, String[] startTime, String[] endTime, double distance){
-        this.date = date;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.distance = distance;
+    public RunDetails() {
 
     }
+
+    public RunDetails(String[] date, String activityDuration, double distance, double pace) {
+        this.date = date;
+        this.activityDuration = activityDuration;
+        this.distance = distance;
+        this.pace = pace;
+    }
+
 
     protected RunDetails(Parcel in) {
         date = in.createStringArray();
-        startTime = in.createStringArray();
-        endTime = in.createStringArray();
+        activityDuration = in.readString();
         distance = in.readDouble();
-    }
-
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeStringArray(date);
-        parcel.writeStringArray(startTime);
-        parcel.writeStringArray(endTime);
-        parcel.writeDouble(distance);
+        pace = in.readDouble();
     }
 
     public static final Creator<RunDetails> CREATOR = new Creator<RunDetails>() {
@@ -54,12 +43,35 @@ public class RunDetails implements Parcelable {
         }
     };
 
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeStringArray(date);
+        parcel.writeString(activityDuration);
+        parcel.writeDouble(distance);
+        parcel.writeDouble(pace);
+    }
+
     public String[] getDate() {
         return date;
     }
 
     public void setDate(String[] date) {
         this.date = date;
+    }
+
+    public String getActivityDuration() {
+        return activityDuration;
+    }
+
+    public void setActivityDuration(String activityDuration) {
+        this.activityDuration = activityDuration;
     }
 
     public double getDistance() {
@@ -70,29 +82,21 @@ public class RunDetails implements Parcelable {
         this.distance = distance;
     }
 
-    public String[] getEndTime() {
-        return endTime;
+    public double getPace() {
+        return pace;
     }
 
-    public void setEndTime(String[] endTime) {
-        this.endTime = endTime;
-    }
-
-    public String[] getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String[] startTime) {
-        this.startTime = startTime;
+    public void setPace(double pace) {
+        this.pace = pace;
     }
 
     @Override
     public String toString() {
         return "RunDetails{" +
                 "date=" + Arrays.toString(date) +
-                ", startTime=" + Arrays.toString(startTime) +
-                ", endTime=" + Arrays.toString(endTime) +
+                ", activityDuration='" + activityDuration + '\'' +
                 ", distance=" + distance +
+                ", pace=" + pace +
                 '}';
     }
 }

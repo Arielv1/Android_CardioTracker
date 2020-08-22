@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Running</string>
+    <string name="reset_underline"><u>reset</u>
+    </string>
 </resources>

@@ -2,51 +2,73 @@ package com.example.running;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.ikovac.timepickerwithseconds.MyTimePickerDialog;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 public class Manual extends AppCompatActivity {
 
+    private MySP mySP;
+
+    private Button btnConfirm;
     private Button btnAdd;
     private Button btnCancel;
+
     private EditText edtDistance;
     private EditText edtStartTime;
     private EditText edtEndTime;
     private EditText edtDate;
+
     private Calendar calendar;
-    private DatePickerDialog dpd;
-    private TimePickerDialog tpd;
-    private MyTimePickerDialog mtpd;
+
+    private DatePickerDialog datePickerDialog;
+    private MyTimePickerDialog timePickerDialog;
+
+    private TextView lblDuration;
+    private TextView lblActualDuration;
+    private TextView lblPace;
+    private TextView lblActualPace;
+    private TextView lblPaceKmh;
+
+    private Double pace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manual);
 
+        mySP = new MySP(this);
+
         setUpViews();
 
-        btnAdd.setOnClickListener(new View.OnClickListener() {
+        btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //complicatedTimeHandler();
-                complicatedTimeHandler();
-
+                if (verifyEdtFields()){
+                    showActualPaceDistance();
+                    btnAdd.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -57,103 +79,38 @@ public class Manual extends AppCompatActivity {
             }
         });
 
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendNewRunData();
+            }
+        });
+
         edtDate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean focus) {
-                enterActivityDate(focus);
-            }
+                enterDateHandler(focus);
+                            }
         });
 
         edtStartTime.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean focus) {
-               // enterActivityTimeWithSeconds(view, focus);
-               // enterActivityTime(view, focus);
-                enterActivityTimeWithSeconds(view, focus);
-            }
+                enterTimeHandler(view, focus);
+                           }
         });
 
 
         edtEndTime.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean focus) {
-                //enterActivityTimeWithSeconds(view, focus);
-                //enterActivityTime(view, focus);
-                enterActivityTimeWithSeconds(view, focus);
-            }
+                enterTimeHandler(view, focus);
+                            }
         });
 
     }
 
-    private void simpleTimeHandler() {
-        if (true) {
-            String distance = edtDistance.getText().toString();
-            String startTime[] = edtStartTime.getText().toString().split(":");
-            String endTime[] = edtEndTime.getText().toString().split(":");
 
-
-
-            Integer start = 60 * Integer.parseInt(startTime[1].toString()) + Integer.parseInt(startTime[0]);
-            Integer end = 60 * Integer.parseInt(endTime[1].toString()) + Integer.parseInt(endTime[0]);
-            Integer time = end - start;
-            Integer hours = time / 3600;
-            Integer minutes = (time / 60) % 60;
-            Log.d("passs", "Activity Hours: " + hours);
-            Log.d("passs", "Activity Minutes: " + minutes.toString());
-            Log.d("passs", "AVG pace: " + Float.parseFloat(distance) / time);
-        }
-    }
-
-    private void complicatedTimeHandler() {
-        if (verifyEdtFields()) {
-           /* String distance = edtDistance.getText().toString();
-            String dateParts[] = edtDate.getText().toString().split("/");
-            String startTime[] = edtStartTime.getText().toString().split(":");
-            String endTime[] = edtEndTime.getText().toString().split(":");
-
-            Long end = 3600 * Long.parseLong(endTime[0]) + 60 * Long.parseLong(endTime[1]) +  Long.parseLong(endTime[2]);
-            Long start = 3600 * Long.parseLong(startTime[0]) + 60 * Long.parseLong(startTime[1]) + Long.parseLong(startTime[2]);
-            Long duration = end - start;
-            Long hours, minutes, seconds;
-            hours = duration / 3600;
-            minutes = (duration / 60) % 60;
-            seconds = (duration % 60);
-            Double avgPace = (Double.parseDouble(distance)/( (double)duration/3600)) % 100;
-
-
-            Log.d("passs", distance);
-            Log.d("passs", "End " + end.toString());
-            Log.d("passs", "Start " + start.toString());
-            Log.d("passs", "Duration " + duration.toString());
-            Log.d("passs", "Activity Hours: " + hours );
-            Log.d("passs", "Activity Minutes: " + minutes);
-            Log.d("passs", "Activity Seconds: " + seconds);
-            Log.d("passs", "Activity Duration: " + hours + ":" + minutes + ":" + seconds);
-            Log.d("passs", "Activity Pace: " + avgPace);
-
-            NewRunDetails newRunDetails = new NewRunDetails(avgPace, Double.parseDouble(distance), dateParts, duration);
-
-            Intent intent = new Intent(getBaseContext(), MainMenu.class);
-
-            intent.putExtra("manualKey", newRunDetails);
-
-            startActivity(intent);*/
-
-           RunDetails runDetails = new RunDetails(splitEditTextByString(edtEndTime, "/."),
-                   splitEditTextByString(edtStartTime,":"),
-                   splitEditTextByString(edtEndTime, ":"),
-                   Double.parseDouble(edtDistance.getText().toString()));
-
-           Log.d("Send", runDetails.toString());
-
-            Intent intent = new Intent(getBaseContext(), MainMenu.class);
-
-            intent.putExtra("manualKey", runDetails);
-
-            startActivity(intent);
-
-        }
-    }
 
     private String[] splitEditTextByString(EditText et, String symbol){
         return et.getText().toString().split(symbol);
@@ -162,42 +119,45 @@ public class Manual extends AppCompatActivity {
 
     private void setUpViews() {
 
-
-        btnAdd = findViewById(R.id.manual_BTN_add);
+        btnConfirm = findViewById(R.id.manual_BTN_confirm);
         btnCancel = findViewById(R.id.manual_BTN_cancel);
+        btnAdd = findViewById(R.id.manual_BTN_add);
         edtDistance = findViewById(R.id.manual_EDT_distance);
         edtStartTime = findViewById(R.id.manual_EDT_start_time);
         edtEndTime = findViewById(R.id.manual_EDT_end_time);
         edtDate = findViewById(R.id.manual_EDT_date);
         calendar = Calendar.getInstance();
+        lblDuration = findViewById(R.id.manual_LBL_duration);
+        lblActualDuration = findViewById(R.id.manual_LBL_actual_duration);
+        lblPace = findViewById(R.id.manual_LBL_pace);
+        lblActualPace = findViewById(R.id.manual_LBL_actual_pace);
+        lblPaceKmh = findViewById(R.id.manual_LBL_pace_kmh);
 
     }
 
-    private void cancelManualActivity(){
-        startActivity(new Intent(getApplicationContext(), MainMenu.class));
-    }
 
-    private void enterActivityDate(boolean focus){
+
+    private void enterDateHandler(boolean focus){
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int month = calendar.get(Calendar.MONTH);
         int year = calendar.get(Calendar.YEAR);
         if (focus) {
-            dpd = new DatePickerDialog(Manual.this,
+            datePickerDialog = new DatePickerDialog(Manual.this,
                     new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                             edtDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
                         }
                     }, year, month, day);
-            dpd.show();
+            datePickerDialog.show();
         }
         else {
-            dpd.hide();
+            datePickerDialog.hide();
         }
 
     }
 
-    private void enterActivityTimeWithSeconds(View view, boolean focus){
+    private void enterTimeHandler(View view, boolean focus){
         final EditText edt = (EditText) findViewById(view.getId());
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minutes = calendar.get(Calendar.MINUTE);
@@ -205,7 +165,7 @@ public class Manual extends AppCompatActivity {
 
         if (focus) {
             // time picker dialog
-            mtpd = new MyTimePickerDialog(this, new MyTimePickerDialog.OnTimeSetListener() {
+            timePickerDialog = new MyTimePickerDialog(this, new MyTimePickerDialog.OnTimeSetListener() {
 
                 @Override
                 public void onTimeSet(com.ikovac.timepickerwithseconds.TimePicker view, int hourOfDay, int minute, int seconds) {
@@ -213,58 +173,121 @@ public class Manual extends AppCompatActivity {
                 }
 
             },hour, minutes, seconds, true);
-            mtpd.show();
+            timePickerDialog.show();
         }
         else {
-            mtpd.hide();
+            timePickerDialog.hide();
+        }
+
+        if (lblPace.getVisibility() == View.VISIBLE){
+            showActualPaceDistance();
         }
     }
 
-    private void enterActivityTime(View view, boolean focus){
-        final EditText edt = (EditText) findViewById(view.getId());
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minutes = calendar.get(Calendar.MINUTE);
-        int seconds = calendar.get(Calendar.SECOND);
+    private boolean verifyEdtField(EditText edt){
+        return edtDate.getText().toString().trim().length() == 0;
+    }
 
-        if (focus) {
-            // time picker dialog
-            tpd = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
-
-                @Override
-                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                    edt.setText(hourOfDay + ":" + minute);
-                }
-
-            },hour, minutes, true);
-            tpd.show();
+    private boolean checkEdtField(EditText editText, String message) {
+        if (editText.getText().toString().trim().length() == 0) {
+            Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
+            return false;
         }
-        else {
-            tpd.hide();
-        }
+        return true;
     }
 
     private boolean verifyEdtFields() {
 
-        if (edtDate.getText().toString().trim().length() == 0) {
-            Toast.makeText(this, "Date Field Is Empty", Toast.LENGTH_SHORT).show();
-            return false;
-        }
+        return checkEdtField(edtDate, "Date Field Is Empty") &&
+                checkEdtField(edtStartTime, "Start Time Field Is Empty") &&
+                checkEdtField(edtEndTime, "End Time Field Is Empty") &&
+                checkEdtField(edtDistance, "Distance Field Is Empty");
 
-        if (edtStartTime.getText().toString().trim().length() == 0) {
-            Toast.makeText(this, "Start Time Field Is Empty", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        if (edtEndTime.getText().toString().trim().length() == 0) {
-            Toast.makeText(this, "End Time Field Is Empty", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        if (edtDistance.getText().toString().trim().length() == 0) {
-            Toast.makeText(this, "Distance Field Is Empty", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        return true;
     }
+
+    public void showActualPaceDistance(){
+        if (!verifyEdtField(edtDate) && !verifyEdtField(edtStartTime) && !verifyEdtField(edtEndTime) && !verifyEdtField(edtDistance)){
+
+            lblDuration.setVisibility(View.VISIBLE);
+            lblPace.setVisibility(View.VISIBLE);
+
+            String[] startTime =  splitEditTextByString(edtStartTime,":");
+            String[] endTime = splitEditTextByString(edtEndTime, ":");
+            double distance = Double.parseDouble(edtDistance.getText().toString());
+
+
+            lblActualDuration.setVisibility(View.VISIBLE);
+
+            Long duration = getDuration(startTime, endTime, distance);
+            setLblDuration(distance, duration);
+
+
+            DecimalFormat df = new DecimalFormat("###.##");
+
+            lblActualPace.setVisibility(View.VISIBLE);
+            lblPaceKmh.setVisibility(View.VISIBLE);
+            lblActualPace.setText(df.format(pace% 100));
+        }
+    }
+
+    private Long getDuration(String[] startTime, String[] endTime, double distance) {
+        Long end = 3600 * Long.parseLong(endTime[0]) + 60 * Long.parseLong(endTime[1]) +  Long.parseLong(endTime[2]);
+        Long start = 3600 * Long.parseLong(startTime[0]) + 60 * Long.parseLong(startTime[1]) + Long.parseLong(startTime[2]);
+        return end - start;
+    }
+
+    private void setLblDuration(double distance, long duration) {
+        Long hours, minutes, seconds;
+        hours = duration / 3600;
+        minutes = (duration / 60) % 60;
+        seconds = (duration % 60);
+        pace = (distance/( (double)duration/3600)) ;
+
+        String sSeconds = "", sMinutes, sHours;
+        if (seconds < 10) {
+            sSeconds = "0" + seconds;
+        }
+        else {
+            sSeconds = seconds.toString();
+        }
+
+        if (minutes < 10) {
+            sMinutes = "0" + minutes;
+
+        }
+        else {
+            sMinutes = minutes.toString();
+        }
+
+        if(hours == 0) {
+            lblActualDuration.setText(sMinutes +":" + sSeconds);
+        }
+        else {
+            lblActualDuration.setText(hours+ ":" + sMinutes +":" + sSeconds);
+        }
+    }
+
+    private void cancelManualActivity(){
+        Gson gson = new Gson();
+        mySP.putString(Keys.NEW_RUN_DATA_PACKAGE, "");
+        finish();
+    }
+
+    private void sendNewRunData() {
+        RunDetails runDetails = new RunDetails(edtDate.getText().toString().split("/"),
+                lblActualDuration.getText().toString(),
+                Double.parseDouble(edtDistance.getText().toString()),
+                pace);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(runDetails);
+        Log.d("Gson", json);
+
+        RunDetails newRunDetails = gson.fromJson(json, RunDetails.class);
+        Log.d("Gson", newRunDetails.toString());
+
+        mySP.putString(Keys.NEW_RUN_DATA_PACKAGE, json);
+        finish();
+    }
+
 }
