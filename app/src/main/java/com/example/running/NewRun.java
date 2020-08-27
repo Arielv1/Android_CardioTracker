@@ -31,7 +31,6 @@ public class NewRun extends AppCompatActivity {
    protected void onSaveInstanceState(@NonNull Bundle outState) {
        super.onSaveInstanceState(outState);
        Log.d("ViewLogger", "NewRun - onSavedInstance " + tmrChronometer.getBase());
-       outState.putLong("CHRONO_STATE", tmrChronometer.getBase());
 
    }
 

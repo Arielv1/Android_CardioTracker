@@ -190,7 +190,7 @@ public class Manual extends AppCompatActivity {
 
     private boolean checkEdtField(EditText editText, String message) {
         if (editText.getText().toString().trim().length() == 0) {
-            Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
+            Toaster.getInstance().showToast(message);
             return false;
         }
         return true;

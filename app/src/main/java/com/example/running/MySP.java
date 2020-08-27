@@ -10,9 +10,19 @@ import static android.content.Context.MODE_PRIVATE;
 class MySP {
 
     private SharedPreferences prefs;
+    private static MySP mySPInstance;
 
     public MySP(Context context) {
         prefs = context.getSharedPreferences("MY_SP", MODE_PRIVATE);
+    }
+
+    public static MySP init(Context context) {
+        if (mySPInstance == null)
+            mySPInstance = new MySP(context);
+        return mySPInstance;
+    }
+    public static MySP getInstance() {
+        return mySPInstance;
     }
 
     public void putString(String key, String value) {

@@ -79,29 +79,27 @@ public class MainMenu extends AppCompatActivity {
         Log.d("ViewLogger", "MainMenu - onResume Invoked");
         super.onResume();
 
+
+    }
+
+    @Override
+    protected void onStart() {
+        Log.d("ViewLogger", "MainMenu - onStart Invoked");
+        super.onStart();
+
         Gson gson = new Gson();
-        RunDetails runDetails = gson.fromJson(mySP.getString(Keys.NEW_RUN_DATA_PACKAGE, ""), RunDetails.class);
+        RunDetails runDetails = gson.fromJson(MySP.getInstance().getString(Keys.NEW_RUN_DATA_PACKAGE, ""), RunDetails.class);
 
         if(runDetails != null) {
-            Log.d("Package", "MainMenu - In OnResume get package with details " + runDetails.toString());
 
+            updateNumRuns();
 
-            numRuns++;
-            updateTextView(lblNumRuns, numRuns.toString());
-            mySP.putInteger(Keys.NUM_OF_RUNS, numRuns);
+            updateTotalDistance(runDetails.getDistance());
 
-            totalDistance += runDetails.getDistance();
-            updateTextView(lblTotalDistance, df.format(totalDistance));
-            mySP.putDouble(Keys.TOTAL_DISTANCE, totalDistance);
+            updatePace(runDetails.getPace());
 
-            totalPace += runDetails.getPace();
-            avgPace = totalPace / numRuns;
-            updateTextView(lblAvgPace, df.format (avgPace));
-            mySP.putDouble(Keys.TOTAL_PACE, totalPace);
-            mySP.putDouble(Keys.AVERAGE_PACE, avgPace);
+            addNewRunToLog(runDetails);
 
-            activitySet.add(gson.toJson(runDetails));
-            mySP.putSetStrings(Keys.ALL_ACTIVITIES, activitySet);
         }
         else {
 
@@ -111,31 +109,24 @@ public class MainMenu extends AppCompatActivity {
 
         }
 
-
-        Log.d("DataDebug", numRuns.toString());
-        Log.d("DataDebug", totalDistance.toString());
-        Log.d("DataDebug", avgPace.toString());
-        Log.d("DataDebug", activitySet.toString());
-
-
         if (!activitySet.isEmpty()) {
             updateGraph();
         }
         else {
             showInitialGraph();
         }
+
+
     }
 
-    @Override
-    protected void onStart() {
-        Log.d("ViewLogger", "MainMenu - onStart Invoked");
-        super.onStart();
-    }
+
+
 
     @Override
     protected void onStop() {
         Log.d("ViewLogger", "MainMenu - onStop Invoked");
         super.onStop();
+        MySP.getInstance().putString(Keys.NEW_RUN_DATA_PACKAGE, "");
     }
 
     @Override
@@ -156,15 +147,15 @@ public class MainMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-        mySP = new MySP(this);
-        mySP.putString(Keys.NEW_RUN_DATA_PACKAGE, "");
+
+        MySP.getInstance().putString(Keys.NEW_RUN_DATA_PACKAGE, "");
         setUpViews();
 
-        numRuns = mySP.getInteger(Keys.NUM_OF_RUNS, Keys.DEFAULT_INT_VALUE);
-        totalDistance = mySP.getDouble(Keys.TOTAL_DISTANCE, Keys.DEFAULT_DOUBLE_VALUE);
-        totalPace = mySP.getDouble(Keys.TOTAL_PACE, Keys.DEFAULT_DOUBLE_VALUE);
-        avgPace = mySP.getDouble(Keys.AVERAGE_PACE, Keys.DEFAULT_DOUBLE_VALUE);
-        activitySet = mySP.getSetStrings(Keys.ALL_ACTIVITIES, Keys.DEFAULT_ALL_ACTIVITIES_VALUE);
+        numRuns = MySP.getInstance().getInteger(Keys.NUM_OF_RUNS, Keys.DEFAULT_INT_VALUE);
+        totalDistance = MySP.getInstance().getDouble(Keys.TOTAL_DISTANCE, Keys.DEFAULT_DOUBLE_VALUE);
+        totalPace = MySP.getInstance().getDouble(Keys.TOTAL_PACE, Keys.DEFAULT_DOUBLE_VALUE);
+        avgPace = MySP.getInstance().getDouble(Keys.AVERAGE_PACE, Keys.DEFAULT_DOUBLE_VALUE);
+        activitySet = MySP.getInstance().getSetStrings(Keys.ALL_ACTIVITIES, Keys.DEFAULT_ALL_ACTIVITIES_VALUE);
 
 
         btnNewActivity.setOnClickListener(new View.OnClickListener() {
@@ -205,11 +196,11 @@ public class MainMenu extends AppCompatActivity {
         updateTextView(lblNumRuns, Keys.LABEL_DEFAULT_VALUE);
         updateTextView(lblAvgPace, Keys.LABEL_DEFAULT_VALUE);
 
-        mySP.putInteger(Keys.NUM_OF_RUNS, Keys.DEFAULT_INT_VALUE);
-        mySP.putDouble(Keys.AVERAGE_PACE, Keys.DEFAULT_DOUBLE_VALUE);
-        mySP.putDouble(Keys.TOTAL_PACE, Keys.DEFAULT_DOUBLE_VALUE);
-        mySP.putDouble(Keys.TOTAL_DISTANCE, Keys.DEFAULT_DOUBLE_VALUE);
-        mySP.putSetStrings(Keys.ALL_ACTIVITIES, Keys.DEFAULT_ALL_ACTIVITIES_VALUE);
+        MySP.getInstance().putInteger(Keys.NUM_OF_RUNS, Keys.DEFAULT_INT_VALUE);
+        MySP.getInstance().putDouble(Keys.AVERAGE_PACE, Keys.DEFAULT_DOUBLE_VALUE);
+        MySP.getInstance().putDouble(Keys.TOTAL_PACE, Keys.DEFAULT_DOUBLE_VALUE);
+        MySP.getInstance().putDouble(Keys.TOTAL_DISTANCE, Keys.DEFAULT_DOUBLE_VALUE);
+        MySP.getInstance().putSetStrings(Keys.ALL_ACTIVITIES, Keys.DEFAULT_ALL_ACTIVITIES_VALUE);
     }
 
     private void setUpViews() {
@@ -220,6 +211,33 @@ public class MainMenu extends AppCompatActivity {
         lblTotalDistance = findViewById(R.id.main_menu_LBL_total_distance);
         lblAvgPace = findViewById(R.id.main_menu_LBL_avg_pace);
         lblReset = findViewById(R.id.main_menu_LBL_reset);
+    }
+
+    private void updateNumRuns() {
+        numRuns++;
+        updateTextView(lblNumRuns, numRuns.toString());
+        MySP.getInstance().putInteger(Keys.NUM_OF_RUNS, numRuns);
+    }
+
+    private void updateTotalDistance(double distance) {
+        totalDistance += distance;
+        updateTextView(lblTotalDistance, df.format(totalDistance));
+        MySP.getInstance().putDouble(Keys.TOTAL_DISTANCE, totalDistance);
+    }
+
+    private void updatePace(double pace) {
+        totalPace += pace;
+        avgPace = totalPace / numRuns;
+        updateTextView(lblAvgPace, df.format (avgPace));
+        MySP.getInstance().putDouble(Keys.TOTAL_PACE, totalPace);
+        MySP.getInstance().putDouble(Keys.AVERAGE_PACE, avgPace);
+
+    }
+
+    private void addNewRunToLog(RunDetails runDetails) {
+        Gson gson = new Gson();
+        activitySet.add(gson.toJson(runDetails));
+        MySP.getInstance().putSetStrings(Keys.ALL_ACTIVITIES, activitySet);
     }
 
     private void updateTextView(TextView tv, String update) {
@@ -249,36 +267,35 @@ public class MainMenu extends AppCompatActivity {
 
     private void updateGraph() {
         graph.removeAllSeries();
+
         ArrayList <RunDetails> allRuns = new ArrayList<RunDetails>();
         Gson gson = new Gson();
-        HashMap<Integer, Double> dayDistance = new HashMap<Integer, Double>();
-        ArrayList <Integer> keys = new ArrayList <Integer>();
+
+        HashMap<Integer, Double> monthDistanceMap = new HashMap<Integer, Double>();
+        ArrayList <Integer> releventMonths = new ArrayList <Integer>();
         for (String json : activitySet) {
-           RunDetails current = gson.fromJson(json, RunDetails.class);
-           allRuns.add(current);
+            RunDetails current = gson.fromJson(json, RunDetails.class);
+            allRuns.add(current);
 
-           int day = Integer.parseInt(current.getDate()[0]);
-           if (dayDistance.containsKey(day)){
-               dayDistance.put(day, dayDistance.get(day) + current.getDistance());
-           }
-           else{
-               dayDistance.put(day, current.getDistance());
-               keys.add(day);
-           }
-         }
+            int month = Integer.parseInt(current.getDate()[1]);
+            if (monthDistanceMap.containsKey(month)){
+                monthDistanceMap.put(month, monthDistanceMap.get(month) + current.getDistance());
+            }
+            else{
+                monthDistanceMap.put(month, current.getDistance());
+                releventMonths.add(month);
+            }
+        }
 
-
-        DataPoint dp[] = new DataPoint [getNumberOfDaysForMonth(Integer.parseInt(allRuns.get(0).getDate()[1])) + 1];
+        DataPoint dp[] = new DataPoint [30];
 
         for (int i = 0 ; i < dp.length; i++) {
             dp[i] = new DataPoint(i, 0);
         }
 
-        for (int day : keys) {
-            dp[day] = new DataPoint (day, dayDistance.get(day));
+        for (int month : releventMonths) {
+            dp[month] = new DataPoint (month, monthDistanceMap.get(month));
         }
-
-
 
         barGraphSeries = new BarGraphSeries<DataPoint>(dp);
         barGraphSeries.setSpacing(20);
@@ -288,30 +305,7 @@ public class MainMenu extends AppCompatActivity {
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
         graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
         graph.addSeries(barGraphSeries);
-    }
 
-    private int getNumberOfDaysForMonth(int month){
-        switch (month){
-            case 1:
-            case 3:
-            case 5:
-            case 7:
-            case 8:
-            case 10:
-            case 12:
-                return 31;
-            case 2:
-                return 28;
-            case 4:
-            case 6:
-            case 9:
-            case 11:
-                return 30;
-            default:
-                break;
-
-        }
-        return 0;
     }
 }
 
