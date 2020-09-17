@@ -8,12 +8,11 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.Toast;
 
-public class NewRun extends AppCompatActivity {
+public class Activity_New_Record extends AppCompatActivity {
 
     private Button btnStart;
     private Button btnPause;
@@ -26,6 +25,7 @@ public class NewRun extends AppCompatActivity {
     private boolean stoppedChronometer;
 
     private long savedState;
+    private String cardioActivityChoice;
 
     @Override
    protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -85,9 +85,11 @@ public class NewRun extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("ViewLogger", "NewRun - onCreate Invoked");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_run);
+        setContentView(R.layout.activity_new_record);
 
         setUpViews();
+
+        setUpFragments();
 
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,18 +115,19 @@ public class NewRun extends AppCompatActivity {
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), MainMenu.class));
+                startActivity(new Intent(getApplicationContext(), Activity_Main_Menu.class));
             }
         });
 
         tmrChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
             @Override
             public void onChronometerTick(Chronometer chronometer) {
-                Toast.makeText(NewRun.this, "" + counter, Toast.LENGTH_SHORT).show();
+                Toast.makeText(Activity_New_Record.this, "" + counter, Toast.LENGTH_SHORT).show();
                 counter++;
             }
         });
     }
+
 
 
 
@@ -169,4 +172,19 @@ public class NewRun extends AppCompatActivity {
         btnCancel = findViewById(R.id.new_run_BTN_cancel);
         btnConfirm = findViewById(R.id.new_run_BTN_confirm);
     }
+
+    private void setUpFragments() {
+
+        Fragment_Radio_Buttons fragment_radio_buttons = Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.new_run_LAY_radio_buttons, false);
+
+    }
+
+    Callback_RadioChoice callback = new Callback_RadioChoice() {
+        @Override
+        public void setRadioButtonChoice(String choice) {
+            cardioActivityChoice = choice;
+
+        }
+    };
+
 }

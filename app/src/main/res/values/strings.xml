@@ -2,4 +2,14 @@
     <string name="app_name">Running</string>
     <string name="reset_underline"><u>reset</u>
     </string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="history_underline"><u>History</u></string>
+
+    <string-array name="cardio_activity_types">
+        <item>Jogging</item>
+        <item>Running</item>
+        <item>Cycling</item>
+        <item>All</item>
+    </string-array>
+
 </resources>

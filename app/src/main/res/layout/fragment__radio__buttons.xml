@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragment_Radio_Buttons">
+
+    <RadioGroup
+        android:id="@+id/fragment_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <RadioButton
+            android:id="@+id/fragment_RAD_jogging"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jogging"
+            android:layout_weight="1"
+            />
+
+        <RadioButton
+            android:id="@+id/fragment_RAD_running"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Running"
+            android:layout_weight="1"
+            />
+        <RadioButton
+            android:id="@+id/fragment_RAD_cycling"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cycling"
+            android:layout_weight="1"
+            />
+
+        <RadioButton
+            android:id="@+id/fragment_RAD_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All"
+            android:layout_weight="1"
+            />
+    </RadioGroup>
+</FrameLayout>

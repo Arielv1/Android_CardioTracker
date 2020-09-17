@@ -4,15 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".NewRun">
+    tools:context=".Activity_New_Record">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
 
+        <FrameLayout
+            android:id="@+id/new_run_LAY_radio_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+        </FrameLayout>
+
         <Chronometer
             android:id="@+id/new_run_TMR_chronometer"
+            android:layout_below="@+id/new_run_LAY_radio_buttons"
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -22,7 +32,7 @@
             />
 
         <LinearLayout
-            android:id="@+id/new_run_LL_btns"
+            android:id="@+id/new_run_LAY_buttons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -54,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_below="@+id/new_run_LL_btns"
+            android:layout_below="@+id/new_run_LAY_buttons"
             >
 
             <TextView

@@ -4,13 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -20,21 +21,11 @@ import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-import java.lang.reflect.Array;
-import java.security.Key;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
-public class MainMenu extends AppCompatActivity {
-
-    private MySP mySP;
+public class Activity_Main_Menu extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private GraphView graph;
     private Button btnNewActivity;
@@ -44,6 +35,7 @@ public class MainMenu extends AppCompatActivity {
     private TextView lblTotalDistance;
     private TextView lblAvgPace;
     private TextView lblReset;
+    private TextView lblHistory;
 
     private Double totalPace;
     private Double avgPace;
@@ -52,9 +44,12 @@ public class MainMenu extends AppCompatActivity {
 
     private LineGraphSeries<DataPoint> lineGraphSeries;
     private BarGraphSeries<DataPoint> barGraphSeries;
-    private Set<String> activitySet;
+    private AllSportActivities allSportActivities;
 
     private DecimalFormat df = new DecimalFormat("###.##");
+
+    private Spinner spinner;
+    private CardioType spinnerChoice;
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -88,17 +83,19 @@ public class MainMenu extends AppCompatActivity {
         super.onStart();
 
         Gson gson = new Gson();
-        RunDetails runDetails = gson.fromJson(MySP.getInstance().getString(Keys.NEW_RUN_DATA_PACKAGE, ""), RunDetails.class);
+        CardioActivity cardioActivity = gson.fromJson(MySP.getInstance().getString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE), CardioActivity.class);
 
-        if(runDetails != null) {
+        allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
+
+        if(cardioActivity != null) {
 
             updateNumRuns();
 
-            updateTotalDistance(runDetails.getDistance());
+            updateTotalDistance(cardioActivity.getDistance());
 
-            updatePace(runDetails.getPace());
+            updatePace(cardioActivity.getPace());
 
-            addNewRunToLog(runDetails);
+            addNewRunToLog(cardioActivity);
 
         }
         else {
@@ -109,14 +106,14 @@ public class MainMenu extends AppCompatActivity {
 
         }
 
-        if (!activitySet.isEmpty()) {
+        if (allSportActivities != null) {
             updateGraph();
         }
         else {
             showInitialGraph();
         }
 
-
+        Log.d("ViewLogger", "MainMenu - allSportActivities " + allSportActivities);
     }
 
 
@@ -126,7 +123,7 @@ public class MainMenu extends AppCompatActivity {
     protected void onStop() {
         Log.d("ViewLogger", "MainMenu - onStop Invoked");
         super.onStop();
-        MySP.getInstance().putString(Keys.NEW_RUN_DATA_PACKAGE, "");
+        MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
     }
 
     @Override
@@ -145,23 +142,24 @@ public class MainMenu extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("ViewLogger", "MainMenu - onCreate Invoked");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_menu);
+        setContentView(R.layout.activity_mainmenu);
 
 
-        MySP.getInstance().putString(Keys.NEW_RUN_DATA_PACKAGE, "");
+        // Makes sure that the last packages isn't repeatedly read after receiving data other activities
+        MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
+
         setUpViews();
 
         numRuns = MySP.getInstance().getInteger(Keys.NUM_OF_RUNS, Keys.DEFAULT_INT_VALUE);
         totalDistance = MySP.getInstance().getDouble(Keys.TOTAL_DISTANCE, Keys.DEFAULT_DOUBLE_VALUE);
         totalPace = MySP.getInstance().getDouble(Keys.TOTAL_PACE, Keys.DEFAULT_DOUBLE_VALUE);
         avgPace = MySP.getInstance().getDouble(Keys.AVERAGE_PACE, Keys.DEFAULT_DOUBLE_VALUE);
-        activitySet = MySP.getInstance().getSetStrings(Keys.ALL_ACTIVITIES, Keys.DEFAULT_ALL_ACTIVITIES_VALUE);
 
 
         btnNewActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), NewRun.class));
+                startActivity(new Intent(getApplicationContext(), Activity_New_Record.class));
 
             }
         });
@@ -169,7 +167,7 @@ public class MainMenu extends AppCompatActivity {
         btnManualActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), Manual.class));
+                startActivity(new Intent(getApplicationContext(), Activity_Add_Manually.class));
 
             }
         });
@@ -182,6 +180,21 @@ public class MainMenu extends AppCompatActivity {
             }
         });
 
+        lblHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), Activity_History.class));
+            }
+        });
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.cardio_activity_types, android.R.layout.simple_spinner_item);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener (this);
+
     }
 
     private void reset() {
@@ -190,7 +203,7 @@ public class MainMenu extends AppCompatActivity {
         totalPace = Keys.DEFAULT_DOUBLE_VALUE;
         totalDistance = Keys.DEFAULT_DOUBLE_VALUE;
         avgPace = Keys.DEFAULT_DOUBLE_VALUE;
-        activitySet = Keys.DEFAULT_ALL_ACTIVITIES_VALUE;
+      //  allSportActivities = new AllSportActivities();
 
         updateTextView(lblTotalDistance, Keys.LABEL_DEFAULT_VALUE);
         updateTextView(lblNumRuns, Keys.LABEL_DEFAULT_VALUE);
@@ -200,7 +213,7 @@ public class MainMenu extends AppCompatActivity {
         MySP.getInstance().putDouble(Keys.AVERAGE_PACE, Keys.DEFAULT_DOUBLE_VALUE);
         MySP.getInstance().putDouble(Keys.TOTAL_PACE, Keys.DEFAULT_DOUBLE_VALUE);
         MySP.getInstance().putDouble(Keys.TOTAL_DISTANCE, Keys.DEFAULT_DOUBLE_VALUE);
-        MySP.getInstance().putSetStrings(Keys.ALL_ACTIVITIES, Keys.DEFAULT_ALL_ACTIVITIES_VALUE);
+        MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE);
     }
 
     private void setUpViews() {
@@ -211,6 +224,8 @@ public class MainMenu extends AppCompatActivity {
         lblTotalDistance = findViewById(R.id.main_menu_LBL_total_distance);
         lblAvgPace = findViewById(R.id.main_menu_LBL_avg_pace);
         lblReset = findViewById(R.id.main_menu_LBL_reset);
+        lblHistory = findViewById(R.id.main_menu_LBL_history);
+        spinner = findViewById(R.id.main_menu_spinner);
     }
 
     private void updateNumRuns() {
@@ -234,10 +249,19 @@ public class MainMenu extends AppCompatActivity {
 
     }
 
-    private void addNewRunToLog(RunDetails runDetails) {
+    private void addNewRunToLog(CardioActivity cardioActivity) {
         Gson gson = new Gson();
-        activitySet.add(gson.toJson(runDetails));
-        MySP.getInstance().putSetStrings(Keys.ALL_ACTIVITIES, activitySet);
+        ArrayList<CardioActivity> activities;
+        if (allSportActivities == null) {
+            activities = new ArrayList<CardioActivity>();
+            allSportActivities = new AllSportActivities();
+        }
+        else {
+            activities = allSportActivities.getActivities();
+        }
+        activities.add(cardioActivity);
+        allSportActivities.setActivities(activities);
+        MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
     }
 
     private void updateTextView(TextView tv, String update) {
@@ -248,34 +272,13 @@ public class MainMenu extends AppCompatActivity {
         graph.removeAllSeries();
     }
 
-    private void accurateGraph(){
-        DataPoint dp[] = new DataPoint [activitySet.size()];
-        Gson gson = new Gson();
-        ArrayList <RunDetails> allRuns = new ArrayList<RunDetails>();
-        for (String json : activitySet) {
-            RunDetails current = gson.fromJson(json, RunDetails.class);
-            allRuns.add(current);
-        }
-
-       for (int i = 0; i < dp.length; i++) {
-          dp[i] = new DataPoint(i, allRuns.get(i).getDistance());
-       }
-
-        barGraphSeries = new BarGraphSeries<>(dp);
-        graph.addSeries(barGraphSeries);
-    }
-
     private void updateGraph() {
         graph.removeAllSeries();
 
-        ArrayList <RunDetails> allRuns = new ArrayList<RunDetails>();
-        Gson gson = new Gson();
-
         HashMap<Integer, Double> monthDistanceMap = new HashMap<Integer, Double>();
         ArrayList <Integer> releventMonths = new ArrayList <Integer>();
-        for (String json : activitySet) {
-            RunDetails current = gson.fromJson(json, RunDetails.class);
-            allRuns.add(current);
+        for (CardioActivity current : allSportActivities.getActivities()) {
+
 
             int month = Integer.parseInt(current.getDate()[1]);
             if (monthDistanceMap.containsKey(month)){
@@ -307,5 +310,17 @@ public class MainMenu extends AppCompatActivity {
         graph.addSeries(barGraphSeries);
 
     }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        String choice = (parent.getItemAtPosition(position).toString());
+        Toaster.getInstance().showToast(choice+"");
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }
+
 

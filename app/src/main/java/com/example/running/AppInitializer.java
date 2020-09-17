@@ -9,6 +9,7 @@ public class AppInitializer extends Application {
     public void onCreate() {
         super.onCreate();
 
+        Utils.init(this);
         Toaster.init(this);
         MySP.init(this);
     }

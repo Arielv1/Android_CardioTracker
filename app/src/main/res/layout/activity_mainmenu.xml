@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainMenu">
+    tools:context=".Activity_Main_Menu">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -12,7 +12,7 @@
         >
 
         <LinearLayout
-            android:id="@+id/main_menu_LL_distance_stats"
+            android:id="@+id/main_menu_LAY_distance_stats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -35,10 +35,12 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:text="Total Distance: "
                 android:textSize="18sp"
                 />
+
+
 
             <TextView
                 android:id="@+id/main_menu_LBL_total_distance"
@@ -47,19 +49,50 @@
                 android:text="0"
                 android:textSize="18sp"
                 />
+
             <TextView
+                android:id="@+id/main_menu_LBL_km"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=" km"
                 android:textSize="18sp"
                 />
+
+            <TextView
+                android:id="@+id/main_menu_LBL_history"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/history_underline"
+                android:textSize="18sp"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/holo_blue_dark"
+                />
         </LinearLayout>
+
         <LinearLayout
-            android:id="@+id/main_menu_LL_pace_stats"
+            android:id="@+id/main_menu_LAY_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_below="@+id/main_menu_LL_distance_stats"
+            android:layout_below="@id/main_menu_LAY_distance_stats"
+            >
+
+            <Spinner
+                android:id="@+id/main_menu_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tooltipText="Activity Type"
+                />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/main_menu_LAY_pace_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@+id/main_menu_LAY_spinner"
             android:layout_marginTop="20dp"
             >
             <TextView
@@ -98,18 +131,18 @@
 
 
         <LinearLayout
-            android:id="@+id/main_menu_LL_activity_btns"
+            android:id="@+id/main_menu_LAY_activity_btns"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_below="@+id/main_menu_LL_pace_stats"
+            android:layout_below="@+id/main_menu_LAY_pace_stats"
             android:layout_marginTop="20dp"
             >
             <Button
                 android:id="@+id/main_menu_BTN_new_activity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/main_menu_LL_pace_stats"
+                android:layout_below="@+id/main_menu_LAY_pace_stats"
                 android:text="Start New Activity"
                 android:layout_weight="1"
                 />
@@ -118,8 +151,8 @@
                 android:id="@+id/main_menu_BTN_manual_activity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/main_menu_LL_pace_stats"
-                android:text="Manually Add Activity"
+                android:layout_below="@+id/main_menu_LAY_pace_stats"
+                android:text="ManuaLAYy Add Activity"
                 android:layout_weight="1"
                 />
 
@@ -130,7 +163,7 @@
             android:orientation="horizontal"
 
 
-            android:layout_toEndOf="@id/main_menu_LL_pace_stats"
+            android:layout_toEndOf="@id/main_menu_LAY_pace_stats"
             >
 
 
@@ -139,7 +172,7 @@
             android:id="@+id/main_menu_graph"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/main_menu_LL_activity_btns"
+            android:layout_below="@+id/main_menu_LAY_activity_btns"
             android:layout_marginTop="20dp"
             />
     </RelativeLayout>

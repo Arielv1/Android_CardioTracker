@@ -2,35 +2,22 @@ package com.example.running;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.ikovac.timepickerwithseconds.MyTimePickerDialog;
 
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
-public class Manual extends AppCompatActivity {
-
-    private MySP mySP;
-
+public class Activity_Add_Manually extends AppCompatActivity {
     private Button btnConfirm;
     private Button btnAdd;
     private Button btnCancel;
@@ -52,15 +39,16 @@ public class Manual extends AppCompatActivity {
     private TextView lblPaceKmh;
 
     private Double pace;
+    private Fragment_Radio_Buttons fragment_radio_buttons;
 
+    private String cardioActivityChoice;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_manual);
-
-        mySP = new MySP(this);
+        setContentView(R.layout.activity_addmanually);
 
         setUpViews();
+        setUpFragments();
 
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,9 +96,27 @@ public class Manual extends AppCompatActivity {
                             }
         });
 
+
+
+        /*fragment_radio_buttons.setActivityCallback(callback);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.manual_fragment_radio_group, fragment_radio_buttons);
+        transaction.commit();*/
+
+
+
     }
 
+    private void setUpFragments() {
+        fragment_radio_buttons = Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.manual_fragment_radio_group, false);
+    }
 
+    Callback_RadioChoice callback = new Callback_RadioChoice() {
+        @Override
+        public void setRadioButtonChoice(String choice) {
+            cardioActivityChoice = choice;
+        }
+    };
 
     private String[] splitEditTextByString(EditText et, String symbol){
         return et.getText().toString().split(symbol);
@@ -142,7 +148,7 @@ public class Manual extends AppCompatActivity {
         int month = calendar.get(Calendar.MONTH);
         int year = calendar.get(Calendar.YEAR);
         if (focus) {
-            datePickerDialog = new DatePickerDialog(Manual.this,
+            datePickerDialog = new DatePickerDialog(Activity_Add_Manually.this,
                     new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -196,9 +202,18 @@ public class Manual extends AppCompatActivity {
         return true;
     }
 
+    private boolean checkRadioBox(String message){
+        if (cardioActivityChoice == null){
+            Toaster.getInstance().showToast(message);
+            return false;
+        }
+        return true;
+    }
+
     private boolean verifyEdtFields() {
 
-        return checkEdtField(edtDate, "Date Field Is Empty") &&
+        return  checkRadioBox("Please Select An Activity Type")&&
+                checkEdtField(edtDate, "Date Field Is Empty") &&
                 checkEdtField(edtStartTime, "Start Time Field Is Empty") &&
                 checkEdtField(edtEndTime, "End Time Field Is Empty") &&
                 checkEdtField(edtDistance, "Distance Field Is Empty");
@@ -269,24 +284,25 @@ public class Manual extends AppCompatActivity {
 
     private void cancelManualActivity(){
         Gson gson = new Gson();
-        mySP.putString(Keys.NEW_RUN_DATA_PACKAGE, "");
+        MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
         finish();
     }
 
     private void sendNewRunData() {
-        RunDetails runDetails = new RunDetails(edtDate.getText().toString().split("/"),
+        CardioActivity cardioActivity = new CardioActivity(edtDate.getText().toString().split("/"),
                 lblActualDuration.getText().toString(),
                 Double.parseDouble(edtDistance.getText().toString()),
-                pace);
+                pace,
+                cardioActivityChoice);
 
         Gson gson = new Gson();
-        String json = gson.toJson(runDetails);
+        String json = gson.toJson(cardioActivity);
         Log.d("Gson", json);
 
-        RunDetails newRunDetails = gson.fromJson(json, RunDetails.class);
-        Log.d("Gson", newRunDetails.toString());
+        CardioActivity newCardioActivity = gson.fromJson(json, CardioActivity.class);
+        Log.d("Gson", newCardioActivity.toString());
 
-        mySP.putString(Keys.NEW_RUN_DATA_PACKAGE, json);
+        MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, json);
         finish();
     }
 
