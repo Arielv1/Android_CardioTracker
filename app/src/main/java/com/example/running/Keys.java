@@ -21,5 +21,7 @@ public interface Keys {
     public static final String DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE = "";
     public static final String DEFAULT_NEW_DATA_PACKAGE_VALUE = "";
 
+    public static final String SPINNER_CHOICE = "SPINNER_CHOICE";
+    public static final String DEFAULT_SPINNER_CHOICE_VALUE = Utils.Spinner_Values.ALL;
 
 }

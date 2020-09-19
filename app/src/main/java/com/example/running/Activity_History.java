@@ -4,12 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import com.google.android.material.button.MaterialButton;
-
 public class Activity_History extends AppCompatActivity {
 
-    private MaterialButton tabs_BTN_list;
-    private MaterialButton tabs_BTN_map;
+    /*private MaterialButton tabs_BTN_list;
+    private MaterialButton tabs_BTN_map;*/
 
     private String cardioActivityChoice;
 

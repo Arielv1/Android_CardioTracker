@@ -6,10 +6,10 @@
     <string name="history_underline"><u>History</u></string>
 
     <string-array name="cardio_activity_types">
+        <item>All</item>
         <item>Jogging</item>
         <item>Running</item>
         <item>Cycling</item>
-        <item>All</item>
     </string-array>
 
 </resources>

@@ -10,6 +10,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import java.util.ArrayList;
+
 public class Utils {
 
     private static Utils utils;
@@ -36,5 +38,51 @@ public class Utils {
         transaction.replace(replecedId, fragment);
         transaction.commit();
         return fragment;
+    }
+
+
+    interface Spinner_Values {
+        final int ALL_INDEX = 0;
+        final String ALL = "All";
+
+        final int JOGGING_INDEX = 1;
+        final String JOGGING = "Jogging";
+
+        final int RUNNING_INDEX = 2;
+        final String RUNNING = "Running";
+
+        final int CYCLING_INDEX = 3;
+        final String CYCLING = "Cycling";
+
+    }
+
+    public int getCardioActivityPositionIndexInSpinner(String cardioActivityName) {
+        if (cardioActivityName.equals(Spinner_Values.ALL)){
+            return Spinner_Values.ALL_INDEX;
+        }
+        else  if (cardioActivityName.equals(Spinner_Values.JOGGING)){
+            return Spinner_Values.JOGGING_INDEX;
+        }
+        else  if (cardioActivityName.equals(Spinner_Values.RUNNING)){
+            return Spinner_Values.RUNNING_INDEX;
+        }
+        return Spinner_Values.CYCLING_INDEX;
+    }
+
+    public ArrayList<CardioActivity> filterCardioActivitiesByType(ArrayList <CardioActivity> cardioActivityList, String activityType){
+        ArrayList <CardioActivity> filteredList = new ArrayList<CardioActivity>();
+
+        if (activityType.equals(Spinner_Values.ALL)){
+            return cardioActivityList;
+        }
+        else {
+            for (CardioActivity cardioActivity : cardioActivityList) {
+                if (cardioActivity.getCardioActivityType().equals(activityType)){
+                    filteredList.add(cardioActivity);
+                }
+            }
+        }
+
+        return filteredList;
     }
 }

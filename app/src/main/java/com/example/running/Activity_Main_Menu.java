@@ -21,11 +21,12 @@ import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.security.Key;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Activity_Main_Menu extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class Activity_Main_Menu extends AppCompatActivity{
 
     private GraphView graph;
     private Button btnNewActivity;
@@ -49,7 +50,7 @@ public class Activity_Main_Menu extends AppCompatActivity implements AdapterView
     private DecimalFormat df = new DecimalFormat("###.##");
 
     private Spinner spinner;
-    private CardioType spinnerChoice;
+    private String spinnerChoice;
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -85,18 +86,11 @@ public class Activity_Main_Menu extends AppCompatActivity implements AdapterView
         Gson gson = new Gson();
         CardioActivity cardioActivity = gson.fromJson(MySP.getInstance().getString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE), CardioActivity.class);
 
-        allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
+       // allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
 
         if(cardioActivity != null) {
-
-            updateNumRuns();
-
-            updateTotalDistance(cardioActivity.getDistance());
-
-            updatePace(cardioActivity.getPace());
-
             addNewRunToLog(cardioActivity);
-
+            updateAllTextViewsAtributes();
         }
         else {
 
@@ -144,23 +138,17 @@ public class Activity_Main_Menu extends AppCompatActivity implements AdapterView
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mainmenu);
 
-
         // Makes sure that the last packages isn't repeatedly read after receiving data other activities
         MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
 
         setUpViews();
-
-        numRuns = MySP.getInstance().getInteger(Keys.NUM_OF_RUNS, Keys.DEFAULT_INT_VALUE);
-        totalDistance = MySP.getInstance().getDouble(Keys.TOTAL_DISTANCE, Keys.DEFAULT_DOUBLE_VALUE);
-        totalPace = MySP.getInstance().getDouble(Keys.TOTAL_PACE, Keys.DEFAULT_DOUBLE_VALUE);
-        avgPace = MySP.getInstance().getDouble(Keys.AVERAGE_PACE, Keys.DEFAULT_DOUBLE_VALUE);
-
+        initializeTextViewsAndVariables();
+        setUpSpinner();
 
         btnNewActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), Activity_New_Record.class));
-
             }
         });
 
@@ -168,7 +156,6 @@ public class Activity_Main_Menu extends AppCompatActivity implements AdapterView
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), Activity_Add_Manually.class));
-
             }
         });
 
@@ -187,14 +174,42 @@ public class Activity_Main_Menu extends AppCompatActivity implements AdapterView
             }
         });
 
+
+
+    }
+
+    private void setUpSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.cardio_activity_types, android.R.layout.simple_spinner_item);
-
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                spinnerChoice = (parent.getItemAtPosition(position).toString());
+                Toaster.getInstance().showToast(spinnerChoice+"");
 
-        spinner.setOnItemSelectedListener (this);
+                if (allSportActivities != null) {
+                    updateAllTextViewsAtributes();
+                    updateGraph();
+                }
 
+                MySP.getInstance().putString(Keys.SPINNER_CHOICE, spinnerChoice);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+        spinner.setSelection(Utils.getInstance().getCardioActivityPositionIndexInSpinner(spinnerChoice));
+    }
+
+    private void initializeTextViewsAndVariables() {
+
+        Gson gson = new Gson();
+        allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
+        numRuns = MySP.getInstance().getInteger(Keys.NUM_OF_RUNS, Keys.DEFAULT_INT_VALUE);
+        totalDistance = MySP.getInstance().getDouble(Keys.TOTAL_DISTANCE, Keys.DEFAULT_DOUBLE_VALUE);
+        totalPace = MySP.getInstance().getDouble(Keys.TOTAL_PACE, Keys.DEFAULT_DOUBLE_VALUE);
+        avgPace = MySP.getInstance().getDouble(Keys.AVERAGE_PACE, Keys.DEFAULT_DOUBLE_VALUE);
+        spinnerChoice = MySP.getInstance().getString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
     }
 
     private void reset() {
@@ -203,17 +218,24 @@ public class Activity_Main_Menu extends AppCompatActivity implements AdapterView
         totalPace = Keys.DEFAULT_DOUBLE_VALUE;
         totalDistance = Keys.DEFAULT_DOUBLE_VALUE;
         avgPace = Keys.DEFAULT_DOUBLE_VALUE;
-      //  allSportActivities = new AllSportActivities();
+        allSportActivities  = new AllSportActivities();
+
+        spinnerChoice = Keys.DEFAULT_SPINNER_CHOICE_VALUE;
+        spinner.setSelection(0);
 
         updateTextView(lblTotalDistance, Keys.LABEL_DEFAULT_VALUE);
         updateTextView(lblNumRuns, Keys.LABEL_DEFAULT_VALUE);
         updateTextView(lblAvgPace, Keys.LABEL_DEFAULT_VALUE);
+
 
         MySP.getInstance().putInteger(Keys.NUM_OF_RUNS, Keys.DEFAULT_INT_VALUE);
         MySP.getInstance().putDouble(Keys.AVERAGE_PACE, Keys.DEFAULT_DOUBLE_VALUE);
         MySP.getInstance().putDouble(Keys.TOTAL_PACE, Keys.DEFAULT_DOUBLE_VALUE);
         MySP.getInstance().putDouble(Keys.TOTAL_DISTANCE, Keys.DEFAULT_DOUBLE_VALUE);
         MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE);
+        MySP.getInstance().putString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
+
+
     }
 
     private void setUpViews() {
@@ -229,24 +251,48 @@ public class Activity_Main_Menu extends AppCompatActivity implements AdapterView
     }
 
     private void updateNumRuns() {
-        numRuns++;
-        updateTextView(lblNumRuns, numRuns.toString());
+
+        ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();
+        updateTextView(lblNumRuns, releventActivities.size()+"");
         MySP.getInstance().putInteger(Keys.NUM_OF_RUNS, numRuns);
+
     }
 
-    private void updateTotalDistance(double distance) {
-        totalDistance += distance;
+    private void updateTotalDistance() {
+        totalDistance = 0.0;
+        ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();
+
+        for (CardioActivity cardioActivity :releventActivities) {
+            totalDistance += cardioActivity.getDistance();
+        }
+
         updateTextView(lblTotalDistance, df.format(totalDistance));
         MySP.getInstance().putDouble(Keys.TOTAL_DISTANCE, totalDistance);
     }
 
-    private void updatePace(double pace) {
-        totalPace += pace;
-        avgPace = totalPace / numRuns;
+    private void updatePace() {
+        totalPace = 0.0;
+        ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();
+        for (CardioActivity cardioActivity :releventActivities) {
+            totalPace += cardioActivity.getPace();
+        }
+
+        if (releventActivities.size() != 0) {
+            avgPace = totalPace/releventActivities.size();
+        }
+        else {
+            avgPace = 0.0;
+        }
         updateTextView(lblAvgPace, df.format (avgPace));
         MySP.getInstance().putDouble(Keys.TOTAL_PACE, totalPace);
         MySP.getInstance().putDouble(Keys.AVERAGE_PACE, avgPace);
 
+    }
+
+    private void updateAllTextViewsAtributes() {
+        updateNumRuns();
+        updatePace();
+        updateTotalDistance();
     }
 
     private void addNewRunToLog(CardioActivity cardioActivity) {
@@ -277,8 +323,8 @@ public class Activity_Main_Menu extends AppCompatActivity implements AdapterView
 
         HashMap<Integer, Double> monthDistanceMap = new HashMap<Integer, Double>();
         ArrayList <Integer> releventMonths = new ArrayList <Integer>();
-        for (CardioActivity current : allSportActivities.getActivities()) {
-
+        ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();
+        for (CardioActivity current : releventActivities) {
 
             int month = Integer.parseInt(current.getDate()[1]);
             if (monthDistanceMap.containsKey(month)){
@@ -311,16 +357,11 @@ public class Activity_Main_Menu extends AppCompatActivity implements AdapterView
 
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        String choice = (parent.getItemAtPosition(position).toString());
-        Toaster.getInstance().showToast(choice+"");
+    private ArrayList <CardioActivity> getCardioActivitiesBySpinnerChoice() {
+        return Utils.getInstance().filterCardioActivitiesByType(allSportActivities.getActivities(), spinnerChoice);
     }
 
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
 
-    }
 }
 
 
