@@ -1,10 +1,5 @@
 package com.example.running;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
 public interface Keys {
 
     public static final String NEW_DATA_PACKAGE = "NEW_RUN_DATA_PACKAGE";
@@ -22,6 +17,12 @@ public interface Keys {
     public static final String DEFAULT_NEW_DATA_PACKAGE_VALUE = "";
 
     public static final String SPINNER_CHOICE = "SPINNER_CHOICE";
-    public static final String DEFAULT_SPINNER_CHOICE_VALUE = Utils.Spinner_Values.ALL;
+    public static final String DEFAULT_SPINNER_CHOICE_VALUE = Utils.CardioActivityTypes.ALL;
 
+    public static String RADIO_HISTORY_CHOICE = "";
+    public static String RADIO_MANUAL_CHOICE = "";
+    public static String RADIO_NEW_RECORD_CHOICE = "";
+    public static String DEFAULT_RADIO_BUTTONS_HISTORY_VALUE = Utils.CardioActivityTypes.ALL;
+
+    public static final String HISTORY_VIEW_CHOICE = "HISTORY_VIEW_CHOICE";
 }

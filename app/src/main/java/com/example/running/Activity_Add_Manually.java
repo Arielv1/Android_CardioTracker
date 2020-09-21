@@ -42,6 +42,8 @@ public class Activity_Add_Manually extends AppCompatActivity {
     private Fragment_Radio_Buttons fragment_radio_buttons;
 
     private String cardioActivityChoice;
+    private int lastRadioChoiceIndex = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,17 +97,7 @@ public class Activity_Add_Manually extends AppCompatActivity {
                 enterTimeHandler(view, focus);
                             }
         });
-
-
-
-        /*fragment_radio_buttons.setActivityCallback(callback);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.manual_fragment_radio_group, fragment_radio_buttons);
-        transaction.commit();*/
-
-
-
-    }
+ }
 
     private void setUpFragments() {
         fragment_radio_buttons = Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.manual_fragment_radio_group, false);
@@ -113,8 +105,8 @@ public class Activity_Add_Manually extends AppCompatActivity {
 
     Callback_RadioChoice callback = new Callback_RadioChoice() {
         @Override
-        public void setRadioButtonChoice(String choice) {
-            cardioActivityChoice = choice;
+        public void setRadioButtonChoice(String radioChoiceValue) {
+            cardioActivityChoice = radioChoiceValue;
         }
     };
 

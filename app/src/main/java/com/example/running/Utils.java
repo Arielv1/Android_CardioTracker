@@ -1,13 +1,8 @@
 package com.example.running;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.widget.Toast;
 
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
@@ -40,39 +35,51 @@ public class Utils {
         return fragment;
     }
 
-
-    interface Spinner_Values {
-        final int ALL_INDEX = 0;
+    interface CardioActivityTypes {
         final String ALL = "All";
-
-        final int JOGGING_INDEX = 1;
         final String JOGGING = "Jogging";
-
-        final int RUNNING_INDEX = 2;
         final String RUNNING = "Running";
-
-        final int CYCLING_INDEX = 3;
         final String CYCLING = "Cycling";
+    }
+
+    interface SpinnerValues {
+        final int ALL_INDEX = 0;
+        final int JOGGING_INDEX = 1;
+        final int RUNNING_INDEX = 2;
+        final int CYCLING_INDEX = 3;
+
 
     }
 
+    interface RadioButtonValues {
+        final int JOGGING_INDEX = 0;
+        final int RUNNING_INDEX = 1;
+        final int CYCLING_INDEX = 2;
+        final int ALL_INDEX = 3;
+    }
+
+    interface ViewTypeOptions {
+        final int LIST = 0;
+        final int CARD = 1;
+    }
+
     public int getCardioActivityPositionIndexInSpinner(String cardioActivityName) {
-        if (cardioActivityName.equals(Spinner_Values.ALL)){
-            return Spinner_Values.ALL_INDEX;
+        if (cardioActivityName.equals(CardioActivityTypes.ALL)){
+            return SpinnerValues.ALL_INDEX;
         }
-        else  if (cardioActivityName.equals(Spinner_Values.JOGGING)){
-            return Spinner_Values.JOGGING_INDEX;
+        else  if (cardioActivityName.equals(CardioActivityTypes.JOGGING)){
+            return SpinnerValues.JOGGING_INDEX;
         }
-        else  if (cardioActivityName.equals(Spinner_Values.RUNNING)){
-            return Spinner_Values.RUNNING_INDEX;
+        else  if (cardioActivityName.equals(CardioActivityTypes.RUNNING)){
+            return SpinnerValues.RUNNING_INDEX;
         }
-        return Spinner_Values.CYCLING_INDEX;
+        return SpinnerValues.CYCLING_INDEX;
     }
 
     public ArrayList<CardioActivity> filterCardioActivitiesByType(ArrayList <CardioActivity> cardioActivityList, String activityType){
         ArrayList <CardioActivity> filteredList = new ArrayList<CardioActivity>();
 
-        if (activityType.equals(Spinner_Values.ALL)){
+        if (activityType.equals(CardioActivityTypes.ALL)){
             return cardioActivityList;
         }
         else {

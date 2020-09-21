@@ -8,14 +8,14 @@
     >
 
    <androidx.recyclerview.widget.RecyclerView
-       android:id="@+id/detailed_log_recyclerview"
+       android:id="@+id/detailed_log_recyclerview_list"
        android:name="com.example.running.ItemFragment"
        android:layout_width="match_parent"
        android:layout_height="match_parent"
        android:layout_marginLeft="16dp"
        android:layout_marginRight="16dp"
        app:layoutManager="LinearLayoutManager"
-       tools:listitem="@layout/fragment_detailed_log_list_item"
+       tools:listitem="@layout/fragment_history_list_item"
        android:scrollbars="vertical"
        android:fadeScrollbars="false"
        />

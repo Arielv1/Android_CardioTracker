@@ -19,6 +19,7 @@ public class Fragment_Radio_Buttons extends Fragment {
     private RadioButton radioAll;
 
     private boolean needAllRadioButton;
+
     private String choice;
 
     private Callback_RadioChoice callback_radioChoice;
@@ -28,7 +29,6 @@ public class Fragment_Radio_Buttons extends Fragment {
     }
 
     public static Fragment_Radio_Buttons newInstance(boolean needAllRadioButton) {
-
         return new Fragment_Radio_Buttons(needAllRadioButton);
     }
 
@@ -50,36 +50,64 @@ public class Fragment_Radio_Buttons extends Fragment {
 
         setUpViewsInFragment(view);
 
-        radioJogging.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                radioHandler("Jogging");
-            }
-        });
-        radioRunning.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                radioHandler("Running");
-            }
-        });
-        radioCycling.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                radioHandler("Cycling");
-            }
-        });
-
         if (!needAllRadioButton) {
             radioAll.setVisibility(View.INVISIBLE);
             ViewGroup layout = (ViewGroup) radioAll.getParent();
         }
 
+        radioJogging.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                radioHandler(Utils.CardioActivityTypes.JOGGING);
+            }
+        });
+        radioRunning.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                radioHandler(Utils.CardioActivityTypes.RUNNING);
+            }
+        });
+        radioCycling.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                radioHandler(Utils.CardioActivityTypes.CYCLING);
+            }
+        });
+
+        radioAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                radioHandler(Utils.CardioActivityTypes.ALL);
+            }
+        });
+
+        setLastPressedRadioButton();
+
         return view;
     }
 
-    private void radioHandler(String radioValue) {
+    private void setLastPressedRadioButton() {
+        String lastChoice = MySP.getInstance().getString(Keys.RADIO_HISTORY_CHOICE, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
+
+        if(lastChoice.equals(Utils.CardioActivityTypes.ALL)){
+            radioAll.performClick();
+        }
+        else if(lastChoice.equals(Utils.CardioActivityTypes.JOGGING)){
+            radioJogging.performClick();
+        }
+        else if(lastChoice.equals(Utils.CardioActivityTypes.RUNNING)){
+            radioRunning.performClick();
+        }
+        else {
+            radioCycling.performClick();
+        }
+
+
+    }
+
+    private void radioHandler(String radioChoiceValue) {
         if (callback_radioChoice != null) {
-            callback_radioChoice.setRadioButtonChoice(radioValue);
+            callback_radioChoice.setRadioButtonChoice(radioChoiceValue);
         }
     }
 

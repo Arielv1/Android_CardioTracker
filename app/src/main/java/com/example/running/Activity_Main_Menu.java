@@ -90,7 +90,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
         if(cardioActivity != null) {
             addNewRunToLog(cardioActivity);
-            updateAllTextViewsAtributes();
         }
         else {
 
@@ -101,6 +100,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
         }
 
         if (allSportActivities != null) {
+            updateAllTextViewsAtributes();
             updateGraph();
         }
         else {
@@ -118,6 +118,8 @@ public class Activity_Main_Menu extends AppCompatActivity{
         Log.d("ViewLogger", "MainMenu - onStop Invoked");
         super.onStop();
         MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
+        MySP.getInstance().putString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
+
     }
 
     @Override
@@ -235,7 +237,10 @@ public class Activity_Main_Menu extends AppCompatActivity{
         MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE);
         MySP.getInstance().putString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
 
-
+        /*
+        TODO - move this to history
+         */
+        MySP.getInstance().putString(Keys.RADIO_HISTORY_CHOICE, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
     }
 
     private void setUpViews() {

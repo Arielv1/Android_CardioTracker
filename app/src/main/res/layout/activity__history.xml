@@ -21,7 +21,7 @@
             />
 
         <FrameLayout
-            android:id="@+id/tabs_LAY_content"
+            android:id="@+id/history_LAY_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="8"
@@ -33,7 +33,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/tabs_BTN_list"
+                android:id="@+id/history_BTN_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="2dp"
@@ -41,7 +41,7 @@
                 android:text="List" />
 
             <Button
-                android:id="@+id/tabs_BTN_map"
+                android:id="@+id/history_BTN_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="2dp"

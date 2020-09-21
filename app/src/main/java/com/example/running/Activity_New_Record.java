@@ -27,6 +27,8 @@ public class Activity_New_Record extends AppCompatActivity {
     private long savedState;
     private String cardioActivityChoice;
 
+    private int lastRadioChoiceIndex = 0;
+
     @Override
    protected void onSaveInstanceState(@NonNull Bundle outState) {
        super.onSaveInstanceState(outState);
@@ -174,15 +176,14 @@ public class Activity_New_Record extends AppCompatActivity {
     }
 
     private void setUpFragments() {
-
         Fragment_Radio_Buttons fragment_radio_buttons = Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.new_run_LAY_radio_buttons, false);
 
     }
 
     Callback_RadioChoice callback = new Callback_RadioChoice() {
         @Override
-        public void setRadioButtonChoice(String choice) {
-            cardioActivityChoice = choice;
+        public void setRadioButtonChoice(String radioChoiceValue) {
+            cardioActivityChoice = radioChoiceValue;
 
         }
     };

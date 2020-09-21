@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Running</string>
-    <string name="reset_underline"><u>reset</u>
-    </string>
+    <string name="reset_underline"><u>reset</u></string>
+    <string name="edit_underline"><u>edit</u></string>
+    <string name="delete_underline"><u>delete</u></string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="history_underline"><u>History</u></string>
 

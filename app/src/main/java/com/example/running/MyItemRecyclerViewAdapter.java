@@ -21,14 +21,13 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_detailed_log_list_item, parent, false);
+                .inflate(R.layout.fragment_history_list_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         CardioActivity cardioActivity = mValues.get(position);
-        Log.d("HistoryLogged", "In Adapter " + Arrays.toString(cardioActivity.getDate()));
         holder.mDate.setText(Arrays.toString(cardioActivity.getDate()));
         holder.mTimeCreated.setText(cardioActivity.getCreatedTimestamp()+"");
     }
