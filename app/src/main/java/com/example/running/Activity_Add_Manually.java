@@ -15,11 +15,13 @@ import com.google.gson.Gson;
 import com.ikovac.timepickerwithseconds.MyTimePickerDialog;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 
 public class Activity_Add_Manually extends AppCompatActivity {
-    private Button btnConfirm;
-    private Button btnAdd;
+
+    private Button btnAddSave;
     private Button btnCancel;
 
     private EditText edtDistance;
@@ -33,17 +35,14 @@ public class Activity_Add_Manually extends AppCompatActivity {
     private MyTimePickerDialog timePickerDialog;
 
     private TextView lblDuration;
-    private TextView lblActualDuration;
     private TextView lblPace;
-    private TextView lblActualPace;
-    private TextView lblPaceKmh;
 
-    private Double pace;
     private Fragment_Radio_Buttons fragment_radio_buttons;
-
+    private double distance;
     private String cardioActivityChoice;
-    private int lastRadioChoiceIndex = 0;
 
+    private boolean calledFromHistory = false;
+    private CardioActivity theCurrentActivity;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,16 +50,13 @@ public class Activity_Add_Manually extends AppCompatActivity {
 
         setUpViews();
         setUpFragments();
+        theCurrentActivity = (CardioActivity)getIntent().getParcelableExtra(Keys.NEW_DATA_PACKAGE);
 
-        btnConfirm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (verifyEdtFields()){
-                    showActualPaceDistance();
-                    btnAdd.setVisibility(View.VISIBLE);
-                }
-            }
-        });
+        if (theCurrentActivity != null) {
+            displayCardioActivityInFields(theCurrentActivity);
+            btnAddSave.setText("Save");
+            calledFromHistory = true;
+        }
 
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,10 +65,12 @@ public class Activity_Add_Manually extends AppCompatActivity {
             }
         });
 
-        btnAdd.setOnClickListener(new View.OnClickListener() {
+        btnAddSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendNewRunData();
+                if (verifyEdtFields()) {
+                    sendNewRunData();
+                }
             }
         });
 
@@ -87,26 +85,60 @@ public class Activity_Add_Manually extends AppCompatActivity {
             @Override
             public void onFocusChange(View view, boolean focus) {
                 enterTimeHandler(view, focus);
+
                            }
         });
-
 
         edtEndTime.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean focus) {
                 enterTimeHandler(view, focus);
-                            }
+            }
+        });
+
+        edtDistance.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                setLblPace();
+            }
         });
  }
 
+    private void displayCardioActivityInFields(CardioActivity cardioActivity) {
+
+        String dText = "";
+        for (String str : cardioActivity.getDate()) {
+            dText += str +"/";
+        }
+        dText = dText.substring(0, dText.length()-1);
+        edtDate.setText(dText);
+        edtDistance.setText(cardioActivity.getDistance() + "");
+        edtStartTime.setText(cardioActivity.getTimeStart());
+        edtEndTime.setText(cardioActivity.getTimeEnd());
+        lblPace.setText(cardioActivity.getPace() + "");
+        lblDuration.setText(cardioActivity.getDuration());
+        cardioActivityChoice = cardioActivity.getCardioActivityType();
+    }
+
+    private void setLblPace() {
+        if (edtDistance.getText().length()!=0 && edtStartTime.getText().length()!=0 && edtEndTime.getText().length()!=0) {
+            DecimalFormat df = new DecimalFormat("###.##");
+            double distance = Double.parseDouble(edtDistance.getText().toString());
+            double pace = (distance/( (double)calculateDuration()/3600)) ;
+            lblPace.setText(df.format(pace% 100));
+        }
+    }
+
     private void setUpFragments() {
         fragment_radio_buttons = Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.manual_fragment_radio_group, false);
+
     }
 
     Callback_RadioChoice callback = new Callback_RadioChoice() {
         @Override
         public void setRadioButtonChoice(String radioChoiceValue) {
             cardioActivityChoice = radioChoiceValue;
+            Toaster.getInstance().showToast(cardioActivityChoice);
         }
     };
 
@@ -117,20 +149,15 @@ public class Activity_Add_Manually extends AppCompatActivity {
 
     private void setUpViews() {
 
-        btnConfirm = findViewById(R.id.manual_BTN_confirm);
         btnCancel = findViewById(R.id.manual_BTN_cancel);
-        btnAdd = findViewById(R.id.manual_BTN_add);
+        btnAddSave = findViewById(R.id.manual_BTN_addsave_button);
         edtDistance = findViewById(R.id.manual_EDT_distance);
         edtStartTime = findViewById(R.id.manual_EDT_start_time);
         edtEndTime = findViewById(R.id.manual_EDT_end_time);
         edtDate = findViewById(R.id.manual_EDT_date);
         calendar = Calendar.getInstance();
         lblDuration = findViewById(R.id.manual_LBL_duration);
-        lblActualDuration = findViewById(R.id.manual_LBL_actual_duration);
         lblPace = findViewById(R.id.manual_LBL_pace);
-        lblActualPace = findViewById(R.id.manual_LBL_actual_pace);
-        lblPaceKmh = findViewById(R.id.manual_LBL_pace_kmh);
-
     }
 
 
@@ -164,10 +191,11 @@ public class Activity_Add_Manually extends AppCompatActivity {
         if (focus) {
             // time picker dialog
             timePickerDialog = new MyTimePickerDialog(this, new MyTimePickerDialog.OnTimeSetListener() {
-
                 @Override
                 public void onTimeSet(com.ikovac.timepickerwithseconds.TimePicker view, int hourOfDay, int minute, int seconds) {
                     edt.setText(hourOfDay + ":" + minute + ":" + seconds);
+                    updateLblDuration();
+                    setLblPace();
                 }
 
             },hour, minutes, seconds, true);
@@ -175,15 +203,10 @@ public class Activity_Add_Manually extends AppCompatActivity {
         }
         else {
             timePickerDialog.hide();
+
         }
 
-        if (lblPace.getVisibility() == View.VISIBLE){
-            showActualPaceDistance();
-        }
-    }
 
-    private boolean verifyEdtField(EditText edt){
-        return edtDate.getText().toString().trim().length() == 0;
     }
 
     private boolean checkEdtField(EditText editText, String message) {
@@ -195,7 +218,7 @@ public class Activity_Add_Manually extends AppCompatActivity {
     }
 
     private boolean checkRadioBox(String message){
-        if (cardioActivityChoice == null){
+        if (cardioActivityChoice == null || cardioActivityChoice == Utils.CardioActivityTypes.ALL) {
             Toaster.getInstance().showToast(message);
             return false;
         }
@@ -212,43 +235,20 @@ public class Activity_Add_Manually extends AppCompatActivity {
 
     }
 
-    public void showActualPaceDistance(){
-        if (!verifyEdtField(edtDate) && !verifyEdtField(edtStartTime) && !verifyEdtField(edtEndTime) && !verifyEdtField(edtDistance)){
 
-            lblDuration.setVisibility(View.VISIBLE);
-            lblPace.setVisibility(View.VISIBLE);
-
-            String[] startTime =  splitEditTextByString(edtStartTime,":");
-            String[] endTime = splitEditTextByString(edtEndTime, ":");
-            double distance = Double.parseDouble(edtDistance.getText().toString());
-
-
-            lblActualDuration.setVisibility(View.VISIBLE);
-
-            Long duration = getDuration(startTime, endTime, distance);
-            setLblDuration(distance, duration);
-
-
-            DecimalFormat df = new DecimalFormat("###.##");
-
-            lblActualPace.setVisibility(View.VISIBLE);
-            lblPaceKmh.setVisibility(View.VISIBLE);
-            lblActualPace.setText(df.format(pace% 100));
-        }
-    }
-
-    private Long getDuration(String[] startTime, String[] endTime, double distance) {
+    private Long calculateDuration() {
+        String[] startTime =  splitEditTextByString(edtStartTime,":");
+        String[] endTime = splitEditTextByString(edtEndTime, ":");
         Long end = 3600 * Long.parseLong(endTime[0]) + 60 * Long.parseLong(endTime[1]) +  Long.parseLong(endTime[2]);
         Long start = 3600 * Long.parseLong(startTime[0]) + 60 * Long.parseLong(startTime[1]) + Long.parseLong(startTime[2]);
         return end - start;
     }
 
-    private void setLblDuration(double distance, long duration) {
+    private void setLblDuration(long duration) {
         Long hours, minutes, seconds;
         hours = duration / 3600;
         minutes = (duration / 60) % 60;
         seconds = (duration % 60);
-        pace = (distance/( (double)duration/3600)) ;
 
         String sSeconds = "", sMinutes, sHours;
         if (seconds < 10) {
@@ -267,33 +267,55 @@ public class Activity_Add_Manually extends AppCompatActivity {
         }
 
         if(hours == 0) {
-            lblActualDuration.setText(sMinutes +":" + sSeconds);
+            lblDuration.setText(sMinutes +":" + sSeconds);
         }
         else {
-            lblActualDuration.setText(hours+ ":" + sMinutes +":" + sSeconds);
+            lblDuration.setText(hours+ ":" + sMinutes +":" + sSeconds);
         }
     }
 
+    private void updateLblDuration() {
+        if (edtStartTime.getText().length() != 0 && edtEndTime.getText().length() != 0){
+            setLblDuration(calculateDuration());
+        }
+
+    }
+
     private void cancelManualActivity(){
-        Gson gson = new Gson();
         MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
         finish();
     }
 
     private void sendNewRunData() {
-        CardioActivity cardioActivity = new CardioActivity(edtDate.getText().toString().split("/"),
-                lblActualDuration.getText().toString(),
-                Double.parseDouble(edtDistance.getText().toString()),
-                pace,
-                cardioActivityChoice);
+        setLblPace();
+        String sTime = edtStartTime.getText().toString();
+        String eTime = edtEndTime.getText().toString();
+
+        if (calledFromHistory) {
+            theCurrentActivity.setDate(edtDate.getText().toString().split("/"));
+            theCurrentActivity.setDuration(lblDuration.getText().toString());
+            theCurrentActivity.setDistance(Double.parseDouble(edtDistance.getText().toString()));
+            theCurrentActivity.setPace(Double.parseDouble(lblPace.getText().toString()));
+            theCurrentActivity.setTimeStart(sTime);
+            theCurrentActivity.setTimeEnd(eTime);
+        }
+        else{
+             theCurrentActivity = new CardioActivity(edtDate.getText().toString().split("/"),
+                    lblDuration.getText().toString(),
+                    Double.parseDouble(edtDistance.getText().toString()),
+                    Double.parseDouble(lblPace.getText().toString()),
+                    new Date().getTime(),
+                    cardioActivityChoice,
+                    sTime,
+                    eTime);
+        }
+
+
+        Log.d("Manual", "Pakcage " + theCurrentActivity);
 
         Gson gson = new Gson();
-        String json = gson.toJson(cardioActivity);
-        Log.d("Gson", json);
-
-        CardioActivity newCardioActivity = gson.fromJson(json, CardioActivity.class);
-        Log.d("Gson", newCardioActivity.toString());
-
+        String json = gson.toJson(theCurrentActivity);
+   ;
         MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, json);
         finish();
     }
