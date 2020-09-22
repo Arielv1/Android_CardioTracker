@@ -48,17 +48,9 @@ public class Utils {
         final int RUNNING_INDEX = 2;
         final int CYCLING_INDEX = 3;
 
-
     }
 
-    interface RadioButtonValues {
-        final int JOGGING_INDEX = 0;
-        final int RUNNING_INDEX = 1;
-        final int CYCLING_INDEX = 2;
-        final int ALL_INDEX = 3;
-    }
-
-    interface ViewTypeOptions {
+    interface AdapterViewOptions {
         final int LIST = 0;
         final int CARD = 1;
     }

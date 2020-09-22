@@ -20,9 +20,8 @@ public interface Keys {
     public static final String DEFAULT_SPINNER_CHOICE_VALUE = Utils.CardioActivityTypes.ALL;
 
     public static String RADIO_HISTORY_CHOICE = "";
-    public static String RADIO_MANUAL_CHOICE = "";
-    public static String RADIO_NEW_RECORD_CHOICE = "";
     public static String DEFAULT_RADIO_BUTTONS_HISTORY_VALUE = Utils.CardioActivityTypes.ALL;
 
-    public static final String HISTORY_VIEW_CHOICE = "HISTORY_VIEW_CHOICE";
+    public static String HISTORY_VIEW_OPTION = "HISTORY_VIEW_OPTION";
+    public static int DEFAULT_HISTORY_VIEW_OPTION_VALUE = Utils.AdapterViewOptions.LIST;
 }
