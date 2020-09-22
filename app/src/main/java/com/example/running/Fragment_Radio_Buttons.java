@@ -108,6 +108,7 @@ public class Fragment_Radio_Buttons extends Fragment {
     private void radioHandler(String radioChoiceValue) {
         if (callback_radioChoice != null) {
             callback_radioChoice.setRadioButtonChoice(radioChoiceValue);
+
         }
     }
 

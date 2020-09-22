@@ -6,10 +6,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
 
 public class Activity_History extends AppCompatActivity {
 
@@ -31,6 +34,45 @@ public class Activity_History extends AppCompatActivity {
     private RecyclerView history_LAY_recyclerview;
     private int lastDisplayChoice;
     private AllSportActivities allSportActivities;
+
+    @Override
+    protected void onStop() {
+        Log.d("ViewLogger", "History - onStop Invoked");
+
+        super.onStop();
+        MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("ViewLogger", "History - onDestroy Invoked");
+
+        super.onDestroy();
+        MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
+    }
+
+    @Override
+    protected void onStart() {
+        Log.d("ViewLogger", "History - onStart Invoked");
+        super.onStart();
+
+        Gson gson = new Gson();
+        CardioActivity cardioActivity = gson.fromJson(MySP.getInstance().getString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE), CardioActivity.class);
+
+        if (cardioActivity != null) {
+            ArrayList<CardioActivity> activities = allSportActivities.getActivities();
+            for (CardioActivity current : allSportActivities.getActivities()) {
+                if (current.getId().equals(cardioActivity.getId())) {
+                    activities.remove(current);
+                    break;
+                }
+            }
+            activities.add(cardioActivity);
+            listCardAdapter.notifyDataSetChanged();
+            MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,14 +80,21 @@ public class Activity_History extends AppCompatActivity {
         lastChoice =  MySP.getInstance().getString(Keys.RADIO_HISTORY_CHOICE, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
         setUpViews();
 
-        //setUpFragments();
-        Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.history_LAY_radio_buttons, true);
+        setUpFragments();
+
 
         lastDisplayChoice = MySP.getInstance().getInteger(Keys.HISTORY_VIEW_OPTION, Keys.DEFAULT_HISTORY_VIEW_OPTION_VALUE);
 
         Gson gson = new Gson();
         allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
-        listCardAdapter = new ListCardAdapter(allSportActivities.getActivities(),  lastDisplayChoice, Activity_History.this);
+
+       try {
+           listCardAdapter = new ListCardAdapter(allSportActivities.getActivities(),  lastDisplayChoice, Activity_History.this);
+       }
+       catch (Exception e) {
+           listCardAdapter = new ListCardAdapter(new ArrayList<CardioActivity>(),  lastDisplayChoice, Activity_History.this);
+       }
+
         history_LAY_recyclerview.setHasFixedSize(true);
 
         adapterHandler(lastDisplayChoice);
@@ -82,8 +131,6 @@ public class Activity_History extends AppCompatActivity {
 
     };
     private void setUpViews() {
-       /* history_BTN_list = findViewById(R.id.history_BTN_list);
-        history_BTN_card = findViewById(R.id.history_BTN_card);*/
         btnList = findViewById(R.id.history_BTN_list);
         btnCard = findViewById(R.id.history_BTN_card);
         history_LAY_recyclerview = findViewById(R.id.history_LAY_recyclerview);
@@ -91,7 +138,6 @@ public class Activity_History extends AppCompatActivity {
 
     private void setUpFragments() {
         Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.history_LAY_radio_buttons, true);
-        setUpCardioActivityHistoryList();
     }
 
     private void setUpCardioActivityHistoryList() {

@@ -137,6 +137,32 @@
                android:layout_width="0dp"
                android:layout_height="0dp"
                android:layout_weight="20" />
+
+           <TextView
+               android:id="@+id/history_list_LBL_edit"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="@string/edit_underline"
+               android:textSize="18sp"
+               android:layout_weight="2"
+               />
+
+           <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="/"
+               android:textSize="18sp"
+               android:layout_weight="1"
+               />
+
+           <TextView
+               android:id="@+id/history_list_LBL_delete"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="@string/delete_underline"
+               android:textSize="18sp"
+               android:layout_weight="2"
+               />
         </LinearLayout>
 
      </LinearLayout>

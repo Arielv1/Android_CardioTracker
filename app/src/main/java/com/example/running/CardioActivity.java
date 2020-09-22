@@ -5,36 +5,47 @@ import android.os.Parcelable;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.UUID;
 
 public class CardioActivity implements Parcelable {
 
+    private String id;
     private String[] date;
-    private String activityDuration;
+    private String duration; /* is a string since time format is 12:34:56 */
     private double distance;
     private double pace;
     private long createdTimestamp = new Date().getTime();
     private String cardioActivityType;
+    private String timeStart;
+    private String timeEnd;
 
     public CardioActivity() {
 
     }
 
-    public CardioActivity(String[] date, String activityDuration, double distance, double pace, String cardioActivityType) {
+    public CardioActivity(String[] date, String duration, double distance, double pace, long createdTimestamp, String cardioActivityType, String timeStart, String timeEnd) {
+        this.id = UUID.randomUUID().toString();
         this.date = date;
-        this.activityDuration = activityDuration;
+        this.duration = duration;
         this.distance = distance;
         this.pace = pace;
+        this.createdTimestamp = createdTimestamp;
         this.cardioActivityType = cardioActivityType;
+        this.timeStart = timeStart;
+        this.timeEnd = timeEnd;
     }
 
 
     protected CardioActivity(Parcel in) {
+        id = in.readString();
         date = in.createStringArray();
-        activityDuration = in.readString();
+        duration = in.readString();
         distance = in.readDouble();
         pace = in.readDouble();
         createdTimestamp = in.readLong();
         cardioActivityType = in.readString();
+        timeStart = in.readString();
+        timeEnd = in.readString();
     }
 
     public static final Creator<CardioActivity> CREATOR = new Creator<CardioActivity>() {
@@ -58,12 +69,15 @@ public class CardioActivity implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(id);
         parcel.writeStringArray(date);
-        parcel.writeString(activityDuration);
+        parcel.writeString(duration);
         parcel.writeDouble(distance);
         parcel.writeDouble(pace);
         parcel.writeLong(createdTimestamp);
         parcel.writeString(cardioActivityType);
+        parcel.writeString(timeStart);
+        parcel.writeString(timeEnd);
 
     }
 
@@ -75,12 +89,16 @@ public class CardioActivity implements Parcelable {
         this.date = date;
     }
 
-    public String getActivityDuration() {
-        return activityDuration;
+    public String getDuration() {
+        return duration;
     }
 
-    public void setActivityDuration(String activityDuration) {
-        this.activityDuration = activityDuration;
+    public String getId() {
+        return id;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
     public double getDistance() {
@@ -115,15 +133,34 @@ public class CardioActivity implements Parcelable {
         this.cardioActivityType = cardioActivityType;
     }
 
+    public String getTimeStart() {
+        return timeStart;
+    }
+
+    public void setTimeStart(String timeStart) {
+        this.timeStart = timeStart;
+    }
+
+    public String getTimeEnd() {
+        return timeEnd;
+    }
+
+    public void setTimeEnd(String timeEnd) {
+        this.timeEnd = timeEnd;
+    }
+
     @Override
     public String toString() {
-        return "RunDetails{" +
-                "date=" + Arrays.toString(date) +
-                ", activityDuration='" + activityDuration + '\'' +
+        return "CardioActivity{" +
+                "id='" + id + '\'' +
+                ", date=" + Arrays.toString(date) +
+                ", duration='" + duration + '\'' +
                 ", distance=" + distance +
                 ", pace=" + pace +
                 ", createdTimestamp=" + createdTimestamp +
                 ", cardioActivityType='" + cardioActivityType + '\'' +
+                ", timeStart='" + timeStart + '\'' +
+                ", timeEnd='" + timeEnd + '\'' +
                 '}';
     }
 }
