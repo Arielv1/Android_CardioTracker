@@ -85,18 +85,17 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
         Gson gson = new Gson();
         CardioActivity cardioActivity = gson.fromJson(MySP.getInstance().getString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE), CardioActivity.class);
-
-       // allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
-
+        allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
         if(cardioActivity != null) {
             addNewRunToLog(cardioActivity);
+            Log.d("ViewLogger", "MainMenu - adding " + cardioActivity);
+
         }
         else {
 
             updateTextView(lblNumRuns, numRuns.toString());
             updateTextView(lblAvgPace, df.format(avgPace));
             updateTextView(lblTotalDistance, df.format(totalDistance));
-
         }
 
         if (allSportActivities != null) {
@@ -172,6 +171,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
         lblHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
                 startActivity(new Intent(getApplicationContext(), Activity_History.class));
             }
         });
@@ -188,8 +188,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 spinnerChoice = (parent.getItemAtPosition(position).toString());
-                Toaster.getInstance().showToast(spinnerChoice+"");
-
                 if (allSportActivities != null) {
                     updateAllTextViewsAtributes();
                     updateGraph();
@@ -303,6 +301,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     private void addNewRunToLog(CardioActivity cardioActivity) {
         Gson gson = new Gson();
         ArrayList<CardioActivity> activities;
+
         if (allSportActivities == null) {
             activities = new ArrayList<CardioActivity>();
             allSportActivities = new AllSportActivities();
@@ -310,7 +309,19 @@ public class Activity_Main_Menu extends AppCompatActivity{
         else {
             activities = allSportActivities.getActivities();
         }
-        activities.add(cardioActivity);
+
+        boolean alreadyExists = false;
+        for (CardioActivity current : activities) {
+            if (current.getId().equals(cardioActivity.getId())){
+                alreadyExists = true;
+                break;
+            }
+        }
+
+        if (!alreadyExists){
+            activities.add(cardioActivity);
+        }
+
         allSportActivities.setActivities(activities);
         MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
     }
