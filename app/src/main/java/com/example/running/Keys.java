@@ -9,6 +9,8 @@ public interface Keys {
     public static final String AVERAGE_PACE = "AVERAGE_PACE";
     public static final String LABEL_DEFAULT_VALUE = "0";
 
+    public static final String FIREBASE_ALL_RUNNING = "FIREBASE_ALL_RUNNING";
+
     public static final int DEFAULT_INT_VALUE = 0;
     public static final double DEFAULT_DOUBLE_VALUE = 0.0;
 

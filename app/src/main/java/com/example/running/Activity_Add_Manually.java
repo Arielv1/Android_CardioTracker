@@ -1,5 +1,6 @@
 package com.example.running;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
@@ -11,15 +12,31 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.ikovac.timepickerwithseconds.MyTimePickerDialog;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Activity_Add_Manually extends AppCompatActivity {
+
+    private static final String TAG = "Activity_Add_Manually";
+
 
     private Button btnAddSave;
     private Button btnCancel;
@@ -28,6 +45,10 @@ public class Activity_Add_Manually extends AppCompatActivity {
     private EditText edtStartTime;
     private EditText edtEndTime;
     private EditText edtDate;
+
+    int day_picked;
+    int month_picked;
+    int year_picked;
 
     private Calendar calendar;
 
@@ -40,6 +61,12 @@ public class Activity_Add_Manually extends AppCompatActivity {
     private Fragment_Radio_Buttons fragment_radio_buttons;
     private double distance;
     private String cardioActivityChoice;
+    private AllSportActivities allSportActivities;
+
+
+    FirebaseDatabase database;
+    DatabaseReference myRefAll_Running;
+
 
     private boolean calledFromHistory = false;
     private CardioActivity theCurrentActivity;
@@ -50,7 +77,13 @@ public class Activity_Add_Manually extends AppCompatActivity {
 
         setUpViews();
         setUpFragments();
+        database = FirebaseDatabase.getInstance();
+        myRefAll_Running = database.getReference(Keys.FIREBASE_ALL_RUNNING);
+
         theCurrentActivity = (CardioActivity)getIntent().getParcelableExtra(Keys.NEW_DATA_PACKAGE);
+
+        getAllActivities();
+
 
         if (theCurrentActivity != null) {
             displayCardioActivityInFields(theCurrentActivity);
@@ -107,9 +140,9 @@ public class Activity_Add_Manually extends AppCompatActivity {
     private void displayCardioActivityInFields(CardioActivity cardioActivity) {
 
         String dText = "";
-        for (String str : cardioActivity.getDate()) {
-            dText += str +"/";
-        }
+//        for (String str : cardioActivity.getDate()) {
+//            dText += str +"/";
+//        }
         dText = dText.substring(0, dText.length()-1);
         edtDate.setText(dText);
         edtDistance.setText(cardioActivity.getDistance() + "");
@@ -172,6 +205,9 @@ public class Activity_Add_Manually extends AppCompatActivity {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                             edtDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+                            day_picked = dayOfMonth;
+                            month_picked =monthOfYear;
+                            year_picked = year;
                         }
                     }, year, month, day);
             datePickerDialog.show();
@@ -292,7 +328,6 @@ public class Activity_Add_Manually extends AppCompatActivity {
         String eTime = edtEndTime.getText().toString();
 
         if (calledFromHistory) {
-            theCurrentActivity.setDate(edtDate.getText().toString().split("/"));
             theCurrentActivity.setDuration(lblDuration.getText().toString());
             theCurrentActivity.setDistance(Double.parseDouble(edtDistance.getText().toString()));
             theCurrentActivity.setPace(Double.parseDouble(lblPace.getText().toString()));
@@ -300,8 +335,11 @@ public class Activity_Add_Manually extends AppCompatActivity {
             theCurrentActivity.setTimeEnd(eTime);
         }
         else{
-             theCurrentActivity = new CardioActivity(edtDate.getText().toString().split("/"),
-                    lblDuration.getText().toString(),
+            String date = ""+day_picked+"/"+month_picked+1+"/"+year_picked;
+             theCurrentActivity = new CardioActivity(
+//                     edtDate.getText().toString().split("/"),
+                     date,
+                     lblDuration.getText().toString(),
                     Double.parseDouble(edtDistance.getText().toString()),
                     Double.parseDouble(lblPace.getText().toString()),
                     new Date().getTime(),
@@ -309,15 +347,40 @@ public class Activity_Add_Manually extends AppCompatActivity {
                     sTime,
                     eTime);
         }
+        Log.d(TAG, "Pakcage " + theCurrentActivity);
 
+        final Gson gson = new Gson();
+        final String json = gson.toJson(theCurrentActivity);
 
-        Log.d("Manual", "Pakcage " + theCurrentActivity);
-
-        Gson gson = new Gson();
-        String json = gson.toJson(theCurrentActivity);
-   ;
         MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, json);
+//        allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
+
+        if(allSportActivities == null)
+        {
+            Log.d(TAG, "ALL SPORTS ACTIVITIES ARE NULLLLLLL WHYYYYYYYYYYYYYYYYY ???? DOES IT THE FIRST RUN?");
+            allSportActivities = new AllSportActivities();
+        }
+        allSportActivities.addActivity(theCurrentActivity);
+
+        myRefAll_Running.setValue(allSportActivities);
         finish();
+    }
+
+    private void getAllActivities() {
+
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+                Log.w(TAG, "onDataChange Called !!!");
+                allSportActivities = dataSnapshot.getValue(AllSportActivities.class);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w(TAG, "loadPost:onCancelled", error.toException());
+            }
+        };
+        myRefAll_Running.addListenerForSingleValueEvent(postListener);
     }
 
 }

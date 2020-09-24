@@ -3,6 +3,7 @@ package com.example.running;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
@@ -10,7 +11,7 @@ import java.util.UUID;
 public class CardioActivity implements Parcelable {
 
     private String id;
-    private String[] date;
+    private String date;
     private String duration; /* is a string since time format is 12:34:56 */
     private double distance;
     private double pace;
@@ -23,22 +24,23 @@ public class CardioActivity implements Parcelable {
 
     }
 
-    public CardioActivity(String[] date, String duration, double distance, double pace, long createdTimestamp, String cardioActivityType, String timeStart, String timeEnd) {
-        this.id = UUID.randomUUID().toString();
-        this.date = date;
-        this.duration = duration;
-        this.distance = distance;
-        this.pace = pace;
-        this.createdTimestamp = createdTimestamp;
-        this.cardioActivityType = cardioActivityType;
-        this.timeStart = timeStart;
-        this.timeEnd = timeEnd;
+//    public CardioActivity(String[] date, String duration, double distance, double pace, long createdTimestamp, String cardioActivityType, String timeStart, String timeEnd) {
+    public CardioActivity(String date,String duration, double distance, double pace, long createdTimestamp, String cardioActivityType, String timeStart, String timeEnd) {
+    this.id = UUID.randomUUID().toString();
+    this.date = date;
+    this.duration = duration;
+    this.distance = distance;
+    this.pace = pace;
+    this.createdTimestamp = createdTimestamp;
+    this.cardioActivityType = cardioActivityType;
+    this.timeStart = timeStart;
+    this.timeEnd = timeEnd;
     }
 
 
     protected CardioActivity(Parcel in) {
         id = in.readString();
-        date = in.createStringArray();
+        date = in.readString();
         duration = in.readString();
         distance = in.readDouble();
         pace = in.readDouble();
@@ -70,7 +72,7 @@ public class CardioActivity implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(id);
-        parcel.writeStringArray(date);
+        parcel.writeString(date);
         parcel.writeString(duration);
         parcel.writeDouble(distance);
         parcel.writeDouble(pace);
@@ -81,11 +83,11 @@ public class CardioActivity implements Parcelable {
 
     }
 
-    public String[] getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(String[] date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -153,7 +155,7 @@ public class CardioActivity implements Parcelable {
     public String toString() {
         return "CardioActivity{" +
                 "id='" + id + '\'' +
-                ", date=" + Arrays.toString(date) +
+                ", date='" + date + '\'' +
                 ", duration='" + duration + '\'' +
                 ", distance=" + distance +
                 ", pace=" + pace +

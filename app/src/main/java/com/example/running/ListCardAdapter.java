@@ -96,8 +96,8 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
 
         switch (viewTypeRequset) {
             case Utils.AdapterViewOptions.LIST:
+                ((ListViewHolder) holder).mDate.setText(cardioActivity.getDate());
                 ((ListViewHolder) holder).mActivityType.setText(cardioActivity.getCardioActivityType());
-                ((ListViewHolder) holder).mDate.setText(Arrays.toString(cardioActivity.getDate()));
                 ((ListViewHolder) holder).mDistance.setText(cardioActivity.getDistance()+"");
                 ((ListViewHolder) holder).mPace.setText(cardioActivity.getPace()+"");
                 ((ListViewHolder) holder).mDuration.setText(cardioActivity.getDuration()+"");

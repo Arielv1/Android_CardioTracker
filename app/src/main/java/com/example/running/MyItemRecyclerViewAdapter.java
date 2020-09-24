@@ -28,7 +28,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         CardioActivity cardioActivity = mValues.get(position);
-        holder.mDate.setText(Arrays.toString(cardioActivity.getDate()));
+        holder.mDate.setText(cardioActivity.getDate());
         holder.mTimeCreated.setText(cardioActivity.getCreatedTimestamp()+"");
     }
 

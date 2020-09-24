@@ -24,7 +24,7 @@ public class Activity_History extends AppCompatActivity {
     private String lastChoice;
 
     private Fragment_Log_List log_list;
-    private Fragment_Log_Card log_card;
+//    private Fragment_Log_Card log_card;d
 
     private Button btnList;
     private Button btnCard;
@@ -79,9 +79,7 @@ public class Activity_History extends AppCompatActivity {
         setContentView(R.layout.activity__history);
         lastChoice =  MySP.getInstance().getString(Keys.RADIO_HISTORY_CHOICE, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
         setUpViews();
-
         setUpFragments();
-
 
         lastDisplayChoice = MySP.getInstance().getInteger(Keys.HISTORY_VIEW_OPTION, Keys.DEFAULT_HISTORY_VIEW_OPTION_VALUE);
 

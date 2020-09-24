@@ -21,6 +21,10 @@ public class AllSportActivities {
         this.activities = activities;
     }
 
+    public void addActivity(CardioActivity activity) {
+        this.activities.add(activity);
+    }
+
     @Override
     public String toString() {
         return "AllSportActivities{" +

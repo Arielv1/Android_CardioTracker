@@ -14,6 +14,11 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
@@ -27,6 +32,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Activity_Main_Menu extends AppCompatActivity{
+
+    private static final String TAG = "Activity_Main_Menu";
 
     private GraphView graph;
     private Button btnNewActivity;
@@ -45,12 +52,15 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
     private LineGraphSeries<DataPoint> lineGraphSeries;
     private BarGraphSeries<DataPoint> barGraphSeries;
-    private AllSportActivities allSportActivities;
+    private AllSportActivities allSportActivities = new AllSportActivities();
 
     private DecimalFormat df = new DecimalFormat("###.##");
 
     private Spinner spinner;
     private String spinnerChoice;
+
+    FirebaseDatabase database;
+    DatabaseReference myRefAll_Running;
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -83,29 +93,14 @@ public class Activity_Main_Menu extends AppCompatActivity{
         Log.d("ViewLogger", "MainMenu - onStart Invoked");
         super.onStart();
 
-        Gson gson = new Gson();
-        CardioActivity cardioActivity = gson.fromJson(MySP.getInstance().getString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE), CardioActivity.class);
-        allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
-        if(cardioActivity != null) {
-            addNewRunToLog(cardioActivity);
-            Log.d("ViewLogger", "MainMenu - adding " + cardioActivity);
+//        CardioActivity cardioActivity = gson.fromJson(MySP.getInstance().getString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE), CardioActivity.class);
+//        allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
+        getAllActivities();
+        updateAllTextViewsAtributes();
 
-        }
-        else {
-
-            updateTextView(lblNumRuns, numRuns.toString());
-            updateTextView(lblAvgPace, df.format(avgPace));
-            updateTextView(lblTotalDistance, df.format(totalDistance));
-        }
-
-        if (allSportActivities != null) {
-            updateAllTextViewsAtributes();
-            updateGraph();
-        }
-        else {
+        if(allSportActivities == null) {
             showInitialGraph();
         }
-
         Log.d("ViewLogger", "MainMenu - allSportActivities " + allSportActivities);
     }
 
@@ -139,12 +134,18 @@ public class Activity_Main_Menu extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mainmenu);
 
+        database = FirebaseDatabase.getInstance();
+        myRefAll_Running = database.getReference(Keys.FIREBASE_ALL_RUNNING);
+
         // Makes sure that the last packages isn't repeatedly read after receiving data other activities
-        MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
+//        MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
+
 
         setUpViews();
         initializeTextViewsAndVariables();
         setUpSpinner();
+
+//        reset();
 
         btnNewActivity.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,13 +172,10 @@ public class Activity_Main_Menu extends AppCompatActivity{
         lblHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
+//                MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
                 startActivity(new Intent(getApplicationContext(), Activity_History.class));
             }
         });
-
-
-
     }
 
     private void setUpSpinner() {
@@ -203,8 +201,26 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
     private void initializeTextViewsAndVariables() {
 
-        Gson gson = new Gson();
-        allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
+        final Gson gson = new Gson();
+//        allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+                Log.w("onStart", "onDataChange Called !!!");
+                allSportActivities = dataSnapshot.getValue(AllSportActivities.class);
+                if(allSportActivities != null)
+                    updateGraph();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+                Log.w("onStart", "loadPost:onCancelled", error.toException());
+            }
+        };
+        myRefAll_Running.addListenerForSingleValueEvent(postListener);
+
         numRuns = MySP.getInstance().getInteger(Keys.NUM_OF_RUNS, Keys.DEFAULT_INT_VALUE);
         totalDistance = MySP.getInstance().getDouble(Keys.TOTAL_DISTANCE, Keys.DEFAULT_DOUBLE_VALUE);
         totalPace = MySP.getInstance().getDouble(Keys.TOTAL_PACE, Keys.DEFAULT_DOUBLE_VALUE);
@@ -219,6 +235,8 @@ public class Activity_Main_Menu extends AppCompatActivity{
         totalDistance = Keys.DEFAULT_DOUBLE_VALUE;
         avgPace = Keys.DEFAULT_DOUBLE_VALUE;
         allSportActivities  = new AllSportActivities();
+        myRefAll_Running.setValue(allSportActivities);
+
 
         spinnerChoice = Keys.DEFAULT_SPINNER_CHOICE_VALUE;
         spinner.setSelection(0);
@@ -234,6 +252,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
         MySP.getInstance().putDouble(Keys.TOTAL_DISTANCE, Keys.DEFAULT_DOUBLE_VALUE);
         MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE);
         MySP.getInstance().putString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
+
 
         /*
         TODO - move this to history
@@ -298,34 +317,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
         updateTotalDistance();
     }
 
-    private void addNewRunToLog(CardioActivity cardioActivity) {
-        Gson gson = new Gson();
-        ArrayList<CardioActivity> activities;
-
-        if (allSportActivities == null) {
-            activities = new ArrayList<CardioActivity>();
-            allSportActivities = new AllSportActivities();
-        }
-        else {
-            activities = allSportActivities.getActivities();
-        }
-
-        boolean alreadyExists = false;
-        for (CardioActivity current : activities) {
-            if (current.getId().equals(cardioActivity.getId())){
-                alreadyExists = true;
-                break;
-            }
-        }
-
-        if (!alreadyExists){
-            activities.add(cardioActivity);
-        }
-
-        allSportActivities.setActivities(activities);
-        MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
-    }
-
     private void updateTextView(TextView tv, String update) {
         tv.setText(update);
     }
@@ -340,9 +331,16 @@ public class Activity_Main_Menu extends AppCompatActivity{
         HashMap<Integer, Double> monthDistanceMap = new HashMap<Integer, Double>();
         ArrayList <Integer> releventMonths = new ArrayList <Integer>();
         ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();
+        if(releventActivities == null)
+            return;
         for (CardioActivity current : releventActivities) {
 
-            int month = Integer.parseInt(current.getDate()[1]);
+//            int month = Integer.parseInt(current.getDate()[1]);
+            String[] date = current.getDate().split("/");
+            Log.w(TAG , "updateGrap: "+date);
+
+            int month = Integer.parseInt(date[1]);
+
             if (monthDistanceMap.containsKey(month)){
                 monthDistanceMap.put(month, monthDistanceMap.get(month) + current.getDistance());
             }
@@ -352,7 +350,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
             }
         }
 
-        DataPoint dp[] = new DataPoint [30];
+        DataPoint dp[] = new DataPoint[200];
 
         for (int i = 0 ; i < dp.length; i++) {
             dp[i] = new DataPoint(i, 0);
@@ -363,18 +361,49 @@ public class Activity_Main_Menu extends AppCompatActivity{
         }
 
         barGraphSeries = new BarGraphSeries<DataPoint>(dp);
-        barGraphSeries.setSpacing(20);
-        barGraphSeries.setDrawValuesOnTop(true);
-        barGraphSeries.setValuesOnTopSize(34);
-        barGraphSeries.setValuesOnTopColor(Color.BLACK);
+//        barGraphSeries.setDrawValuesOnTop(true);
+//        barGraphSeries.setValuesOnTopSize(34);
+//        barGraphSeries.setValuesOnTopColor(Color.BLACK);
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
         graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+//        barGraphSeries.setSpacing(30);
+//        graph.addSeries(barGraphSeries);
         graph.addSeries(barGraphSeries);
 
+//        graph.setHorizontalScrollBarEnabled(true);
+
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(30);
+
+//        graph.getViewport().setScrollable(true);
+        graph.getViewport().setScalable(true);
+//        graph.getViewport().setScrollableY(true);
     }
 
     private ArrayList <CardioActivity> getCardioActivitiesBySpinnerChoice() {
         return Utils.getInstance().filterCardioActivitiesByType(allSportActivities.getActivities(), spinnerChoice);
+    }
+
+    private void getAllActivities() {
+
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+                Log.w(TAG, "onDataChange Called !!!");
+                allSportActivities = dataSnapshot.getValue(AllSportActivities.class);
+                if(allSportActivities != null)
+                    updateGraph();
+
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+                Log.w(TAG, "loadPost:onCancelled", error.toException());
+            }
+        };
+        myRefAll_Running.addListenerForSingleValueEvent(postListener);
     }
 
 
