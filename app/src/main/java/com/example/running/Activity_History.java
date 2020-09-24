@@ -2,9 +2,9 @@ package com.example.running;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,9 +12,10 @@ import android.widget.Button;
 
 import com.google.gson.Gson;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class Activity_History extends AppCompatActivity {
+public class Activity_History extends AppCompatActivity implements ListCardAdapter.OnItemClickListener {
 
     private Button history_BTN_list;
     private Button history_BTN_card;
@@ -54,22 +55,23 @@ public class Activity_History extends AppCompatActivity {
     @Override
     protected void onStart() {
         Log.d("ViewLogger", "History - onStart Invoked");
-        super.onStart();
+            super.onStart();
 
-        Gson gson = new Gson();
-        CardioActivity cardioActivity = gson.fromJson(MySP.getInstance().getString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE), CardioActivity.class);
+            Gson gson = new Gson();
+            CardioActivity cardioActivity = gson.fromJson(MySP.getInstance().getString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE), CardioActivity.class);
 
-        if (cardioActivity != null) {
-            ArrayList<CardioActivity> activities = allSportActivities.getActivities();
-            for (CardioActivity current : allSportActivities.getActivities()) {
-                if (current.getId().equals(cardioActivity.getId())) {
-                    activities.remove(current);
-                    break;
+            if (cardioActivity != null) {
+                ArrayList<CardioActivity> activities = allSportActivities.getActivities();
+                for (CardioActivity current : allSportActivities.getActivities()) {
+                    if (current.getId().equals(cardioActivity.getId())) {
+                        activities.remove(current);
+                        break;
+                    }
                 }
-            }
-            activities.add(cardioActivity);
-            listCardAdapter.notifyDataSetChanged();
-            MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
+                activities.add(cardioActivity);
+                allSportActivities.setActivities(activities);
+                listCardAdapter.notifyDataSetChanged();
+                MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
         }
     }
 
@@ -87,10 +89,11 @@ public class Activity_History extends AppCompatActivity {
         allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
 
        try {
-           listCardAdapter = new ListCardAdapter(allSportActivities.getActivities(),  lastDisplayChoice, Activity_History.this);
+           //listCardAdapter = new ListCardAdapter(allSportActivities.getActivities(),  lastDisplayChoice, Activity_History.this);
+           listCardAdapter = new ListCardAdapter(allSportActivities.getActivities(), this, lastDisplayChoice);
        }
        catch (Exception e) {
-           listCardAdapter = new ListCardAdapter(new ArrayList<CardioActivity>(),  lastDisplayChoice, Activity_History.this);
+           listCardAdapter = new ListCardAdapter(new ArrayList<CardioActivity>(),  this, lastDisplayChoice);
        }
 
         history_LAY_recyclerview.setHasFixedSize(true);
@@ -156,5 +159,24 @@ public class Activity_History extends AppCompatActivity {
         listCardAdapter.setViewTypeRequset(viewType);
         listCardAdapter.notifyDataSetChanged();
         history_LAY_recyclerview.setAdapter(listCardAdapter);
+    }
+
+    @Override
+    public void onItemEdit(int position) {
+        Intent intent = new Intent(getApplicationContext(), Activity_Add_Manually.class);
+        intent.putExtra(Keys.NEW_DATA_PACKAGE, allSportActivities.getActivities().get(position));
+        startActivity(intent);
+    }
+
+    @Override
+    public void onItemDelete(int position) {
+
+        Gson gson = new Gson();
+
+        ArrayList <CardioActivity> activities = allSportActivities.getActivities();
+        activities.remove(position);
+        allSportActivities.setActivities(activities);
+        listCardAdapter.notifyDataSetChanged();
+        MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
     }
 }

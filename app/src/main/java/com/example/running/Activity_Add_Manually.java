@@ -171,7 +171,6 @@ public class Activity_Add_Manually extends AppCompatActivity {
         @Override
         public void setRadioButtonChoice(String radioChoiceValue) {
             cardioActivityChoice = radioChoiceValue;
-            Toaster.getInstance().showToast(cardioActivityChoice);
         }
     };
 
