@@ -181,6 +181,15 @@
                 />
 
         </LinearLayout>
+
+<!--        <fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--            xmlns:tools="http://schemas.android.com/tools"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_below="@+id/new_run_LL_end_run_btns"-->
+<!--            android:id="@+id/map"-->
+<!--            tools:context=".Activity_New_Record"-->
+<!--            android:name="com.google.android.gms.maps.SupportMapFragment" />-->
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

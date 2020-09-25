@@ -1,13 +1,11 @@
 package com.example.running;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -33,15 +31,16 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Activity_New_Record extends FragmentActivity implements OnMapReadyCallback {
+public class Activity_Record extends FragmentActivity implements OnMapReadyCallback {
 
-    private static final String TAG = "Activity_New_Record";
+    private static final String TAG = "Activity_Record";
 
     private Button btnStart;
     private Button btnPause;
@@ -86,69 +85,70 @@ public class Activity_New_Record extends FragmentActivity implements OnMapReadyC
     private Polyline polyline;
     private ArrayList<LatLng> points = new ArrayList();
 
+    int counter = 1;
+
     @Override
-   protected void onSaveInstanceState(@NonNull Bundle outState) {
-       super.onSaveInstanceState(outState);
-       Log.d(TAG, "NewRun - onSavedInstance " + tmrChronometer.getBase());
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, " onSavedInstance " + tmrChronometer.getBase());
 
-   }
+    }
 
-   @Override
-   protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-       super.onRestoreInstanceState(savedInstanceState);
-       savedState = savedInstanceState.getLong("CHRONO_STATE");
-       Log.d(TAG, "NewRun - onRestoreInstanceState " + savedState);
-       tmrChronometer.setBase(savedState);
-       tmrChronometer.start();
-   }
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        savedState = savedInstanceState.getLong("CHRONO_STATE");
+        Log.d(TAG, " onRestoreInstanceState " + savedState);
+        tmrChronometer.setBase(savedState);
+        tmrChronometer.start();
+    }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("ViewLogger", "NewRun - onPause Invoked");
+        Log.d(TAG, "onPause Invoked");
     }
 
     @Override
     protected void onStart() {
-        Log.d("ViewLogger", "NewRun - onStart Invoked");
+        Log.d(TAG, " onStart Invoked");
         super.onStart();
     }
 
     @Override
     protected void onResume() {
-        Log.d("ViewLogger", "NewRun - onResume Invoked");
+        Log.d(TAG, "onResume Invoked");
         super.onResume();
+        getMyLocation();
     }
 
     @Override
     protected void onStop() {
-        Log.d("ViewLogger", "NewRun - onStop Invoked");
+        Log.d(TAG, " onStop Invoked");
         super.onStop();
     }
 
     @Override
     protected void onRestart() {
-        Log.d("ViewLogger", "NewRun - onDestroy Invoked");
+        Log.d(TAG, " onDestroy Invoked");
         super.onRestart();
     }
 
     @Override
     protected void onDestroy() {
-        Log.d("ViewLogger", "NewRun - onDestroy Invoked");
+        Log.d(TAG, " nDestroy Invoked");
         super.onDestroy();
     }
 
-    int counter = 1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("ViewLogger", "NewRun - onCreate Invoked");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_record);
+        setContentView(R.layout.activity__record);
+        Log.d(TAG, "onCreate: callled");
 
         setUpViews();
 
-        setUpFragments();
+//        setUpFragments();
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         createLocationRequest();
@@ -228,22 +228,22 @@ public class Activity_New_Record extends FragmentActivity implements OnMapReadyC
         tmrChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
             @Override
             public void onChronometerTick(Chronometer chronometer) {
-                Toast.makeText(Activity_New_Record.this, "" + counter, Toast.LENGTH_SHORT).show();
+                Toast.makeText(Activity_Record.this, "" + counter, Toast.LENGTH_SHORT).show();
                 counter++;
             }
         });
 
-        //init google map fragment to show map.
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
-    private void createLocationRequest() {
-        locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(10000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG, "onMapReady called");
+        mMap = googleMap;
+        getMyLocation();
     }
 
     private void requestPermision() {
@@ -268,8 +268,9 @@ public class Activity_New_Record extends FragmentActivity implements OnMapReadyC
                     //if permission granted.
                     locationPermission = true;
                     getMyLocation();
-
                 } else {
+                    Log.d(TAG, "onRequestPermissionsResult Permission denied");
+                    locationPermission = false;
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
@@ -277,22 +278,28 @@ public class Activity_New_Record extends FragmentActivity implements OnMapReadyC
             }
         }
     }
-
-    //to get user location
-    @SuppressLint("MissingPermission")
-    private void getMyLocation() {
-
-        if (locationPermission) {
-            Log.d(TAG, "before calling Requect Location Update");
-            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-        }
+    private void createLocationRequest() {
+        Log.d(TAG, "createLocationRequest: called");
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(10000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
+    private void getMyLocation() {
+        Log.d(TAG, "getMyLocation called");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_REQUEST_CODE);
+            return;
+        }
+        Log.d(TAG, "before calling Requectsssssssss Location Update");
+//        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        getMyLocation();
     }
 
     private void start(View view) {
@@ -339,17 +346,16 @@ public class Activity_New_Record extends FragmentActivity implements OnMapReadyC
         btnConfirm = findViewById(R.id.new_run_BTN_confirm);
     }
 
-    private void setUpFragments() {
-        Fragment_Radio_Buttons fragment_radio_buttons = Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.new_run_LAY_radio_buttons, false);
-
+//    private void setUpFragments() {
+//        Fragment_Radio_Buttons fragment_radio_buttons = Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.new_run_LAY_radio_buttons, false);
+//
+//    }
+//
+//    Callback_RadioChoice callback = new Callback_RadioChoice() {
+//        @Override
+//        public void setRadioButtonChoice(String radioChoiceValue) {
+//            cardioActivityChoice = radioChoiceValue;
+//
+//        }
+//    };
     }
-
-    Callback_RadioChoice callback = new Callback_RadioChoice() {
-        @Override
-        public void setRadioButtonChoice(String radioChoiceValue) {
-            cardioActivityChoice = radioChoiceValue;
-
-        }
-    };
-
-}
