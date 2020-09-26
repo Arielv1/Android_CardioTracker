@@ -26,12 +26,11 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
         void onItemDelete(int position);
     }
 
-
-
     class ListViewHolder extends RecyclerView.ViewHolder implements  OnClickListener{
 
         TextView mDate, mActivityType, mPace, mDuration, mDistance, mEdit, mDelete;
         OnItemClickListener listener;
+
         public ListViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
             mDate = itemView.findViewById(R.id.history_list_LBL_date);
@@ -76,15 +75,44 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
 
     class CardViewHodler extends RecyclerView.ViewHolder {
 
-        TextView lower_text, upper_text;
-        ImageView card_image;
+        TextView mDate, mDuration, mPace, mDistance;
+        ImageView mEdit, nDelete, mType;
 
-        public CardViewHodler(@NonNull View itemView) {
+        public CardViewHodler(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
-            lower_text = (TextView) itemView.findViewById(R.id.card_lower_text);
-            upper_text = (TextView) itemView.findViewById(R.id.card_upper_text);
-            card_image = (ImageView) itemView.findViewById(R.id.cardview_image);
+            mDate = (TextView) itemView.findViewById(R.id.card_LBL_date);
+            mDuration = (TextView) itemView.findViewById(R.id.card_LBL_duration);
+            mDistance = (TextView) itemView.findViewById(R.id.card_LBL_distance);
+            mPace = (TextView) itemView.findViewById(R.id.card_LBL_pace);
+
+            mType = (ImageView) itemView.findViewById(R.id.card_IMG_type);
+            mEdit = (ImageView) itemView.findViewById(R.id.card_IMG_edit);
+            nDelete = (ImageView) itemView.findViewById(R.id.card_IMG_delete);
+
+            mEdit.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null){
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION){
+                            listener.onItemEdit(position);
+                        }
+                    }
+                }
+            });
+            nDelete.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null){
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION){
+                            listener.onItemDelete(position);
+                        }
+                    }
+                }
+            });
         }
+
     }
 
     private ArrayList<CardioActivity> cardioActivities;
@@ -125,7 +153,7 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
                 return new ListViewHolder(view, mListener);
             case Utils.AdapterViewOptions.CARD:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_log_card, parent, false);
-                return new CardViewHodler(view);
+                return new CardViewHodler(view, mListener);
             default:
                 break;
         }
@@ -139,15 +167,26 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
 
         switch (viewTypeRequset) {
             case Utils.AdapterViewOptions.LIST:
-                ((ListViewHolder) holder).mDate.setText(cardioActivity.getDate());
                 ((ListViewHolder) holder).mActivityType.setText(cardioActivity.getCardioActivityType());
+                ((ListViewHolder) holder).mDate.setText(cardioActivity.getDate());
                 ((ListViewHolder) holder).mDistance.setText(cardioActivity.getDistance()+"");
                 ((ListViewHolder) holder).mPace.setText(cardioActivity.getPace()+"");
                 ((ListViewHolder) holder).mDuration.setText(cardioActivity.getDuration()+"");
-               break;
+                break;
             case Utils.AdapterViewOptions.CARD:
-                ((CardViewHodler)holder).upper_text.setText("Changed Upper Text");
-                ((CardViewHodler)holder).lower_text.setText("Changed Lower Text");
+                ((CardViewHodler)holder).mDate.setText(cardioActivity.getDate());
+                ((CardViewHodler)holder).mDistance.setText(cardioActivity.getDistance()+"");
+                ((CardViewHodler)holder).mPace.setText(cardioActivity.getPace()+"");
+                ((CardViewHodler)holder).mDuration.setText(cardioActivity.getDuration()+"");
+                if (cardioActivity.getCardioActivityType().equals(Utils.CardioActivityTypes.JOGGING)) {
+                    ((CardViewHodler)holder).mType.setImageResource(R.drawable.ic_jogging);
+                }
+                else if (cardioActivity.getCardioActivityType().equals(Utils.CardioActivityTypes.RUNNING)) {
+                    ((CardViewHodler)holder).mType.setImageResource(R.drawable.ic_running);
+                }
+                else {
+                    ((CardViewHodler)holder).mType.setImageResource(R.drawable.ic_cycling);
+                }
                 break;
             default:
                 break;

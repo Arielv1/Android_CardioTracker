@@ -12,10 +12,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,16 +22,13 @@ import com.ikovac.timepickerwithseconds.MyTimePickerDialog;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Activity_Add_Manually extends AppCompatActivity {
 
-    private static final String TAG = "Activity_Add_Manually";
+    private static final String TAG = "ViewLogger";
 
 
     private Button btnAddSave;
@@ -46,10 +39,6 @@ public class Activity_Add_Manually extends AppCompatActivity {
     private EditText edtEndTime;
     private EditText edtDate;
 
-    int day_picked;
-    int month_picked;
-    int year_picked;
-
     private Calendar calendar;
 
     private DatePickerDialog datePickerDialog;
@@ -59,13 +48,13 @@ public class Activity_Add_Manually extends AppCompatActivity {
     private TextView lblPace;
 
     private Fragment_Radio_Buttons fragment_radio_buttons;
-    private double distance;
+
     private String cardioActivityChoice;
     private AllSportActivities allSportActivities;
 
 
-    FirebaseDatabase database;
-    DatabaseReference myRefAll_Running;
+    private FirebaseDatabase database;
+    private DatabaseReference databaseReference;
 
 
     private boolean calledFromHistory = false;
@@ -78,12 +67,11 @@ public class Activity_Add_Manually extends AppCompatActivity {
         setUpViews();
         setUpFragments();
         database = FirebaseDatabase.getInstance();
-        myRefAll_Running = database.getReference(Keys.FIREBASE_ALL_RUNNING);
+        databaseReference = database.getReference(Keys.FIREBASE_ALL_RUNNING);
 
         theCurrentActivity = (CardioActivity)getIntent().getParcelableExtra(Keys.NEW_DATA_PACKAGE);
 
-        getAllActivities();
-
+        getAllActivitiesFromFirebase();
 
         if (theCurrentActivity != null) {
             displayCardioActivityInFields(theCurrentActivity);
@@ -139,12 +127,7 @@ public class Activity_Add_Manually extends AppCompatActivity {
 
     private void displayCardioActivityInFields(CardioActivity cardioActivity) {
 
-        String dText = "";
-//        for (String str : cardioActivity.getDate()) {
-//            dText += str +"/";
-//        }
-        dText = dText.substring(0, dText.length()-1);
-        edtDate.setText(dText);
+        edtDate.setText(cardioActivity.getDate());
         edtDistance.setText(cardioActivity.getDistance() + "");
         edtStartTime.setText(cardioActivity.getTimeStart());
         edtEndTime.setText(cardioActivity.getTimeEnd());
@@ -204,9 +187,6 @@ public class Activity_Add_Manually extends AppCompatActivity {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                             edtDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
-                            day_picked = dayOfMonth;
-                            month_picked =monthOfYear;
-                            year_picked = year;
                         }
                     }, year, month, day);
             datePickerDialog.show();
@@ -214,7 +194,6 @@ public class Activity_Add_Manually extends AppCompatActivity {
         else {
             datePickerDialog.hide();
         }
-
     }
 
     private void enterTimeHandler(View view, boolean focus){
@@ -272,6 +251,9 @@ public class Activity_Add_Manually extends AppCompatActivity {
 
 
     private Long calculateDuration() {
+        /*
+        TODO - implement possibility of endTime < startTime
+         */
         String[] startTime =  splitEditTextByString(edtStartTime,":");
         String[] endTime = splitEditTextByString(edtEndTime, ":");
         Long end = 3600 * Long.parseLong(endTime[0]) + 60 * Long.parseLong(endTime[1]) +  Long.parseLong(endTime[2]);
@@ -317,7 +299,6 @@ public class Activity_Add_Manually extends AppCompatActivity {
     }
 
     private void cancelManualActivity(){
-        MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
         finish();
     }
 
@@ -327,17 +308,22 @@ public class Activity_Add_Manually extends AppCompatActivity {
         String eTime = edtEndTime.getText().toString();
 
         if (calledFromHistory) {
+            theCurrentActivity.setDate(edtDate.getText().toString());
             theCurrentActivity.setDuration(lblDuration.getText().toString());
             theCurrentActivity.setDistance(Double.parseDouble(edtDistance.getText().toString()));
             theCurrentActivity.setPace(Double.parseDouble(lblPace.getText().toString()));
+            theCurrentActivity.setCardioActivityType(cardioActivityChoice);
             theCurrentActivity.setTimeStart(sTime);
             theCurrentActivity.setTimeEnd(eTime);
+
+            Gson gson = new Gson();
+            String json = gson.toJson(theCurrentActivity);
+            Log.d(TAG, "sending to history\n" + json);
+            MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, json);
         }
         else{
-            String date = ""+day_picked+"/"+month_picked+1+"/"+year_picked;
              theCurrentActivity = new CardioActivity(
-//                     edtDate.getText().toString().split("/"),
-                     date,
+                     edtDate.getText().toString(),
                      lblDuration.getText().toString(),
                     Double.parseDouble(edtDistance.getText().toString()),
                     Double.parseDouble(lblPace.getText().toString()),
@@ -345,27 +331,21 @@ public class Activity_Add_Manually extends AppCompatActivity {
                     cardioActivityChoice,
                     sTime,
                     eTime);
+
+            if(allSportActivities == null) {
+                allSportActivities = new AllSportActivities(new ArrayList<CardioActivity>());
+            }
+            ArrayList<CardioActivity> recordedActivities = allSportActivities.getActivities();
+            recordedActivities.add(theCurrentActivity);
+            Collections.sort(recordedActivities);
+
+            databaseReference.setValue(allSportActivities);
         }
-        Log.d(TAG, "Pakcage " + theCurrentActivity);
 
-        final Gson gson = new Gson();
-        final String json = gson.toJson(theCurrentActivity);
-
-        MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, json);
-//        allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
-
-        if(allSportActivities == null)
-        {
-            Log.d(TAG, "ALL SPORTS ACTIVITIES ARE NULLLLLLL WHYYYYYYYYYYYYYYYYY ???? DOES IT THE FIRST RUN?");
-            allSportActivities = new AllSportActivities();
-        }
-        allSportActivities.addActivity(theCurrentActivity);
-
-        myRefAll_Running.setValue(allSportActivities);
         finish();
     }
 
-    private void getAllActivities() {
+    private void getAllActivitiesFromFirebase() {
 
         ValueEventListener postListener = new ValueEventListener() {
             @Override
@@ -379,7 +359,7 @@ public class Activity_Add_Manually extends AppCompatActivity {
                 Log.w(TAG, "loadPost:onCancelled", error.toException());
             }
         };
-        myRefAll_Running.addListenerForSingleValueEvent(postListener);
+        databaseReference.addListenerForSingleValueEvent(postListener);
     }
 
 }

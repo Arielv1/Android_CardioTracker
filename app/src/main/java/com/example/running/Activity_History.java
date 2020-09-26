@@ -1,7 +1,6 @@
 package com.example.running;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -10,22 +9,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Activity_History extends AppCompatActivity implements ListCardAdapter.OnItemClickListener {
 
-    private Button history_BTN_list;
-    private Button history_BTN_card;
+    private static final String TAG = "ViewLogger";
 
-    private int lastRadioChoiceIndex = 3;
-    private String cardioActivityChoice;
-    private String lastChoice;
-
-    private Fragment_Log_List log_list;
-//    private Fragment_Log_Card log_card;d
+    private String chosenRadioButtonValue;
 
     private Button btnList;
     private Button btnCard;
@@ -35,6 +30,9 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     private RecyclerView history_LAY_recyclerview;
     private int lastDisplayChoice;
     private AllSportActivities allSportActivities;
+
+    private FirebaseDatabase database;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onStop() {
@@ -55,55 +53,53 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     @Override
     protected void onStart() {
         Log.d("ViewLogger", "History - onStart Invoked");
-            super.onStart();
+        super.onStart();
 
-            Gson gson = new Gson();
-            CardioActivity cardioActivity = gson.fromJson(MySP.getInstance().getString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE), CardioActivity.class);
+        Gson gson = new Gson();
+        CardioActivity cardioActivity = gson.fromJson(MySP.getInstance().getString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE), CardioActivity.class);
 
-            if (cardioActivity != null) {
-                ArrayList<CardioActivity> activities = allSportActivities.getActivities();
-                for (CardioActivity current : allSportActivities.getActivities()) {
-                    if (current.getId().equals(cardioActivity.getId())) {
-                        activities.remove(current);
-                        break;
-                    }
+        if (cardioActivity != null) {
+            ArrayList<CardioActivity> activities = allSportActivities.getActivities();
+            for (CardioActivity current : activities) {
+                if (current.getId().equals(cardioActivity.getId())){
+                    activities.remove(current);
+                    activities.add(cardioActivity);
+                    Collections.sort(activities);
+                    allSportActivities.setActivities(activities);
+                    break;
                 }
-                activities.add(cardioActivity);
-                allSportActivities.setActivities(activities);
-                listCardAdapter.notifyDataSetChanged();
-                MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
+            }
+            databaseReference.setValue(allSportActivities);
         }
+        else {
+        }
+        setAdapterViewOption(MySP.getInstance().getInteger(Keys.HISTORY_VIEW_OPTION, Keys.DEFAULT_HISTORY_VIEW_OPTION_VALUE));
+        refreshAllCardioActivitiesDisplayInAdapter(chosenRadioButtonValue);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity__history);
-        lastChoice =  MySP.getInstance().getString(Keys.RADIO_HISTORY_CHOICE, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
+
+        chosenRadioButtonValue =  MySP.getInstance().getString(Keys.RADIO_HISTORY_CHOICE, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
+
         setUpViews();
         setUpFragments();
 
+        database = FirebaseDatabase.getInstance();
+        databaseReference = database.getReference(Keys.FIREBASE_ALL_RUNNING);
+
         lastDisplayChoice = MySP.getInstance().getInteger(Keys.HISTORY_VIEW_OPTION, Keys.DEFAULT_HISTORY_VIEW_OPTION_VALUE);
+        allSportActivities = getBundleFromMainMenu();
 
-        Gson gson = new Gson();
-        allSportActivities = gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
-
-       try {
-           //listCardAdapter = new ListCardAdapter(allSportActivities.getActivities(),  lastDisplayChoice, Activity_History.this);
-           listCardAdapter = new ListCardAdapter(allSportActivities.getActivities(), this, lastDisplayChoice);
-       }
-       catch (Exception e) {
-           listCardAdapter = new ListCardAdapter(new ArrayList<CardioActivity>(),  this, lastDisplayChoice);
-       }
-
-        history_LAY_recyclerview.setHasFixedSize(true);
-
-        adapterHandler(lastDisplayChoice);
+        initializeAdapter();
+        setAdapterViewOption(lastDisplayChoice);
 
         btnList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapterHandler(Utils.AdapterViewOptions.LIST);
+                setAdapterViewOption(Utils.AdapterViewOptions.LIST);
             }
         });
 
@@ -111,22 +107,36 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
         btnCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapterHandler(Utils.AdapterViewOptions.CARD);
+                setAdapterViewOption(Utils.AdapterViewOptions.CARD);
             }
         });
+    }
+
+    private void initializeAdapter() {
+        try {
+            listCardAdapter = new ListCardAdapter(allSportActivities.getActivities(), this, lastDisplayChoice);
+        }
+        catch (Exception e) {
+            listCardAdapter = new ListCardAdapter(new ArrayList<CardioActivity>(),  this, lastDisplayChoice);
+        }
+
+        history_LAY_recyclerview.setHasFixedSize(true);
+
+    }
+
+    private AllSportActivities getBundleFromMainMenu() {
+        allSportActivities = (AllSportActivities) getIntent().getParcelableExtra(Keys.ALL_CARDIO_ACTIVITIES);
+        if (allSportActivities  == null) {
+            allSportActivities = new AllSportActivities(new ArrayList<CardioActivity>());
+        }
+        return allSportActivities;
     }
 
     Callback_RadioChoice callback = new Callback_RadioChoice() {
         @Override
         public void setRadioButtonChoice(String radioChoiceValue) {
-            cardioActivityChoice = radioChoiceValue;
-            MySP.getInstance().putString(Keys.RADIO_HISTORY_CHOICE, cardioActivityChoice);
-
-            if (!cardioActivityChoice.equals(lastChoice)) {
-                setUpCardioActivityHistoryList();
-                updateCardioActivitiesInAdapter(cardioActivityChoice);
-            }
-            lastChoice = cardioActivityChoice;
+            MySP.getInstance().putString(Keys.RADIO_HISTORY_CHOICE, radioChoiceValue);
+            refreshAllCardioActivitiesDisplayInAdapter(radioChoiceValue);
         }
 
 
@@ -141,20 +151,13 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
         Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.history_LAY_radio_buttons, true);
     }
 
-    private void setUpCardioActivityHistoryList() {
-        log_list = Fragment_Log_List.newInstance();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-       // transaction.replace(R.id.history_LAY_content, log_list);
-        transaction.commit();
-    }
-
-    private void updateCardioActivitiesInAdapter(String radioChoiceValue) {
-
+    private void refreshAllCardioActivitiesDisplayInAdapter(String radioChoiceValue) {
         listCardAdapter.setCardioActivities(Utils.getInstance().filterCardioActivitiesByType(allSportActivities.getActivities(), radioChoiceValue));
         listCardAdapter.notifyDataSetChanged();
         history_LAY_recyclerview.setAdapter(listCardAdapter);
     }
-    private void adapterHandler(int viewType) {
+
+    private void setAdapterViewOption(int viewType) {
         MySP.getInstance().putInteger(Keys.HISTORY_VIEW_OPTION, viewType);
         listCardAdapter.setViewTypeRequset(viewType);
         listCardAdapter.notifyDataSetChanged();
@@ -178,5 +181,6 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
         allSportActivities.setActivities(activities);
         listCardAdapter.notifyDataSetChanged();
         MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
+        databaseReference.setValue(allSportActivities);
     }
 }

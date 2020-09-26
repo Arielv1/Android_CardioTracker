@@ -7,7 +7,6 @@
     <string name="history_underline"><u>History</u></string>
     <string name="test_email">test@test.com</string>
     <string name="test_password">testpassword</string>
-
     <string-array name="cardio_activity_types">
         <item>All</item>
         <item>Jogging</item>

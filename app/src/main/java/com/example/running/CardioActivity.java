@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
-public class CardioActivity implements Parcelable {
+public class CardioActivity implements Parcelable, Comparable<CardioActivity> {
 
     private String id;
     private String date;
@@ -151,6 +151,10 @@ public class CardioActivity implements Parcelable {
         this.timeEnd = timeEnd;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "CardioActivity{" +
@@ -164,5 +168,11 @@ public class CardioActivity implements Parcelable {
                 ", timeStart='" + timeStart + '\'' +
                 ", timeEnd='" + timeEnd + '\'' +
                 '}';
+    }
+
+
+    @Override
+    public int compareTo(CardioActivity cardioActivity) {
+        return Long.compare(cardioActivity.getCreatedTimestamp(), this.getCreatedTimestamp());
     }
 }

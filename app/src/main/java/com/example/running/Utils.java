@@ -5,6 +5,9 @@ import android.content.Context;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.gson.Gson;
+
+import java.security.Key;
 import java.util.ArrayList;
 
 public class Utils {
@@ -84,4 +87,15 @@ public class Utils {
 
         return filteredList;
     }
+
+    public void putAllCardioSportActivitiesInSP(AllSportActivities allSportActivities) {
+        Gson gson = new Gson();
+        MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
+    }
+
+    public AllSportActivities getAllCardioSportActivitiesFromSP() {
+        Gson gson = new Gson();
+        return gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
+    }
+
 }
