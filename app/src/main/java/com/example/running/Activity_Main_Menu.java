@@ -137,7 +137,8 @@ public class Activity_Main_Menu extends AppCompatActivity{
         btnNewActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), Activity_New_Record.class));
+//                startActivity(new Intent(getApplicationContext(), Activity_New_Record.class));
+                startActivity(new Intent(getApplicationContext(), Activity_Record.class));
             }
         });
 
