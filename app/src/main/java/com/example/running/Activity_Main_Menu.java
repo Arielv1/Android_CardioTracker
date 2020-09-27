@@ -138,7 +138,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
             @Override
             public void onClick(View v) {
 //                startActivity(new Intent(getApplicationContext(), Activity_New_Record.class));
-                startActivity(new Intent(getApplicationContext(), MapActivity.class));
+                startActivity(new Intent(getApplicationContext(), ArielMapActivity.class));
             }
         });
 
@@ -303,24 +303,24 @@ public class Activity_Main_Menu extends AppCompatActivity{
         }
 
         barGraphSeries = new BarGraphSeries<DataPoint>(dp);
-//        barGraphSeries.setDrawValuesOnTop(true);
-//        barGraphSeries.setValuesOnTopSize(34);
-//        barGraphSeries.setValuesOnTopColor(Color.BLACK);
+//      barGraphSeries.setDrawValuesOnTop(true);
+//      barGraphSeries.setValuesOnTopSize(34);
+//      barGraphSeries.setValuesOnTopColor(Color.BLACK);
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
         graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
-//        barGraphSeries.setSpacing(30);
-//        graph.addSeries(barGraphSeries);
+//      barGraphSeries.setSpacing(30);
+//      graph.addSeries(barGraphSeries);
         graph.addSeries(barGraphSeries);
 
-//        graph.setHorizontalScrollBarEnabled(true);
+//      graph.setHorizontalScrollBarEnabled(true);
 
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(30);
+        graph.getViewport().setMaxX(13);
 
-//        graph.getViewport().setScrollable(true);
+//      graph.getViewport().setScrollable(true);
         graph.getViewport().setScalable(true);
-//        graph.getViewport().setScrollableY(true);
+//      graph.getViewport().setScrollableY(true);
     }
 
     private ArrayList <CardioActivity> getCardioActivitiesBySpinnerChoice() {

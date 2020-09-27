@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.running">
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <uses-feature android:name="android.hardware.type.watch" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     
     <application
         android:name=".AppInitializer"
@@ -15,21 +20,28 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/map_key" />
-        <activity android:name=".MapActivity"/>
-        <activity android:name=".Activity_Record"/>
-        <activity android:name=".Activity_History"/>
+
+        <activity android:name=".ArielMapActivity" />
+        <activity android:name=".MapActivity" />
+        <activity android:name=".Activity_History" />
         <activity android:name=".Activity_Add_Manually" />
         <activity android:name=".Activity_New_Record" />
-        <activity android:name=".Activity_Main_Menu">
+        <activity android:name=".Activity_Main_Menu" />
+        <activity
+            android:name=".GPSActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".GPS_Service"/>
+        
     </application>
 
 </manifest>
