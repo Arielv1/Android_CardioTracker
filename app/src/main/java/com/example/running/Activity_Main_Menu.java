@@ -137,8 +137,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
         btnNewActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                startActivity(new Intent(getApplicationContext(), Activity_New_Record.class));
-                startActivity(new Intent(getApplicationContext(), ArielMapActivity.class));
+                startActivity(new Intent(getApplicationContext(), GPSActivity.class));
             }
         });
 
@@ -270,19 +269,16 @@ public class Activity_Main_Menu extends AppCompatActivity{
     private void showGraph() {
         graph.removeAllSeries();
 
-        HashMap<Integer, Double> monthDistanceMap = new HashMap<Integer, Double>();
-        ArrayList <Integer> releventMonths = new ArrayList <Integer>();
+        HashMap<Integer, Double> monthDistanceMap = new HashMap<>();
+        ArrayList <Integer> releventMonths = new ArrayList <>();
         ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();
 
         if(releventActivities == null || allSportActivities == null || allSportActivities.getActivities().size() == 0)
             return;
-
         for (CardioActivity current : releventActivities) {
-
             String[] date = current.getDate().split("/");
 
             int month = Integer.parseInt(date[1]);
-
             if (monthDistanceMap.containsKey(month)){
                 monthDistanceMap.put(month, monthDistanceMap.get(month) + current.getDistance());
             }
@@ -303,24 +299,13 @@ public class Activity_Main_Menu extends AppCompatActivity{
         }
 
         barGraphSeries = new BarGraphSeries<DataPoint>(dp);
-//      barGraphSeries.setDrawValuesOnTop(true);
-//      barGraphSeries.setValuesOnTopSize(34);
-//      barGraphSeries.setValuesOnTopColor(Color.BLACK);
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
         graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
-//      barGraphSeries.setSpacing(30);
-//      graph.addSeries(barGraphSeries);
         graph.addSeries(barGraphSeries);
-
-//      graph.setHorizontalScrollBarEnabled(true);
-
         graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(13);
-
-//      graph.getViewport().setScrollable(true);
+        graph.getViewport().setMinX(1);
+        graph.getViewport().setMaxX(12);
         graph.getViewport().setScalable(true);
-//      graph.getViewport().setScrollableY(true);
     }
 
     private ArrayList <CardioActivity> getCardioActivitiesBySpinnerChoice() {
