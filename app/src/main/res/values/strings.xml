@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Running</string>
+    <string name="app_name">CardioTracker</string>
     <string name="reset_underline"><u>reset</u></string>
     <string name="edit_underline"><u>edit</u></string>
     <string name="delete_underline"><u>delete</u></string>
@@ -27,7 +27,7 @@
     <string name="pause">pause</string>
     <string name="stop">stop</string>
     <string name="distance">Distance:</string>
-    <string name="speed">Speed:</string>
+    <string name="pace">Pace:</string>
     <string name="km_h">km/h</string>
     <string name="calories_burned">Calories Burned:</string>
     <string name="confirm">Confirm</string>

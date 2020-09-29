@@ -84,6 +84,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:layout_marginTop="9dp"
                 android:layout_marginLeft="8dp"
                 >
 
@@ -94,7 +95,7 @@
                    android:textSize="18sp"
                    />
                <TextView
-                   android:id="@+id/card_LBL_pace"
+                   android:id="@+id/card_LBL_distance"
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
                    android:text="5.37"
@@ -128,7 +129,7 @@
                    android:textSize="18sp"
                    />
                <TextView
-                   android:id="@+id/card_LBL_distance"
+                   android:id="@+id/card_LBL_pace"
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
                    android:text="6.97"
@@ -142,18 +143,20 @@
                    android:layout_weight="1"
                    />
 
-               <ImageView
+               <com.google.android.material.button.MaterialButton
                    android:id="@+id/card_IMG_edit"
-                   android:layout_width="wrap_content"
+                   android:layout_width="55dp"
                    android:layout_height="wrap_content"
-                   android:src="@drawable/ic_edit"
+                   android:backgroundTint="@color/colorEdit"                   app:icon="@drawable/ic_edit"
+                   android:layout_marginRight="4dp"
                    />
 
-               <ImageView
+               <com.google.android.material.button.MaterialButton
                    android:id="@+id/card_IMG_delete"
-                   android:layout_width="wrap_content"
+                   android:layout_width="55dp"
                    android:layout_height="wrap_content"
-                   android:src="@drawable/ic_delete"
+                   android:backgroundTint="@color/colorDelete"
+                   app:icon="@drawable/ic_delete"
                    />
 
             </LinearLayout>

@@ -1,7 +1,6 @@
 package com.example.running;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,11 +11,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.Gson;
+import com.google.android.material.button.MaterialButton;
 
-import java.security.Key;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHolder> {
 
@@ -78,7 +75,9 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
     class CardViewHodler extends RecyclerView.ViewHolder {
 
         TextView mDate, mDuration, mPace, mDistance;
-        ImageView mEdit, nDelete, mType;
+        ImageView mType;
+        MaterialButton mEdit, nDelete;
+
 
         public CardViewHodler(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
@@ -88,8 +87,8 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
             mPace = (TextView) itemView.findViewById(R.id.card_LBL_pace);
 
             mType = (ImageView) itemView.findViewById(R.id.card_IMG_type);
-            mEdit = (ImageView) itemView.findViewById(R.id.card_IMG_edit);
-            nDelete = (ImageView) itemView.findViewById(R.id.card_IMG_delete);
+            mEdit =  itemView.findViewById(R.id.card_IMG_edit);
+            nDelete = itemView.findViewById(R.id.card_IMG_delete);
 
             mEdit.setOnClickListener(new OnClickListener() {
                 @Override
@@ -154,7 +153,7 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_list, parent, false);
                 return new ListViewHolder(view, mListener);
             case Utils.AdapterViewOptions.CARD:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_log_card, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_card, parent, false);
                 return new CardViewHodler(view, mListener);
             default:
                 break;

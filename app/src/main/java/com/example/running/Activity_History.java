@@ -136,7 +136,8 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     Callback_RadioChoice callback = new Callback_RadioChoice() {
         @Override
         public void setRadioButtonChoice(String radioChoiceValue) {
-            MySP.getInstance().putString(Keys.RADIO_HISTORY_CHOICE, radioChoiceValue);
+            chosenRadioButtonValue = radioChoiceValue;
+
             refreshAllCardioActivitiesDisplayInAdapter(radioChoiceValue);
         }
 
@@ -149,10 +150,11 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     }
 
     private void setUpFragments() {
-        Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.history_LAY_radio_buttons, true);
+        Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.history_LAY_radio_buttons, true, Keys.RADIO_HISTORY_CHOICE);
     }
 
     private void refreshAllCardioActivitiesDisplayInAdapter(String radioChoiceValue) {
+        Log.d(TAG, "refreshAllCardioActivitiesDisplayInAdapter:\nradioChoiceValue " + radioChoiceValue + " chosenRadio " + chosenRadioButtonValue);
         listCardAdapter.setCardioActivities(Utils.getInstance().filterCardioActivitiesByType(allSportActivities.getActivities(), radioChoiceValue));
         listCardAdapter.notifyDataSetChanged();
         history_LAY_recyclerview.addItemDecoration(new DividerItemDecoration(history_LAY_recyclerview.getContext(),LinearLayoutManager.VERTICAL));
@@ -170,9 +172,11 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     @Override
     public void onItemEdit(int position) {
         Intent intent = new Intent(getApplicationContext(), Activity_Add_Manually.class);
-        chosenRadioButtonValue = allSportActivities.getActivities().get(position).getCardioActivityType();
-        MySP.getInstance().putString(Keys.RADIO_HISTORY_CHOICE, chosenRadioButtonValue);
-        intent.putExtra(Keys.NEW_DATA_PACKAGE, allSportActivities.getActivities().get(position));
+        CardioActivity current = allSportActivities.getActivities().get(position);
+        String currentActivityType = current.getCardioActivityType();
+        //chosenRadioButtonValue = allSportActivities.getActivities().get(position).getCardioActivityType();
+        MySP.getInstance().putString(Keys.RADIO_HISTORY_CHOICE_EDIT, currentActivityType);
+        intent.putExtra(Keys.NEW_DATA_PACKAGE, current);
         startActivity(intent);
     }
 

@@ -164,7 +164,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/start_new_activity"
                 android:layout_weight="1"
-                app:backgroundTint="@color/resetColor"
+                app:backgroundTint="@color/colorReset"
                 android:textColor="@color/colorPrimary"
                 />
             <!--                style="@style/Widget.MaterialComponents.Button"-->

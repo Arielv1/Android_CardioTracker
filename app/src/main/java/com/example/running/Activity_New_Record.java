@@ -1,49 +1,56 @@
 package com.example.running;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
-public class Activity_New_Record extends FragmentActivity implements OnMapReadyCallback {
+public class Activity_New_Record extends AppCompatActivity implements OnMapReadyCallback {
 
-    private static final String TAG = "Activity_New_Record";
-
+    private TextView lblDistance;
+    private TextView lblPace;
+    private TextView lblCalories;
     private Button btnStart;
     private Button btnPause;
     private Button btnStop;
@@ -52,41 +59,34 @@ public class Activity_New_Record extends FragmentActivity implements OnMapReadyC
     private Chronometer tmrChronometer;
     private long timeOfPause;
     private boolean runningChronometer;
-    private boolean stoppedChronometer;
+    private boolean firstStartClick;
+    private String cardioType;
+    private GoogleMap mGoogleMap;
 
-    private long savedState;
-    private String cardioActivityChoice;
+    private BroadcastReceiver broadcastReceiver;
+    private long timeInSeconds = 0;
+    private double distance = 0;
 
-    private int lastRadioChoiceIndex = 0;
+    private long savedChronometerState;
 
-    TextView txt_distance;
-    TextView txt_speed;
-    //google map object
-    private GoogleMap mMap;
-    private FusedLocationProviderClient fusedLocationClient;
-    private LocationCallback locationCallback;
-    LocationRequest locationRequest;
+    private Marker lastLocationMarkerOnMap;
+    private LatLng lastLocation;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private final int ZOOM_VALUE = 13;
 
-    private long time = 1;
-    private double speed;
-    private double distance;
-    private Location lastLocation = null;
+    private final int REQUEST_CODE = 101;
+    private static final String TAG = "GPSActivity";
 
-    Runnable secondlyRun;
-    private Handler handler = new Handler();
-    private boolean timer_start = false;
-    private int timer_value = 1;
-    private final int DELAY = 1000;
-    private final int ZOOM_VALUE = 20;
+    Calendar calendar;
+    SimpleDateFormat simpleTimeFormat = new SimpleDateFormat("HH:mm:ss");
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    private String sTime, eTime, date;
 
-    private final static int LOCATION_REQUEST_CODE = 23;
-    boolean locationPermission = false;
+    private AllSportActivities allSportActivities;
 
-    //polyline object
-    private List<Polyline> polylines = null;
-    private Polyline polyline;
-    private ArrayList<LatLng> points = new ArrayList();
 
+    private FirebaseDatabase database;
+    private DatabaseReference databaseReference;
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -97,236 +97,113 @@ public class Activity_New_Record extends FragmentActivity implements OnMapReadyC
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        savedState = savedInstanceState.getLong("CHRONO_STATE");
-        Log.d(TAG, "NewRun - onRestoreInstanceState " + savedState);
-        tmrChronometer.setBase(savedState);
+        savedChronometerState = savedInstanceState.getLong("CHRONO_STATE");
+        Log.d(TAG, "NewRun - onRestoreInstanceState " + savedChronometerState);
+        tmrChronometer.setBase(savedChronometerState);
         tmrChronometer.start();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d("ViewLogger", "NewRun - onPause Invoked");
-    }
-
-    @Override
-    protected void onStart() {
-        Log.d("ViewLogger", "NewRun - onStart Invoked");
-        super.onStart();
-    }
-
-    @Override
     protected void onResume() {
-        Log.d("ViewLogger", "NewRun - onResume Invoked");
         super.onResume();
+        if (broadcastReceiver == null) {
+            broadcastReceiver = new BroadcastReceiver() {
+
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    timeInSeconds = (long)((SystemClock.elapsedRealtime() - tmrChronometer.getBase())/1000);
+                    if (lastLocationMarkerOnMap != null) {
+                        lastLocationMarkerOnMap.remove();
+                    }
+
+                    LatLng currentLocation = new LatLng(Double.parseDouble(intent.getExtras().get("lat").toString())
+                            , Double.parseDouble(intent.getExtras().get("lng").toString()));
+
+                    if (lastLocation == null) {
+                        lastLocation = currentLocation;
+                    }
+
+                    float[] results = new float[1];
+                    Location.distanceBetween(lastLocation.latitude, lastLocation.longitude, currentLocation.latitude, currentLocation.longitude,results);
+                    distance += (results[0]/1000);
+                    calculateAndDisplayPerformance(distance, (double)timeInSeconds/3600);
+
+                    mGoogleMap.addPolyline(new PolylineOptions().add(currentLocation, lastLocation));
+                    lastLocation = currentLocation;
+
+                    lastLocationMarkerOnMap = mGoogleMap.addMarker(new MarkerOptions().position(currentLocation));
+
+                    Log.d(TAG, "currentLocation: " + currentLocation + " lastlocation " + lastLocation + " time: " + timeInSeconds + " distance " + distance);
+
+                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
+                    mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, ZOOM_VALUE));
+
+                }
+
+
+            };
+        }
+        registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
     }
 
-    @Override
-    protected void onStop() {
-        Log.d("ViewLogger", "NewRun - onStop Invoked");
-        super.onStop();
-    }
-
-    @Override
-    protected void onRestart() {
-        Log.d("ViewLogger", "NewRun - onDestroy Invoked");
-        super.onRestart();
+    private void calculateAndDisplayPerformance(double distance, double seconds) {
+        double pace = (distance/seconds);
+        Log.d(TAG, "pace " + pace);
+        DecimalFormat df = new DecimalFormat("###.##");
+        updateTextView(lblDistance, df.format(distance));
+        updateTextView(lblPace, df.format(pace));
     }
 
     @Override
     protected void onDestroy() {
-        Log.d("ViewLogger", "NewRun - onDestroy Invoked");
         super.onDestroy();
+        if (broadcastReceiver != null) {
+            unregisterReceiver(broadcastReceiver);
+        }
     }
 
-    int counter = 1;
-
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("ViewLogger", "NewRun - onCreate Invoked");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_record);
 
         setUpViews();
-
         setUpFragments();
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        createLocationRequest();
+        database = FirebaseDatabase.getInstance();
+        databaseReference = database.getReference(Keys.FIREBASE_ALL_RUNNING);
 
-        requestPermision();
+        getAllActivitiesFromFirebase();
 
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                Log.d(TAG, "onLocationResult");
-                if (locationResult == null) {
-                    return;
-                }
-//                polylines = new ArrayList<>();
-                PolylineOptions polyOptions = new PolylineOptions();
-//                ArrayList<LatLng> localpoints = new ArrayList<>();
-                if (polyline != null) polyline.remove();
-                LatLng lastLatLng = null;
-                Location currentLocation = locationResult.getLastLocation();
-                for (Location location : locationResult.getLocations()) {
-                    LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
-                    points.add(point);
-                    Log.d(TAG, "point is:" + point.toString());
-                    lastLatLng = point;
-                }
-                if (lastLocation != null) {
-                    // if one of them not equel then location changed.... so we get distance
-                    if (lastLocation.getLatitude() != currentLocation.getLatitude() && lastLocation.getLongitude() != currentLocation.getLongitude()) {
-                        distance += lastLocation.distanceTo(currentLocation);
-                    }
-                }
-                lastLocation = locationResult.getLastLocation();
-                txt_distance.setText("" + distance);
-                txt_speed.setText("" + (distance / time));
-                polyOptions.addAll(points);
-                polyOptions.width(15);
-                polyOptions.color(Color.BLACK);
-                polyOptions.geodesic(true);
-                polyline = mMap.addPolyline(polyOptions);
-                Log.d(TAG, "polyline is:" + polyline.toString());
-//                polylines.add(polyline);
-                Log.d(TAG, "LastLatLng is:" + lastLatLng.latitude + " lng is: " + lastLatLng.longitude);
+        fetchLastKnownLocation();
+        if (!confirmPermissions()) {
+            enableButtons();
 
-                if (lastLatLng != null)
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastLatLng, ZOOM_VALUE));
-            }
-        };
+        }
 
-        btnStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                start(view);
-            }
-        });
-
-        btnPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pause(view);
-            }
-        });
-
-        btnStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                stop(view);
-            }
-        });
-
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), Activity_Main_Menu.class));
-            }
-        });
-
-        tmrChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer chronometer) {
-                Toast.makeText(Activity_New_Record.this, "" + counter, Toast.LENGTH_SHORT).show();
-                counter++;
-            }
-        });
-
-        //init google map fragment to show map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
-    private void createLocationRequest() {
-        locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(10000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-    private void requestPermision() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_REQUEST_CODE);
-        } else {
-            locationPermission = true;
+    Callback_RadioChoice callback = new Callback_RadioChoice() {
+        @Override
+        public void setRadioButtonChoice(String radioChoiceValue) {
+            cardioType = radioChoiceValue;
+            MySP.getInstance().putString(Keys.RADIO_CHOICE_NEW_RECORD, cardioType);
         }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        Log.d(TAG, "onRequestPermissionsResult");
-        switch (requestCode) {
-            case LOCATION_REQUEST_CODE: {
-                if (grantResults.length > 0  && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //if permission granted.
-                    locationPermission = true;
-                    getMyLocation();
-
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-        }
-    }
-
-    //to get user location
-    @SuppressLint("MissingPermission")
-    private void getMyLocation() {
-
-        if (locationPermission) {
-            Log.d(TAG, "before calling Requect Location Update");
-            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-        }
-    }
+    };
 
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        getMyLocation();
-    }
-
-    private void start(View view) {
-
-        if(!runningChronometer && !stoppedChronometer) {
-            tmrChronometer.setBase(SystemClock.elapsedRealtime() - timeOfPause);
-            tmrChronometer.start();
-            runningChronometer = true;
-        }
-    }
-
-    private void pause(View view) {
-
-        if(runningChronometer && !stoppedChronometer) {
-            timeOfPause = SystemClock.elapsedRealtime() - tmrChronometer.getBase();
-            tmrChronometer.stop();
-            runningChronometer = false;
-        }
-        else if (!stoppedChronometer){
-            tmrChronometer.setBase(SystemClock.elapsedRealtime() - timeOfPause);
-            tmrChronometer.start();
-            runningChronometer = true;
-        }
-    }
-
-    private void stop(View view) {
-
-        tmrChronometer.stop();
-        runningChronometer = false;
-        stoppedChronometer = true;
-        btnCancel.setVisibility(View.VISIBLE);
-        btnConfirm.setVisibility(View.VISIBLE);
-
+    private void setUpFragments() {
+        Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.new_run_LAY_radio_buttons, false, Keys.RADIO_CHOICE_NEW_RECORD);
     }
 
     private void setUpViews() {
-        txt_distance = findViewById(R.id.new_run_LBL_actual_distance);
-        txt_speed = findViewById(R.id.new_run_LBL_actual_avg_speed);
+        lblDistance = findViewById(R.id.new_run_LBL_distance);
+        lblPace = findViewById(R.id.new_run_LBL_pace);
+        lblCalories = findViewById(R.id.new_run_LBL_calories);
         btnStart = findViewById(R.id.new_run_BTN_start);
         btnPause = findViewById(R.id.new_run_BTN_pause);
         btnStop = findViewById(R.id.new_run_BTN_stop);
@@ -335,17 +212,200 @@ public class Activity_New_Record extends FragmentActivity implements OnMapReadyC
         btnConfirm = findViewById(R.id.new_run_BTN_confirm);
     }
 
-    private void setUpFragments() {
-        Fragment_Radio_Buttons fragment_radio_buttons = Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.new_run_LAY_radio_buttons, false);
+    private void startChronometer() {
+        tmrChronometer.setBase(SystemClock.elapsedRealtime() - timeOfPause);
+        tmrChronometer.start();
+        runningChronometer = true;
+    }
+
+    private void pauseChronometer() {
+
+        if (runningChronometer) {
+            timeOfPause = SystemClock.elapsedRealtime() - tmrChronometer.getBase();
+            tmrChronometer.stop();
+            runningChronometer = false;
+        } else  {
+            tmrChronometer.setBase(SystemClock.elapsedRealtime() - timeOfPause);
+            tmrChronometer.start();
+            runningChronometer = true;
+        }
+    }
+
+    private void stopChronometer() {
+
+        tmrChronometer.stop();
+        runningChronometer = false;
+        btnCancel.setVisibility(View.VISIBLE);
+        btnConfirm.setVisibility(View.VISIBLE);
 
     }
 
-    Callback_RadioChoice callback = new Callback_RadioChoice() {
-        @Override
-        public void setRadioButtonChoice(String radioChoiceValue) {
-            cardioActivityChoice = radioChoiceValue;
+    private void enableButtons() {
 
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!firstStartClick) {
+                    calendar = Calendar.getInstance();
+                    sTime = (simpleTimeFormat.format(calendar.getTime()));
+                    date = simpleDateFormat.format(calendar.getTime());
+
+                    if (date.charAt(0)=='0'){
+                        date = date.substring(1);
+                    }
+
+                    if (date.charAt(3)=='0'){
+                        String start = date.substring(0,3);
+                        date = start + date.substring(4);
+                    }
+
+
+                }
+                Log.d(TAG, "onClick: sTime " + sTime + " date " + date);
+                if (!runningChronometer){
+                    btnPause.setEnabled(true);
+                    btnStop.setEnabled(true);
+                    startChronometer();
+                    Intent i = new Intent(getApplicationContext(), GPS_Service.class);
+                    startService(i);
+                }
+            }
+        });
+
+        btnPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pauseChronometer();
+                Intent i = new Intent(getApplicationContext(), GPS_Service.class);
+                stopService(i);
+            }
+        });
+
+        btnStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                calendar = Calendar.getInstance();
+                eTime = (simpleTimeFormat.format(calendar.getTime()));
+                Log.d(TAG, "onClick: eTime " + eTime);
+                btnStart.setEnabled(false);
+                btnPause.setEnabled(false);
+                calculateAndDisplayPerformance(distance, (double)timeInSeconds/3600);
+                stopChronometer();
+                Intent i = new Intent(getApplicationContext(), GPS_Service.class);
+                stopService(i);
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        btnConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(cardioType != null && !cardioType.equals(Utils.CardioActivityTypes.ALL)){
+                    addNewCartioActiviy();
+                    finish();
+                }
+                else {
+                    Toaster.getInstance().showToast("Please Select Type");
+                }
+
+            }
+        });
+    }
+
+    private boolean confirmPermissions() {
+        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE);
+
+            return true;
         }
-    };
+        return false;
+    }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                fetchLastKnownLocation();
+                enableButtons();
+            } else {
+                confirmPermissions();
+            }
+        }
+    }
+
+    private void fetchLastKnownLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        Task <Location> task = fusedLocationProviderClient.getLastLocation();
+        task.addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null){
+                    lastLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    lastLocationMarkerOnMap = mGoogleMap.addMarker(new MarkerOptions().position(lastLocation));
+                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(lastLocation));
+                    mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastLocation, ZOOM_VALUE));
+                }
+            }
+        });
+
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mGoogleMap = googleMap;
+    }
+
+    private void updateTextView(TextView textView, String text){
+        textView.setText(text);
+    }
+
+    private void addNewCartioActiviy() {
+        long durationValue = Utils.getInstance().calculateTimeDifference(sTime, eTime);
+        String sDuration = Utils.getInstance().formatTimeToString(durationValue);
+        CardioActivity newCardioActivity = new CardioActivity(
+                date,
+                sDuration,
+                Double.parseDouble(lblDistance.getText().toString()),
+                Double.parseDouble(lblPace.getText().toString()),
+                new Date().getTime(),
+                cardioType,
+                sTime,
+                eTime
+        );
+
+        allSportActivities = Utils.getInstance().addNewCardioActivityDatabase(allSportActivities, newCardioActivity);
+
+        databaseReference.setValue(allSportActivities);
+    }
+
+
+    private void getAllActivitiesFromFirebase() {
+
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+                Log.w(TAG, "onDataChange Called !!!");
+                allSportActivities = dataSnapshot.getValue(AllSportActivities.class);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w(TAG, "loadPost:onCancelled", error.toException());
+            }
+        };
+        databaseReference.addListenerForSingleValueEvent(postListener);
+    }
 }

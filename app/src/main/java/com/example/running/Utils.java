@@ -1,6 +1,7 @@
 package com.example.running;
 
 import android.content.Context;
+import android.widget.EditText;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -9,6 +10,7 @@ import com.google.gson.Gson;
 
 import java.security.Key;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Utils {
 
@@ -29,10 +31,10 @@ public class Utils {
         return utils;
     }
 
-    public Fragment_Radio_Buttons createFragmentRadioButtons(FragmentActivity fActivity, Callback_RadioChoice callback, int replecedId, boolean allButtons) {
-        Fragment_Radio_Buttons fragment = Fragment_Radio_Buttons.newInstance(allButtons);
+    public Fragment_Radio_Buttons createFragmentRadioButtons(FragmentActivity fragmentActivity, Callback_RadioChoice callback, int replecedId, boolean allButtons, String refrenceSPKey) {
+        Fragment_Radio_Buttons fragment = Fragment_Radio_Buttons.newInstance(allButtons, refrenceSPKey);
         fragment.setActivityCallback(callback);
-        FragmentTransaction transaction = fActivity.getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = fragmentActivity.getSupportFragmentManager().beginTransaction();
         transaction.replace(replecedId, fragment);
         transaction.commit();
         return fragment;
@@ -98,4 +100,60 @@ public class Utils {
         return gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
     }
 
+    private String[] splitEditTextByString(String str, String symbol){
+        return str.split(symbol);
+    }
+
+    public Long calculateTimeDifference(String sTime, String eTime) {
+        /*
+        TODO - implement possibility of endTime < startTime
+         */
+        String[] startTime =  splitEditTextByString(sTime,":");
+        String[] endTime = splitEditTextByString(eTime, ":");
+        Long end = 3600 * Long.parseLong(endTime[0]) + 60 * Long.parseLong(endTime[1]) +  Long.parseLong(endTime[2]);
+        Long start = 3600 * Long.parseLong(startTime[0]) + 60 * Long.parseLong(startTime[1]) + Long.parseLong(startTime[2]);
+        return end - start;
+    }
+
+    public String formatTimeToString(long time) {
+        Long hours, minutes, seconds;
+        hours = time / 3600;
+        minutes = (time / 60) % 60;
+        seconds = (time % 60);
+
+        String sSeconds = "", sMinutes, sHours, sTime="";
+        if (seconds < 10) {
+            sSeconds = "0" + seconds;
+        }
+        else {
+            sSeconds = seconds.toString();
+        }
+
+        if (minutes < 10) {
+            sMinutes = "0" + minutes;
+
+        }
+        else {
+            sMinutes = minutes.toString();
+        }
+
+        if(hours == 0) {
+            sTime = sMinutes +":" + sSeconds;
+        }
+        else {
+            sTime = hours+ ":" + sMinutes +":" + sSeconds;
+        }
+        return sTime;
+    }
+
+    public AllSportActivities addNewCardioActivityDatabase(AllSportActivities allSportActivities, CardioActivity cardioActivity){
+        if(allSportActivities == null) {
+            allSportActivities = new AllSportActivities(new ArrayList<CardioActivity>());
+        }
+        ArrayList<CardioActivity> recordedActivities = allSportActivities.getActivities();
+        recordedActivities.add(cardioActivity);
+        Collections.sort(recordedActivities);
+        return allSportActivities;
+
+    }
 }

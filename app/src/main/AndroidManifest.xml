@@ -28,11 +28,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/map_key" />
 
-        <activity android:name=".MapActivity" />
         <activity android:name=".Activity_History" />
         <activity android:name=".Activity_Add_Manually" />
         <activity android:name=".Activity_New_Record" />
-        <activity android:name=".GPSActivity" />
         <activity
             android:name=".Activity_Main_Menu">
             <intent-filter>

@@ -20,7 +20,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -30,7 +29,6 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 public class Activity_Main_Menu extends AppCompatActivity{
@@ -143,10 +141,11 @@ public class Activity_Main_Menu extends AppCompatActivity{
         setUpSpinner();
 
 
+
         btnNewActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), GPSActivity.class));
+                startActivity(new Intent(getApplicationContext(), Activity_New_Record.class));
             }
         });
 
@@ -325,11 +324,12 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
         DataPoint dp[] = new DataPoint[15];
 
-        for (int i = 1 ; i < dp.length; i++) {
+        for (int i = 0 ; i < dp.length; i++) {
             dp[i] = new DataPoint(i, 0);
         }
 
         for (int month : releventMonths) {
+            Log.d(TAG, "showGraph: " + month + " : " + monthDistanceMap.get(month));
             dp[month-1] = new DataPoint (month, monthDistanceMap.get(month));
         }
         barGraphSeries = new BarGraphSeries<>(dp);
@@ -372,6 +372,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinX(1);
         graph.getViewport().setMaxX(12);
+        graph.getViewport().setMaxY(100);
 //        graph.getViewport().setScalable(true);
         graph.getViewport().setScrollableY(true);
     }

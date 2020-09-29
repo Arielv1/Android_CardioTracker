@@ -3,5 +3,7 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
-    <color name="resetColor">#00BCD4</color>
+    <color name="colorReset">#00BCD4</color>
+    <color name="colorEdit">#0EB137</color>
+    <color name="colorDelete">#C83737</color>
 </resources>
