@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 
 import java.security.Key;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 
 public class Utils {
@@ -110,9 +111,17 @@ public class Utils {
          */
         String[] startTime =  splitEditTextByString(sTime,":");
         String[] endTime = splitEditTextByString(eTime, ":");
-        Long end = 3600 * Long.parseLong(endTime[0]) + 60 * Long.parseLong(endTime[1]) +  Long.parseLong(endTime[2]);
-        Long start = 3600 * Long.parseLong(startTime[0]) + 60 * Long.parseLong(startTime[1]) + Long.parseLong(startTime[2]);
-        return end - start;
+
+        /*          (num hours * 3600 seconds in an hour)  +   (num minutes * 60 seconds in a minute) + seconds*/
+        Long endTimeInSeconds = 3600 * Long.parseLong(endTime[0]) + 60 * Long.parseLong(endTime[1]) +  Long.parseLong(endTime[2]);
+        Long startTimeInSeconds = 3600 * Long.parseLong(startTime[0]) + 60 * Long.parseLong(startTime[1]) + Long.parseLong(startTime[2]);
+
+        if (startTimeInSeconds <= endTimeInSeconds) {
+            return endTimeInSeconds - startTimeInSeconds;
+        }
+
+        /* there are 86400 seconds in a day */
+        return 86400 - startTimeInSeconds + endTimeInSeconds;
     }
 
     public String formatTimeToString(long time) {
@@ -144,6 +153,10 @@ public class Utils {
             sTime = hours+ ":" + sMinutes +":" + sSeconds;
         }
         return sTime;
+    }
+
+    public double calculatePaceFromDistanceAndSeconds(double distance, double timeInSeconds){
+        return (distance/((double)(timeInSeconds/3600)));
     }
 
     public AllSportActivities addNewCardioActivityDatabase(AllSportActivities allSportActivities, CardioActivity cardioActivity){

@@ -161,7 +161,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         if (edtDistance.getText().length()!=0 && edtStartTime.getText().length()!=0 && edtEndTime.getText().length()!=0) {
             DecimalFormat df = new DecimalFormat("###.##");
             double distance = Double.parseDouble(edtDistance.getText().toString());
-            double pace = (distance/( (double)Utils.getInstance().calculateTimeDifference(edtStartTime.getText().toString(), edtEndTime.getText().toString())/3600)) ;
+            double pace = Utils.getInstance().calculatePaceFromDistanceAndSeconds(distance, Utils.getInstance().calculateTimeDifference(edtStartTime.getText().toString(), edtEndTime.getText().toString()));
             lblPace.setText(df.format(pace% 100));
         }
     }
@@ -243,14 +243,6 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         }
         return true;
     }
-    private boolean checkEndTimeCompareToStartTime(String message) {
-        long result = calculateDuration();
-        if (result < 0) {
-            Toaster.getInstance().showToast(message);
-            return false;
-        }
-        return true;
-    }
 
     private boolean checkRadioBox(String message){
         if (cardioActivityChoice == null || cardioActivityChoice == Utils.CardioActivityTypes.ALL) {
@@ -266,22 +258,8 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
                 checkEdtField(edtDate, "Date Field Is Empty") &&
                 checkEdtField(edtStartTime, "Start Time Field Is Empty") &&
                 checkEdtField(edtEndTime, "End Time Field Is Empty") &&
-                checkEdtField(edtDistance, "Distance Field Is Empty") &&
-                checkEndTimeCompareToStartTime("End Time Bigger then Start Time");
+                checkEdtField(edtDistance, "Distance Field Is Empty");
     }
-
-
-    private Long calculateDuration() {
-        /*
-        TODO - implement possibility of endTime < startTime
-         */
-        String[] startTime =  splitEditTextByString(edtStartTime,":");
-        String[] endTime = splitEditTextByString(edtEndTime, ":");
-        Long end = 3600 * Long.parseLong(endTime[0]) + 60 * Long.parseLong(endTime[1]) +  Long.parseLong(endTime[2]);
-        Long start = 3600 * Long.parseLong(startTime[0]) + 60 * Long.parseLong(startTime[1]) + Long.parseLong(startTime[2]);
-        return end - start;
-    }
-
 
     private void cancelManualActivity(){
         finish();

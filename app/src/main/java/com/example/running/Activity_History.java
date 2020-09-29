@@ -36,6 +36,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     private int lastDisplayChoice;
     private AllSportActivities allSportActivities;
 
+    private CardioActivity selectedToEdit;
     private FirebaseDatabase database;
     private DatabaseReference databaseReference;
 
@@ -66,15 +67,10 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
 
         if (cardioActivity != null) {
             ArrayList<CardioActivity> activities = allSportActivities.getActivities();
-            for (CardioActivity current : activities) {
-                if (current.getId().equals(cardioActivity.getId())){
-                    activities.remove(current);
-                    activities.add(cardioActivity);
-                    Collections.sort(activities);
-                    allSportActivities.setActivities(activities);
-                    break;
-                }
-            }
+            activities.remove(selectedToEdit);
+            activities.add(cardioActivity);
+            Collections.sort(activities);
+            allSportActivities.setActivities(activities);
             databaseReference.setValue(allSportActivities);
         }
         setAdapterViewOption(MySP.getInstance().getInteger(Keys.HISTORY_VIEW_OPTION, Keys.DEFAULT_HISTORY_VIEW_OPTION_VALUE));
@@ -124,7 +120,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     private void createAlertReset() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirm");
-        builder.setMessage("Are you sure you want to reset The Records of all Sport Activities?");
+        builder.setMessage("Are you sure you want to reset your history and progress?");
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
@@ -147,7 +143,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     private void createAlertDelete(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirm");
-        builder.setMessage("Are you sure you want to delete this Record?");
+        builder.setMessage("Are you sure you want to delete this record?");
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
@@ -235,25 +231,17 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     @Override
     public void onItemEdit(int position) {
         Intent intent = new Intent(getApplicationContext(), Activity_Add_Manually.class);
-        CardioActivity current = allSportActivities.getActivities().get(position);
-        String currentActivityType = current.getCardioActivityType();
-        //chosenRadioButtonValue = allSportActivities.getActivities().get(position).getCardioActivityType();
+        selectedToEdit = allSportActivities.getActivities().get(position);
+        String currentActivityType = selectedToEdit.getCardioActivityType();
         MySP.getInstance().putString(Keys.RADIO_HISTORY_CHOICE_EDIT, currentActivityType);
-        intent.putExtra(Keys.NEW_DATA_PACKAGE, current);
+        intent.putExtra(Keys.NEW_DATA_PACKAGE, selectedToEdit);
         startActivity(intent);
     }
     @Override
     public void onItemDelete(int position) {
 
         createAlertDelete(position);
-//        Gson gson = new Gson();
-//
-//        ArrayList <CardioActivity> activities = allSportActivities.getActivities();
-//        activities.remove(position);
-//        allSportActivities.setActivities(activities);
-//        listCardAdapter.notifyDataSetChanged();
-//        MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
-//        databaseReference.setValue(allSportActivities);
+
     }
     public void deleteItem(int position)
     {

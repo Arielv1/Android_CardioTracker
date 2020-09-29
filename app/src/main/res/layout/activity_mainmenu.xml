@@ -21,26 +21,35 @@
             android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/main_menu_LAY_distance_stats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
             android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="I Want To View"
+                android:textSize="18sp"
+                />
 
             <Spinner
                 android:id="@+id/main_menu_spinner"
-                style="?android:attr/spinnerDropDownItemStyle"
-                android:layout_width="290dp"
+                android:spinnerMode="dropdown"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:foregroundGravity="center"
-                android:background="@color/colorSpinner"
                 android:textAlignment="center"
-                android:tooltipText="Activity Type" />
+                android:layout_marginStart="8dp"
+                style="@style/Widget.AppCompat.DropDownItem.Spinner"
+                />
 
         </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                >
 
                 <TextView
                 android:layout_width="wrap_content"
@@ -49,20 +58,21 @@
                 android:textSize="18sp"
                 />
 
-            <TextView
-                android:id="@+id/main_menu_LBL_num_runs"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0"
-                android:textSize="18sp"
-                />
+                <TextView
+                    android:id="@+id/main_menu_LBL_num_runs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="18sp"
+                    android:layout_marginLeft="4dp"
+                    />
             </LinearLayout>
 
             <LinearLayout
             android:id="@+id/main_menu_LAY_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="2dp"
             android:orientation="horizontal"
             >
 
@@ -81,6 +91,7 @@
                 android:layout_height="wrap_content"
                 android:text="0"
                 android:textSize="18sp"
+                android:layout_marginLeft="4dp"
                 />
 
             <TextView
@@ -88,6 +99,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/km"
+                android:layout_marginStart="4dp"
                 android:textSize="18sp"
                 />
 
@@ -100,90 +112,76 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="2dp"
+
             >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/average_pace"
-            android:textSize="18sp"
-            />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/average_pace"
+                android:textSize="18sp"
+                />
 
-        <TextView
-            android:id="@+id/main_menu_LBL_avg_pace"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0.00"
-            android:textSize="18sp"
-            />
+            <TextView
+                android:id="@+id/main_menu_LBL_avg_pace"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.00"
+                android:textSize="18sp"
+                android:layout_marginLeft="4dp"
+                />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/km_h"
-            android:textSize="18sp"
-            />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/km_h"
+                android:textSize="18sp"
+                android:layout_marginLeft="4dp"
+                />
 
     </LinearLayout>
-
-
-    <LinearLayout
-            android:id="@+id/main_menu_LAY_pace_stats"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="20dp"
-            >
-
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/main_menu_LBL_history"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/main_menu_LAY_activity_btns"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/history_underline"
-                style="@style/Widget.MaterialComponents.Button"
-                android:textSize="15sp"
-                android:textAlignment="center"
-                android:textColor="@android:color/holo_blue_dark"
-                android:layout_weight="1"
-                />
+                android:orientation="vertical"
+                >
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/main_menu_BTN_new_activity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/start_new_activity"
+                    android:textAlignment="viewStart"
+                    app:backgroundTint="@color/colorPrimary"
+                    app:icon="@drawable/ic_timer"
+                    app:iconGravity="start"
+                    />
 
-        </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/main_menu_BTN_manual_activity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/manually_add_activity"
+                    android:textAlignment="viewStart"
+                    app:backgroundTint="@color/colorPrimary"
+                    app:icon="@drawable/ic_add"
+                    app:iconGravity="start"
+                    />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/main_menu_LBL_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/progress_history"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:textSize="15sp"
+                    android:textAlignment="viewStart"
+                    app:icon="@drawable/ic_history"
+                    app:iconGravity="start"
+                    />
 
-        <LinearLayout
-            android:id="@+id/main_menu_LAY_activity_btns"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="20dp"
-            >
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/main_menu_BTN_new_activity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/start_new_activity"
-                android:layout_weight="1"
-                app:backgroundTint="@color/colorReset"
-                android:textColor="@color/colorPrimary"
-                />
-            <!--                style="@style/Widget.MaterialComponents.Button"-->
-
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/main_menu_BTN_manual_activity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/manually_add_activity"
-                android:layout_marginStart="5dp"
-                android:layout_weight="1"
-                app:backgroundTint="@color/colorPrimaryDark"
-
-                />
-
-        </LinearLayout>
-
+            </LinearLayout>
         </LinearLayout>
 
 <!--        <LinearLayout-->

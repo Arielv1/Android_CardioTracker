@@ -149,9 +149,10 @@ tools:context=".Activity_New_Record">
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_gravity="center"
         >
 
         <Button
@@ -161,8 +162,9 @@ tools:context=".Activity_New_Record">
             android:visibility="invisible"
             android:text="@string/confirm"
             android:textSize="18sp"
-            android:layout_weight="1"
+
             />
+
         <Button
             android:id="@+id/new_run_BTN_cancel"
             android:layout_width="wrap_content"
@@ -170,7 +172,7 @@ tools:context=".Activity_New_Record">
             android:visibility="invisible"
             android:text="@string/cancel"
             android:textSize="18sp"
-            android:layout_weight="1"
+            android:layout_marginStart="5dp"
             />
 
     </LinearLayout>

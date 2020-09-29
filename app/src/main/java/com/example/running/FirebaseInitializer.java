@@ -1,5 +1,6 @@
 package com.example.running;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Log;
 
@@ -23,7 +24,7 @@ public class FirebaseInitializer {
         return instance;
     }
 
-    private FirebaseInitializer(Context context, String email, String password) {
+    private FirebaseInitializer(final Context context, String email, String password) {
 
         FirebaseApp.initializeApp(context);
         FirebaseAuth.getInstance().signInWithEmailAndPassword(
@@ -34,8 +35,9 @@ public class FirebaseInitializer {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "Firebase authentication Successful sign in");
                 } else {
-                    //If sign in fails, then log the error//
                     Log.d(TAG, "Firebase authentication failed");
+
+                    Toaster.getInstance().showToast("No Internet Connection");
                 }
             }
         });

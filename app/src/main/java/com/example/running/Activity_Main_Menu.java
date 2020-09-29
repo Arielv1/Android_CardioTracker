@@ -4,8 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -31,6 +34,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static kotlin.text.Typography.amp;
+
 public class Activity_Main_Menu extends AppCompatActivity{
 
     private static final String TAG = "ViewLogger";
@@ -42,7 +47,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     private TextView lblNumRuns;
     private TextView lblTotalDistance;
     private TextView lblAvgPace;
-//    private Button btnReset;
+
     private Button btnHistory;
 
     private LineGraphSeries<DataPoint> lineGraphSeries;
@@ -54,12 +59,10 @@ public class Activity_Main_Menu extends AppCompatActivity{
     private Spinner spinner;
     private String spinnerChoice;
 
-    FirebaseDatabase database;
-    DatabaseReference myRefAll_Running;
-    SimpleDateFormat sdf = new SimpleDateFormat("M");
-    String[] month_letters = {"Je"," Feb "," Mar ","Apr ","May ","Jun ","Jul ","Aug ","Sep ","Oct ","N","Dec"};
-//    String[] month_letters = {"Jen"," Feb "," Mar ","Apr ","May ","Jun ","Jul ","Aug ","Sep ","Oct ","Nov","Dec"};
-
+    private FirebaseDatabase database;
+    private DatabaseReference myRefAll_Running;
+    private SimpleDateFormat sdf = new SimpleDateFormat("M");
+    private String[] month_letters = {"Je"," Feb "," Mar ","Apr ","May ","Jun ","Jul ","Aug ","Sep ","Oct ","N","Dec"};
 
 
 
@@ -94,9 +97,23 @@ public class Activity_Main_Menu extends AppCompatActivity{
         Log.d("ViewLogger", "MainMenu - onStart Invoked");
         super.onStart();
 
-        /*allSportActivities = Utils.getInstance().getAllCardioSportActivitiesFromSP();
-        updateAllTextViewsAtributes();
-        showGraph();*/
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        if (!(activeNetworkInfo != null && activeNetworkInfo.isConnected())) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Internet Connection Problem");
+            builder.setMessage("There's seems to be a problem connecting to the WiFi / Mobile Data, as such some services won't work properly or at all");
+            builder.setPositiveButton("I UNDERSTAND", new DialogInterface.OnClickListener() {
+
+                public void onClick(DialogInterface dialog, int which) {
+                    // Do nothing but close the dialog
+                    reset();
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+
 
         getAllActivitiesFromFirebase();
 
@@ -156,14 +173,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
             }
         });
 
-//        btnReset.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                createAlert();
-////                reset();
-////                showGraph();
-//            }
-//        });
 
         btnHistory.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -173,31 +182,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
                 startActivity(intent);
             }
         });
-    }
-
-    private void createAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Confirm");
-        builder.setMessage("Are you sure you want to reset The Records of all Sport Activities?");
-        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int which) {
-                // Do nothing but close the dialog
-                reset();
-                showGraph();
-            }
-        });
-        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                // Do nothing
-                dialog.dismiss();
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
     }
 
     private void setUpSpinner() {
@@ -332,41 +316,20 @@ public class Activity_Main_Menu extends AppCompatActivity{
             dp[month-1] = new DataPoint (month, monthDistanceMap.get(month));
         }
         barGraphSeries = new BarGraphSeries<DataPoint>(dp);
-//        String[] month_letters = {" Jen "," Feb "," Mar ","Apr ","May ","Jun ","Jul ","Aug ","Sep ","Oct ","Nov "," Dec"};
 
-//        graph.getGridLabelRenderer().setLabelFormatter(
-//                new DefaultLabelFormatter() {
-//                    @Override
-//                    public String formatLabel(double value, boolean isValueX) {
-//                        if (isValueX) {
-//                            Log.d(TAG, "formatLabel: "+value);
-//                            // show normal x values
-////                            return super.formatLabel(value, isValueX) + "  ";
-//
-//                            return " " +month_letters[(int)value-1] + " ";
-//                        } else {
-//                            // show currency for y values
-//                            return super.formatLabel(value, isValueX);
-//                        }
-//                    }
-//                }
-//        );
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
         String[] month_numbers = {"1","2","3","4","5","6","7","8","9","10","11","12"};
         barGraphSeries.setDataWidth(0.5);
 
-//        barGraphSeries.setSpacing(20);
         graph.addSeries(barGraphSeries);
 
         staticLabelsFormatter.setHorizontalLabels(month_letters);
         graph.getGridLabelRenderer().setNumHorizontalLabels(12);
-//        graph.getGridLabelRenderer().setLabelsSpace(20);
         graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
         graph.setTitle("Yearly Tracking on Activities");
         graph.setClickable(false);
         graph.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
         graph.setVerticalScrollBarEnabled(false);
-//        graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinX(1);
         graph.getViewport().setMaxX(12);

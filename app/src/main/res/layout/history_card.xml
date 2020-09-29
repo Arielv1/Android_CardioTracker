@@ -147,7 +147,7 @@
                    android:id="@+id/card_IMG_edit"
                    android:layout_width="55dp"
                    android:layout_height="wrap_content"
-                   android:backgroundTint="@color/colorEdit"                   app:icon="@drawable/ic_edit"
+                   android:backgroundTint="@color/colorGreen"                   app:icon="@drawable/ic_edit"
                    android:layout_marginRight="4dp"
                    />
 
@@ -155,7 +155,7 @@
                    android:id="@+id/card_IMG_delete"
                    android:layout_width="55dp"
                    android:layout_height="wrap_content"
-                   android:backgroundTint="@color/colorDelete"
+                   android:backgroundTint="@color/colorRed"
                    app:icon="@drawable/ic_delete"
                    />
 

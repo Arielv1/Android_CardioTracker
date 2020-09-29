@@ -97,8 +97,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        savedChronometerState = savedInstanceState.getLong("CHRONO_STATE");
-        Log.d(TAG, "NewRun - onRestoreInstanceState " + savedChronometerState);
+        savedChronometerState = savedInstanceState.getLong("chronometer_state");
         tmrChronometer.setBase(savedChronometerState);
         tmrChronometer.start();
     }
@@ -126,7 +125,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
                     float[] results = new float[1];
                     Location.distanceBetween(lastLocation.latitude, lastLocation.longitude, currentLocation.latitude, currentLocation.longitude,results);
                     distance += (results[0]/1000);
-                    calculateAndDisplayPerformance(distance, (double)timeInSeconds/3600);
+                    calculateAndDisplayPerformance(distance, timeInSeconds);
 
                     mGoogleMap.addPolyline(new PolylineOptions().add(currentLocation, lastLocation));
                     lastLocation = currentLocation;
@@ -147,7 +146,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
     }
 
     private void calculateAndDisplayPerformance(double distance, double seconds) {
-        double pace = (distance/seconds);
+        double pace = Utils.getInstance().calculatePaceFromDistanceAndSeconds(distance, seconds);
         Log.d(TAG, "pace " + pace);
         DecimalFormat df = new DecimalFormat("###.##");
         updateTextView(lblDistance, df.format(distance));
@@ -289,7 +288,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
                 Log.d(TAG, "onClick: eTime " + eTime);
                 btnStart.setEnabled(false);
                 btnPause.setEnabled(false);
-                calculateAndDisplayPerformance(distance, (double)timeInSeconds/3600);
+                calculateAndDisplayPerformance(distance, timeInSeconds);
                 stopChronometer();
                 Intent i = new Intent(getApplicationContext(), GPS_Service.class);
                 stopService(i);
@@ -337,6 +336,9 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
                 fetchLastKnownLocation();
                 enableButtons();
             } else {
+                /*
+                TODO - imply to activate gps service
+                 */
                 confirmPermissions();
             }
         }
