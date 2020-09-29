@@ -42,7 +42,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     private TextView lblNumRuns;
     private TextView lblTotalDistance;
     private TextView lblAvgPace;
-    private Button btnReset;
+//    private Button btnReset;
     private Button btnHistory;
 
     private LineGraphSeries<DataPoint> lineGraphSeries;
@@ -156,14 +156,14 @@ public class Activity_Main_Menu extends AppCompatActivity{
             }
         });
 
-        btnReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                createAlert();
-//                reset();
-//                showGraph();
-            }
-        });
+//        btnReset.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                createAlert();
+////                reset();
+////                showGraph();
+//            }
+//        });
 
         btnHistory.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -213,7 +213,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
                     updateAllTextViewsAtributes();
                     showGraph();
                 }
-
                 MySP.getInstance().putString(Keys.SPINNER_CHOICE, spinnerChoice);
             }
             @Override
@@ -253,7 +252,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
         lblNumRuns = findViewById(R.id.main_menu_LBL_num_runs);
         lblTotalDistance = findViewById(R.id.main_menu_LBL_total_distance);
         lblAvgPace = findViewById(R.id.main_menu_LBL_avg_pace);
-        btnReset = findViewById(R.id.main_menu_LBL_reset);
+//        btnReset = findViewById(R.id.main_menu_LBL_reset);
         btnHistory = findViewById(R.id.main_menu_LBL_history);
         spinner = findViewById(R.id.main_menu_spinner);
     }
@@ -322,7 +321,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
             }
         }
 
-        DataPoint dp[] = new DataPoint[15];
+        DataPoint dp[] = new DataPoint[13];
 
         for (int i = 0 ; i < dp.length; i++) {
             dp[i] = new DataPoint(i, 0);
@@ -332,7 +331,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
             Log.d(TAG, "showGraph: " + month + " : " + monthDistanceMap.get(month));
             dp[month-1] = new DataPoint (month, monthDistanceMap.get(month));
         }
-        barGraphSeries = new BarGraphSeries<>(dp);
+        barGraphSeries = new BarGraphSeries<DataPoint>(dp);
 //        String[] month_letters = {" Jen "," Feb "," Mar ","Apr ","May ","Jun ","Jul ","Aug ","Sep ","Oct ","Nov "," Dec"};
 
 //        graph.getGridLabelRenderer().setLabelFormatter(
@@ -352,7 +351,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
 //                    }
 //                }
 //        );
-
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
         String[] month_numbers = {"1","2","3","4","5","6","7","8","9","10","11","12"};
         barGraphSeries.setDataWidth(0.5);
@@ -364,7 +362,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
         graph.getGridLabelRenderer().setNumHorizontalLabels(12);
 //        graph.getGridLabelRenderer().setLabelsSpace(20);
         graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
-        graph.setTitle("Month Numbers");
+        graph.setTitle("Yearly Tracking on Activities");
         graph.setClickable(false);
         graph.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
         graph.setVerticalScrollBarEnabled(false);

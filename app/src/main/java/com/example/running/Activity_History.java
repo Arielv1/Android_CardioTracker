@@ -1,10 +1,12 @@
 package com.example.running;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +28,8 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
 
     private Button btnList;
     private Button btnCard;
+    private Button btnReset;
+
 
     private ListCardAdapter listCardAdapter;
     private RecyclerView history_LAY_recyclerview;
@@ -34,6 +38,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
 
     private FirebaseDatabase database;
     private DatabaseReference databaseReference;
+
 
     @Override
     protected void onStop() {
@@ -72,8 +77,6 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
             }
             databaseReference.setValue(allSportActivities);
         }
-        else {
-        }
         setAdapterViewOption(MySP.getInstance().getInteger(Keys.HISTORY_VIEW_OPTION, Keys.DEFAULT_HISTORY_VIEW_OPTION_VALUE));
         refreshAllCardioActivitiesDisplayInAdapter(chosenRadioButtonValue);
     }
@@ -111,8 +114,67 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
                 setAdapterViewOption(Utils.AdapterViewOptions.CARD);
             }
         });
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createAlertReset();
+            }
+        });
+    }
+    private void createAlertReset() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm");
+        builder.setMessage("Are you sure you want to reset The Records of all Sport Activities?");
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing but close the dialog
+                reset();
+            }
+        });
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
+    private void createAlertDelete(final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm");
+        builder.setMessage("Are you sure you want to delete this Record?");
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing but close the dialog
+                deleteItem(position);
+            }
+        });
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void reset() {
+
+        allSportActivities  = new AllSportActivities();
+        databaseReference.setValue(allSportActivities);
+        MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE);
+        MySP.getInstance().putString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
+        MySP.getInstance().putString(Keys.RADIO_HISTORY_CHOICE, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
+    }
     private void initializeAdapter() {
         try {
             listCardAdapter = new ListCardAdapter(allSportActivities.getActivities(), this, lastDisplayChoice);
@@ -126,7 +188,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     }
 
     private AllSportActivities getBundleFromMainMenu() {
-        allSportActivities = (AllSportActivities) getIntent().getParcelableExtra(Keys.ALL_CARDIO_ACTIVITIES);
+        allSportActivities =  getIntent().getParcelableExtra(Keys.ALL_CARDIO_ACTIVITIES);
         if (allSportActivities  == null) {
             allSportActivities = new AllSportActivities(new ArrayList<CardioActivity>());
         }
@@ -146,6 +208,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     private void setUpViews() {
         btnList = findViewById(R.id.history_BTN_list);
         btnCard = findViewById(R.id.history_BTN_card);
+        btnReset = findViewById(R.id.history_LBL_reset);
         history_LAY_recyclerview = findViewById(R.id.history_LAY_recyclerview);
     }
 
@@ -179,12 +242,22 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
         intent.putExtra(Keys.NEW_DATA_PACKAGE, current);
         startActivity(intent);
     }
-
     @Override
     public void onItemDelete(int position) {
 
+        createAlertDelete(position);
+//        Gson gson = new Gson();
+//
+//        ArrayList <CardioActivity> activities = allSportActivities.getActivities();
+//        activities.remove(position);
+//        allSportActivities.setActivities(activities);
+//        listCardAdapter.notifyDataSetChanged();
+//        MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
+//        databaseReference.setValue(allSportActivities);
+    }
+    public void deleteItem(int position)
+    {
         Gson gson = new Gson();
-
         ArrayList <CardioActivity> activities = allSportActivities.getActivities();
         activities.remove(position);
         allSportActivities.setActivities(activities);

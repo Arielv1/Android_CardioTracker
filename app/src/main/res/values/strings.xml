@@ -33,5 +33,9 @@
     <string name="confirm">Confirm</string>
     <string name="card">Card</string>
     <string name="list">List</string>
+    <string name="total_runs">Total Runs:</string>
+    <string name="total_distance">Total Distance:</string>
+    <string name="km">km</string>
+    <string name="average_pace">Average Pace:</string>
 
 </resources>

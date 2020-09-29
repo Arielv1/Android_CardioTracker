@@ -231,7 +231,6 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         }
         else {
             timePickerDialog.hide();
-
         }
 
 
@@ -239,6 +238,14 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
 
     private boolean checkEdtField(EditText editText, String message) {
         if (editText.getText().toString().trim().length() == 0) {
+            Toaster.getInstance().showToast(message);
+            return false;
+        }
+        return true;
+    }
+    private boolean checkEndTimeCompareToStartTime(String message) {
+        long result = calculateDuration();
+        if (result < 0) {
             Toaster.getInstance().showToast(message);
             return false;
         }
@@ -259,8 +266,8 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
                 checkEdtField(edtDate, "Date Field Is Empty") &&
                 checkEdtField(edtStartTime, "Start Time Field Is Empty") &&
                 checkEdtField(edtEndTime, "End Time Field Is Empty") &&
-                checkEdtField(edtDistance, "Distance Field Is Empty");
-
+                checkEdtField(edtDistance, "Distance Field Is Empty") &&
+                checkEndTimeCompareToStartTime("End Time Bigger then Start Time");
     }
 
 
