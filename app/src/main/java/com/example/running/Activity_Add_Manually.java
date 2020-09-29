@@ -26,7 +26,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 
-public class Activity_Add_Manually extends AppCompatActivity {
+public class Activity_Add_Manually extends AppCompatActivity implements Callback_RadioChoice {
 
     private static final String TAG = "ViewLogger";
 
@@ -59,6 +59,15 @@ public class Activity_Add_Manually extends AppCompatActivity {
 
     private boolean calledFromHistory = false;
     private CardioActivity theCurrentActivity;
+
+    Callback_RadioChoice callback = new Callback_RadioChoice() {
+        @Override
+        public void setRadioButtonChoice(String radioChoiceValue) {
+            cardioActivityChoice = radioChoiceValue;
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,7 +84,7 @@ public class Activity_Add_Manually extends AppCompatActivity {
 
         if (theCurrentActivity != null) {
             displayCardioActivityInFields(theCurrentActivity);
-            btnAddSave.setText("Save");
+            btnAddSave.setText("save");
             calledFromHistory = true;
         }
 
@@ -134,6 +143,8 @@ public class Activity_Add_Manually extends AppCompatActivity {
         lblPace.setText(cardioActivity.getPace() + "");
         lblDuration.setText(cardioActivity.getDuration());
         cardioActivityChoice = cardioActivity.getCardioActivityType();
+        Log.d(TAG, "displayCardioActivityInFields: before calling SetRadio Button with: "+cardioActivityChoice);
+        setRadioButtonChoice(cardioActivityChoice);
     }
 
     private void setLblPace() {
@@ -149,13 +160,6 @@ public class Activity_Add_Manually extends AppCompatActivity {
         fragment_radio_buttons = Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.manual_fragment_radio_group, false);
 
     }
-
-    Callback_RadioChoice callback = new Callback_RadioChoice() {
-        @Override
-        public void setRadioButtonChoice(String radioChoiceValue) {
-            cardioActivityChoice = radioChoiceValue;
-        }
-    };
 
     private String[] splitEditTextByString(EditText et, String symbol){
         return et.getText().toString().split(symbol);
@@ -362,4 +366,8 @@ public class Activity_Add_Manually extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(postListener);
     }
 
+    @Override
+    public void setRadioButtonChoice(String radioChoiceValue) {
+        Log.d(TAG, "setRadioButtonChoice called with:" +radioChoiceValue);
+    }
 }

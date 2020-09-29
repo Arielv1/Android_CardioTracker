@@ -234,7 +234,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Confirm"
+                android:text="@string/confirm"
                 android:textSize="18sp"
             />
 
@@ -243,7 +243,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Cancel"
+                android:layout_marginStart="5dp"
+                android:text="@string/cancel"
                 android:textSize="18sp" />
         </LinearLayout>
 

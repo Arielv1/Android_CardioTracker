@@ -20,7 +20,7 @@
        app:layoutManager="LinearLayoutManager"
        tools:layout_editor_absoluteX="36dp"
        tools:layout_editor_absoluteY="-16dp"
-       app:cardBackgroundColor="#25B189"
+       app:cardBackgroundColor="#FFFFFF"
        tools:listitem="@layout/fragment_history_list_item">
 
       <LinearLayout

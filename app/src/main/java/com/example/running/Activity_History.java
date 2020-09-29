@@ -1,6 +1,8 @@
 package com.example.running;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -25,7 +27,6 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     private Button btnList;
     private Button btnCard;
 
-
     private ListCardAdapter listCardAdapter;
     private RecyclerView history_LAY_recyclerview;
     private int lastDisplayChoice;
@@ -36,7 +37,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
 
     @Override
     protected void onStop() {
-        Log.d("ViewLogger", "History - onStop Invoked");
+        Log.d(TAG , "History - onStop Invoked");
 
         super.onStop();
         MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
@@ -44,7 +45,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
 
     @Override
     protected void onDestroy() {
-        Log.d("ViewLogger", "History - onDestroy Invoked");
+        Log.d(TAG, "History - onDestroy Invoked");
 
         super.onDestroy();
         MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
@@ -52,7 +53,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
 
     @Override
     protected void onStart() {
-        Log.d("ViewLogger", "History - onStart Invoked");
+        Log.d(TAG, "History - onStart Invoked");
         super.onStart();
 
         Gson gson = new Gson();
@@ -154,6 +155,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     private void refreshAllCardioActivitiesDisplayInAdapter(String radioChoiceValue) {
         listCardAdapter.setCardioActivities(Utils.getInstance().filterCardioActivitiesByType(allSportActivities.getActivities(), radioChoiceValue));
         listCardAdapter.notifyDataSetChanged();
+        history_LAY_recyclerview.addItemDecoration(new DividerItemDecoration(history_LAY_recyclerview.getContext(),LinearLayoutManager.VERTICAL));
         history_LAY_recyclerview.setAdapter(listCardAdapter);
     }
 
@@ -161,12 +163,15 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
         MySP.getInstance().putInteger(Keys.HISTORY_VIEW_OPTION, viewType);
         listCardAdapter.setViewTypeRequset(viewType);
         listCardAdapter.notifyDataSetChanged();
+        history_LAY_recyclerview.addItemDecoration(new DividerItemDecoration(history_LAY_recyclerview.getContext(),LinearLayoutManager.VERTICAL));
         history_LAY_recyclerview.setAdapter(listCardAdapter);
     }
 
     @Override
     public void onItemEdit(int position) {
         Intent intent = new Intent(getApplicationContext(), Activity_Add_Manually.class);
+        chosenRadioButtonValue = allSportActivities.getActivities().get(position).getCardioActivityType();
+        MySP.getInstance().putString(Keys.RADIO_HISTORY_CHOICE, chosenRadioButtonValue);
         intent.putExtra(Keys.NEW_DATA_PACKAGE, allSportActivities.getActivities().get(position));
         startActivity(intent);
     }

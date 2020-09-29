@@ -20,5 +20,18 @@
     values-round/strings.xml for round devices.
     -->
     <string name="hello_world">Hello Square World!</string>
+    <string name="manually_add_activity">Manually  Add Activity</string>
+    <string name="start_new_activity">Start New Activity</string>
+    <string name="cancel">Cancel</string>
+    <string name="start">start</string>
+    <string name="pause">pause</string>
+    <string name="stop">stop</string>
+    <string name="distance">Distance:</string>
+    <string name="speed">Speed:</string>
+    <string name="km_h">km/h</string>
+    <string name="calories_burned">Calories Burned:</string>
+    <string name="confirm">Confirm</string>
+    <string name="card">Card</string>
+    <string name="list">List</string>
 
 </resources>

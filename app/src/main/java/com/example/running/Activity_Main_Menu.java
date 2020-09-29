@@ -1,8 +1,10 @@
 package com.example.running;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,16 +20,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-import java.security.Key;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 public class Activity_Main_Menu extends AppCompatActivity{
@@ -41,8 +44,8 @@ public class Activity_Main_Menu extends AppCompatActivity{
     private TextView lblNumRuns;
     private TextView lblTotalDistance;
     private TextView lblAvgPace;
-    private TextView lblReset;
-    private TextView lblHistory;
+    private Button btnReset;
+    private Button btnHistory;
 
     private LineGraphSeries<DataPoint> lineGraphSeries;
     private BarGraphSeries<DataPoint> barGraphSeries;
@@ -55,6 +58,12 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
     FirebaseDatabase database;
     DatabaseReference myRefAll_Running;
+    SimpleDateFormat sdf = new SimpleDateFormat("M");
+    String[] month_letters = {"Je"," Feb "," Mar ","Apr ","May ","Jun ","Jul ","Aug ","Sep ","Oct ","N","Dec"};
+//    String[] month_letters = {"Jen"," Feb "," Mar ","Apr ","May ","Jun ","Jul ","Aug ","Sep ","Oct ","Nov","Dec"};
+
+
+
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -148,15 +157,16 @@ public class Activity_Main_Menu extends AppCompatActivity{
             }
         });
 
-        lblReset.setOnClickListener(new View.OnClickListener() {
+        btnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                reset();
-                showGraph();
+                createAlert();
+//                reset();
+//                showGraph();
             }
         });
 
-        lblHistory.setOnClickListener(new View.OnClickListener() {
+        btnHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), Activity_History.class);
@@ -164,6 +174,31 @@ public class Activity_Main_Menu extends AppCompatActivity{
                 startActivity(intent);
             }
         });
+    }
+
+    private void createAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm");
+        builder.setMessage("Are you sure you want to reset The Records of all Sport Activities?");
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing but close the dialog
+                reset();
+                showGraph();
+            }
+        });
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Do nothing
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void setUpSpinner() {
@@ -219,8 +254,8 @@ public class Activity_Main_Menu extends AppCompatActivity{
         lblNumRuns = findViewById(R.id.main_menu_LBL_num_runs);
         lblTotalDistance = findViewById(R.id.main_menu_LBL_total_distance);
         lblAvgPace = findViewById(R.id.main_menu_LBL_avg_pace);
-        lblReset = findViewById(R.id.main_menu_LBL_reset);
-        lblHistory = findViewById(R.id.main_menu_LBL_history);
+        btnReset = findViewById(R.id.main_menu_LBL_reset);
+        btnHistory = findViewById(R.id.main_menu_LBL_history);
         spinner = findViewById(R.id.main_menu_spinner);
     }
 
@@ -288,24 +323,57 @@ public class Activity_Main_Menu extends AppCompatActivity{
             }
         }
 
-        DataPoint dp[] = new DataPoint[200];
+        DataPoint dp[] = new DataPoint[15];
 
-        for (int i = 0 ; i < dp.length; i++) {
+        for (int i = 1 ; i < dp.length; i++) {
             dp[i] = new DataPoint(i, 0);
         }
 
         for (int month : releventMonths) {
-            dp[month] = new DataPoint (month, monthDistanceMap.get(month));
+            dp[month-1] = new DataPoint (month, monthDistanceMap.get(month));
         }
+        barGraphSeries = new BarGraphSeries<>(dp);
+//        String[] month_letters = {" Jen "," Feb "," Mar ","Apr ","May ","Jun ","Jul ","Aug ","Sep ","Oct ","Nov "," Dec"};
 
-        barGraphSeries = new BarGraphSeries<DataPoint>(dp);
+//        graph.getGridLabelRenderer().setLabelFormatter(
+//                new DefaultLabelFormatter() {
+//                    @Override
+//                    public String formatLabel(double value, boolean isValueX) {
+//                        if (isValueX) {
+//                            Log.d(TAG, "formatLabel: "+value);
+//                            // show normal x values
+////                            return super.formatLabel(value, isValueX) + "  ";
+//
+//                            return " " +month_letters[(int)value-1] + " ";
+//                        } else {
+//                            // show currency for y values
+//                            return super.formatLabel(value, isValueX);
+//                        }
+//                    }
+//                }
+//        );
+
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
-        graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+        String[] month_numbers = {"1","2","3","4","5","6","7","8","9","10","11","12"};
+        barGraphSeries.setDataWidth(0.5);
+
+//        barGraphSeries.setSpacing(20);
         graph.addSeries(barGraphSeries);
-        graph.getViewport().setXAxisBoundsManual(true);
+
+        staticLabelsFormatter.setHorizontalLabels(month_letters);
+        graph.getGridLabelRenderer().setNumHorizontalLabels(12);
+//        graph.getGridLabelRenderer().setLabelsSpace(20);
+        graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+        graph.setTitle("Month Numbers");
+        graph.setClickable(false);
+        graph.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+        graph.setVerticalScrollBarEnabled(false);
+//        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinX(1);
         graph.getViewport().setMaxX(12);
-        graph.getViewport().setScalable(true);
+//        graph.getViewport().setScalable(true);
+        graph.getViewport().setScrollableY(true);
     }
 
     private ArrayList <CardioActivity> getCardioActivitiesBySpinnerChoice() {

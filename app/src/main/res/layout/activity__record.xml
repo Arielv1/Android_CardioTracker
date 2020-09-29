@@ -44,19 +44,21 @@ tools:context=".Activity_New_Record">
             android:id="@+id/new_run_BTN_start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="start"
+            android:text="@string/start"
             />
         <Button
             android:id="@+id/new_run_BTN_pause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="pause"
+            android:text="@string/pause"
+            android:layout_marginStart="5dp"
             />
         <Button
             android:id="@+id/new_run_BTN_stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="stop"
+            android:text="@string/stop"
+            android:layout_marginStart="5dp"
             />
     </LinearLayout>
     <LinearLayout
@@ -71,7 +73,7 @@ tools:context=".Activity_New_Record">
             android:id="@+id/new_run_LBL_distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Distance:"
+            android:text="@string/distance"
             android:textSize="18sp"
             />
 
@@ -89,7 +91,7 @@ tools:context=".Activity_New_Record">
             android:layout_height="wrap_content"
             android:text="km"
             android:textSize="18sp"
-            android:paddingLeft="5dp"
+            android:paddingStart="5dp"
             />
 
 
@@ -106,7 +108,7 @@ tools:context=".Activity_New_Record">
             android:id="@+id/new_run_LBL_avg_speed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Speed:"
+            android:text="@string/speed"
             android:textSize="18sp"
             />
 
@@ -116,15 +118,15 @@ tools:context=".Activity_New_Record">
             android:layout_height="wrap_content"
             android:text="0.00"
             android:textSize="18sp"
-            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
             />
         <TextView
             android:id="@+id/new_run_LBL_kmh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="km/h"
+            android:text="@string/km_h"
             android:textSize="18sp"
-            android:paddingLeft="5dp"
+            android:paddingStart="5dp"
             />
     </LinearLayout>
     <LinearLayout
@@ -139,7 +141,7 @@ tools:context=".Activity_New_Record">
             android:id="@+id/new_run_LBL_avg_Calories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Calories Burned:"
+            android:text="@string/calories_burned"
             android:textSize="18sp"
             />
 
@@ -149,7 +151,7 @@ tools:context=".Activity_New_Record">
             android:layout_height="wrap_content"
             android:text="0"
             android:textSize="18sp"
-            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
             />
 
     </LinearLayout>
@@ -166,7 +168,7 @@ tools:context=".Activity_New_Record">
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="invisible"
-            android:text="Confirm"
+            android:text="@string/confirm"
             android:textSize="18sp"
             android:layout_weight="1"
             />
@@ -175,16 +177,14 @@ tools:context=".Activity_New_Record">
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="invisible"
-            android:text="Cancel"
+            android:text="@string/cancel"
             android:textSize="18sp"
             android:layout_weight="1"
             />
 
     </LinearLayout>
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/new_run_LL_end_run_btns"

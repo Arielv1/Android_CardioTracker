@@ -28,7 +28,9 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
 
     class ListViewHolder extends RecyclerView.ViewHolder implements  OnClickListener{
 
-        TextView mDate, mActivityType, mPace, mDuration, mDistance, mEdit, mDelete;
+        TextView mDate, mActivityType, mPace, mDuration, mDistance;
+        ImageView mEdit, mDelete;
+
         OnItemClickListener listener;
 
         public ListViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
@@ -38,8 +40,8 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
             mPace = itemView.findViewById(R.id.history_list_LBL_pace);
             mDuration = itemView.findViewById(R.id.history_list_LBL_duration);
             mDistance = itemView.findViewById(R.id.history_list_LBL_km);
-            mEdit= itemView.findViewById(R.id.history_list_LBL_edit);
-            mDelete= itemView.findViewById(R.id.history_list_LBL_delete);
+            mEdit= itemView.findViewById(R.id.list_IMG_edit);
+            mDelete= itemView.findViewById(R.id.list_IMG_delete);
             itemView.setOnClickListener(this);
 
             mEdit.setOnClickListener(new OnClickListener() {

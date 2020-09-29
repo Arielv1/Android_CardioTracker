@@ -40,14 +40,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="List"/>
+                android:text="@string/list"/>
 
             <Button
                 android:id="@+id/history_BTN_card"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Card"/>
+                android:layout_marginStart="5dp"
+                android:text="@string/card"/>
 
 
         </LinearLayout>
