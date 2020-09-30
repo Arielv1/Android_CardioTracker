@@ -24,7 +24,6 @@ public class CardioActivity implements Parcelable, Comparable<CardioActivity> {
     public CardioActivity() {
 
     }
-
 //    public CardioActivity(String[] date, String duration, double distance, double pace, long createdTimestamp, String cardioActivityType, String timeStart, String timeEnd) {
     public CardioActivity(String date,String duration, double distance, double pace, double caloriesBurned, long createdTimestamp, String cardioActivityType, String timeStart, String timeEnd) {
     this.id = UUID.randomUUID().toString();
@@ -38,7 +37,6 @@ public class CardioActivity implements Parcelable, Comparable<CardioActivity> {
     this.timeStart = timeStart;
     this.timeEnd = timeEnd;
     }
-
 
     protected CardioActivity(Parcel in) {
         id = in.readString();
@@ -65,8 +63,6 @@ public class CardioActivity implements Parcelable, Comparable<CardioActivity> {
         }
     };
 
-
-
     @Override
     public int describeContents() {
         return 0;
@@ -84,7 +80,6 @@ public class CardioActivity implements Parcelable, Comparable<CardioActivity> {
         parcel.writeString(cardioActivityType);
         parcel.writeString(timeStart);
         parcel.writeString(timeEnd);
-
     }
 
     public String getDate() {

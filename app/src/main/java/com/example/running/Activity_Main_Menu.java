@@ -95,13 +95,15 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
     @Override
     protected void onResume() {
-        Log.d("ViewLogger", "MainMenu - onResume Invoked");
+        Log.d(TAG, "onResume Invoked");
         super.onResume();
+        updateAllTextViewsAttributes();
+        showGraph();
     }
 
     @Override
     protected void onStart() {
-        Log.d("ViewLogger", "MainMenu - onStart Invoked");
+        Log.d(TAG , "onStart Invoked");
         super.onStart();
         setWeightEditText(MySP.getInstance().getDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE));
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -116,9 +118,10 @@ public class Activity_Main_Menu extends AppCompatActivity{
             AlertDialog alert = builder.create();
             alert.show();
         }
-
-
         getAllActivitiesFromFirebase();
+        // TODO: 10/1/2020  check if needed 
+//        updateAllTextViewsAttributes();
+//        showGraph();
     }
 
 
@@ -128,7 +131,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
     protected void onStop() {
         Log.d("ViewLogger", "MainMenu - onStop Invoked");
         super.onStop();
-
         MySP.getInstance().putString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
 
     }
@@ -202,10 +204,8 @@ public class Activity_Main_Menu extends AppCompatActivity{
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 spinnerChoice = (parent.getItemAtPosition(position).toString());
-                if (allSportActivities != null) {
-                    updateAllTextViewsAtributes();
-                    showGraph();
-                }
+                updateAllTextViewsAttributes();
+                showGraph();
                 MySP.getInstance().putString(Keys.SPINNER_CHOICE, spinnerChoice);
             }
             @Override
@@ -293,11 +293,24 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
     }
 
-    private void updateAllTextViewsAtributes() {
-        updateNumRuns();
-        updatePace();
-        updateTotalDistance();
-        updateTotalCalories();
+    private void updateAllTextViewsAttributes() {
+        if(allSportActivities == null)
+        {
+            resetAllTextViewsAttributes();
+        }
+        else {
+            updateNumRuns();
+            updatePace();
+            updateTotalDistance();
+            updateTotalCalories();
+        }
+    }
+
+    private void resetAllTextViewsAttributes() {
+        lblTotalCalories.setText("0");
+        lblAvgPace.setText("0");
+        lblNumRuns.setText("0");
+        lblTotalDistance.setText("0");
     }
 
     private void updateTextView(TextView tv, String update) {
@@ -332,12 +345,13 @@ public class Activity_Main_Menu extends AppCompatActivity{
         Log.d(TAG, "showGraph: " + allSportActivities);
         
         graph.removeAllSeries();
-
+        if(allSportActivities == null)
+            return;
         HashMap<Integer, Double> monthDistanceMap = new HashMap<>();
         ArrayList <Integer> releventMonths = new ArrayList <>();
         ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();
 
-        if(releventActivities == null || allSportActivities == null || allSportActivities.getActivities().size() == 0)
+        if(releventActivities == null  || allSportActivities.getActivities().size() == 0)
             return;
         for (CardioActivity current : releventActivities) {
             String[] date = current.getDate().split("/");
@@ -399,10 +413,8 @@ public class Activity_Main_Menu extends AppCompatActivity{
                 Utils.getInstance().putAllCardioSportActivitiesInSP(allSportActivities);
 
                 Log.d(TAG, "onDataChange: " + allSportActivities);
-                if(allSportActivities != null){
-                    updateAllTextViewsAtributes();
-                    showGraph();
-                }
+                updateAllTextViewsAttributes();
+                showGraph();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
