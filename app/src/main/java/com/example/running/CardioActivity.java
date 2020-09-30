@@ -15,6 +15,7 @@ public class CardioActivity implements Parcelable, Comparable<CardioActivity> {
     private String duration; /* is a string since time format is 12:34:56 */
     private double distance;
     private double pace;
+    private double caloriesBurned;
     private long createdTimestamp = new Date().getTime();
     private String cardioActivityType;
     private String timeStart;
@@ -25,12 +26,13 @@ public class CardioActivity implements Parcelable, Comparable<CardioActivity> {
     }
 
 //    public CardioActivity(String[] date, String duration, double distance, double pace, long createdTimestamp, String cardioActivityType, String timeStart, String timeEnd) {
-    public CardioActivity(String date,String duration, double distance, double pace, long createdTimestamp, String cardioActivityType, String timeStart, String timeEnd) {
+    public CardioActivity(String date,String duration, double distance, double pace, double caloriesBurned, long createdTimestamp, String cardioActivityType, String timeStart, String timeEnd) {
     this.id = UUID.randomUUID().toString();
     this.date = date;
     this.duration = duration;
     this.distance = distance;
     this.pace = pace;
+    this.caloriesBurned = caloriesBurned;
     this.createdTimestamp = createdTimestamp;
     this.cardioActivityType = cardioActivityType;
     this.timeStart = timeStart;
@@ -44,6 +46,7 @@ public class CardioActivity implements Parcelable, Comparable<CardioActivity> {
         duration = in.readString();
         distance = in.readDouble();
         pace = in.readDouble();
+        caloriesBurned = in.readDouble();
         createdTimestamp = in.readLong();
         cardioActivityType = in.readString();
         timeStart = in.readString();
@@ -76,6 +79,7 @@ public class CardioActivity implements Parcelable, Comparable<CardioActivity> {
         parcel.writeString(duration);
         parcel.writeDouble(distance);
         parcel.writeDouble(pace);
+        parcel.writeDouble(caloriesBurned);
         parcel.writeLong(createdTimestamp);
         parcel.writeString(cardioActivityType);
         parcel.writeString(timeStart);
@@ -117,6 +121,14 @@ public class CardioActivity implements Parcelable, Comparable<CardioActivity> {
 
     public void setPace(double pace) {
         this.pace = pace;
+    }
+
+    public double getCaloriesBurned() {
+        return caloriesBurned;
+    }
+
+    public void setCaloriesBurned(double caloriesBurned) {
+        this.caloriesBurned = caloriesBurned;
     }
 
     public long getCreatedTimestamp() {
@@ -163,13 +175,13 @@ public class CardioActivity implements Parcelable, Comparable<CardioActivity> {
                 ", duration='" + duration + '\'' +
                 ", distance=" + distance +
                 ", pace=" + pace +
+                ", caloriesBurned=" + caloriesBurned +
                 ", createdTimestamp=" + createdTimestamp +
                 ", cardioActivityType='" + cardioActivityType + '\'' +
                 ", timeStart='" + timeStart + '\'' +
                 ", timeEnd='" + timeEnd + '\'' +
                 '}';
     }
-
 
     @Override
     public int compareTo(CardioActivity cardioActivity) {

@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         tools:layout_editor_absoluteX="-16dp"
         tools:layout_editor_absoluteY="287dp"
         android:orientation="vertical">
@@ -20,19 +20,8 @@
             >
 
         </FrameLayout>
-            
-
-        <TextView
-            android:id="@+id/manual_DP_calendar"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/manual_fragment_radio_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            />
 
         <LinearLayout
-            android:id="@+id/manual_LL_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
@@ -132,89 +121,86 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             >
 
             <LinearLayout
-                android:id="@+id/manual_LL_duration_summary"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_weight="1">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Activity Duration:"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/manual_LBL_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
                     android:textSize="24sp"
+                    android:layout_marginStart="4dp"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Overall Pace:"
+                    android:textSize="24sp"
+                    />
+
+                <TextView
+                    android:id="@+id/manual_LBL_pace"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0.00"
+                    android:textSize="24sp"
+                    android:layout_marginStart="4dp"
                     />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Activity Pace:"
+                    android:text="@string/km_h"
                     android:textSize="24sp"
+                    android:layout_marginStart="4dp"
                     />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/manual_LL_pace_summary"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
                 >
-                 <LinearLayout
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:orientation="horizontal"
-                     >
-                     <TextView
-                         android:id="@+id/manual_LBL_duration"
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:text="00:00"
-                         android:textSize="24sp"
-                         />
 
-                     <TextView
-                         android:id="@+id/manual_LBL_duration_units"
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:text="hours"
-                         android:textSize="24sp"
-                         android:layout_marginLeft="8dp"
-                         />
-                 </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    >
-                    <TextView
-                        android:id="@+id/manual_LBL_pace"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0.00"
-                        android:textSize="24sp"
+                    android:text="Calories Burned:"
+                    android:textSize="24sp"
+                    />
 
-                        />
-
-                    <TextView
-                        android:id="@+id/manual_LBL_pace_units"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="km/h"
-                        android:textSize="24sp"
-                        android:layout_marginLeft="8dp"
-                        />
-                </LinearLayout>
-
-
+                <TextView
+                    android:id="@+id/manual_LBL_calories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="24sp"
+                    android:layout_marginLeft="4dp"
+                    />
 
             </LinearLayout>
-
 
         </LinearLayout>
 
@@ -224,9 +210,8 @@
             android:id="@+id/manual_LL_action_btns"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@+id/manual_LL_pace_summary"
             android:orientation="horizontal"
+            android:layout_marginTop="8dp"
             >
 
             <Button

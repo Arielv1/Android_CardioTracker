@@ -21,10 +21,7 @@ import com.google.gson.Gson;
 import com.ikovac.timepickerwithseconds.MyTimePickerDialog;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 
 public class Activity_Add_Manually extends AppCompatActivity implements Callback_RadioChoice {
@@ -47,6 +44,12 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
 
     private TextView lblDuration;
     private TextView lblPace;
+    private TextView lblCalories;
+
+    private long duration = 0;
+    private double distance = 0;
+    private double pace = 0;
+    private double caloriesBurned = 0;
 
     private Fragment_Radio_Buttons fragment_radio_buttons;
 
@@ -101,7 +104,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
             public void onClick(View view) {
                 if (verifyEdtFields()) {
                     setLblDuration();
-                    setLblPace();
+                    setLblPaceCaloriesAndDistance();
                     sendNewRunData();
                     finish();
                 }
@@ -133,7 +136,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         edtDistance.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                setLblPace();
+                setLblPaceCaloriesAndDistance();
             }
         });
  }
@@ -153,16 +156,20 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
 
     private void setLblDuration() {
         if (edtStartTime.getText().length() != 0 && edtEndTime.getText().length() != 0){
-            lblDuration.setText(Utils.getInstance().formatTimeToString(Utils.getInstance().calculateTimeDifference(edtStartTime.getText().toString(), edtEndTime.getText().toString())));
+            duration = Utils.getInstance().calculateTimeDifference(edtStartTime.getText().toString(), edtEndTime.getText().toString());
+            lblDuration.setText(Utils.getInstance().formatTimeToString(duration));
         }
     }
 
-    private void setLblPace() {
+    private void setLblPaceCaloriesAndDistance() {
         if (edtDistance.getText().length()!=0 && edtStartTime.getText().length()!=0 && edtEndTime.getText().length()!=0) {
             DecimalFormat df = new DecimalFormat("###.##");
-            double distance = Double.parseDouble(edtDistance.getText().toString());
-            double pace = Utils.getInstance().calculatePaceFromDistanceAndSeconds(distance, Utils.getInstance().calculateTimeDifference(edtStartTime.getText().toString(), edtEndTime.getText().toString()));
+            distance = Double.parseDouble(edtDistance.getText().toString());
+            pace = Utils.getInstance().calculatePaceFromDistanceAndSeconds(distance, Utils.getInstance().calculateTimeDifference(edtStartTime.getText().toString(), edtEndTime.getText().toString()));
+            caloriesBurned = CaloriesCalculator.getInstance().calculateBurnedCalories(pace, duration);
             lblPace.setText(df.format(pace% 100));
+            lblCalories.setText(df.format(caloriesBurned));
+
         }
     }
 
@@ -171,9 +178,6 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
 
     }
 
-    private String[] splitEditTextByString(EditText et, String symbol){
-        return et.getText().toString().split(symbol);
-    }
 
 
     private void setUpViews() {
@@ -187,6 +191,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         calendar = Calendar.getInstance();
         lblDuration = findViewById(R.id.manual_LBL_duration);
         lblPace = findViewById(R.id.manual_LBL_pace);
+        lblCalories = findViewById(R.id.manual_LBL_calories);
     }
 
 
@@ -223,7 +228,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
                 public void onTimeSet(com.ikovac.timepickerwithseconds.TimePicker view, int hourOfDay, int minute, int seconds) {
                     edt.setText(hourOfDay + ":" + minute + ":" + seconds);
                     setLblDuration();
-                    setLblPace();
+                    setLblPaceCaloriesAndDistance();
                 }
 
             },hour, minutes, seconds, true);
@@ -235,6 +240,8 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
 
 
     }
+
+
 
     private boolean checkEdtField(EditText editText, String message) {
         if (editText.getText().toString().trim().length() == 0) {
@@ -272,8 +279,9 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         if (calledFromHistory) {
             theCurrentActivity.setDate(edtDate.getText().toString());
             theCurrentActivity.setDuration(lblDuration.getText().toString());
-            theCurrentActivity.setDistance(Double.parseDouble(edtDistance.getText().toString()));
-            theCurrentActivity.setPace(Double.parseDouble(lblPace.getText().toString()));
+            theCurrentActivity.setDistance(distance);
+            theCurrentActivity.setPace(pace);
+            theCurrentActivity.setCaloriesBurned(caloriesBurned);
             theCurrentActivity.setCardioActivityType(cardioActivityChoice);
             theCurrentActivity.setTimeStart(sTime);
             theCurrentActivity.setTimeEnd(eTime);
@@ -287,8 +295,9 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
              theCurrentActivity = new CardioActivity(
                      edtDate.getText().toString(),
                      lblDuration.getText().toString(),
-                    Double.parseDouble(edtDistance.getText().toString()),
-                    Double.parseDouble(lblPace.getText().toString()),
+                    distance,
+                    pace,
+                    caloriesBurned,
                     new Date().getTime(),
                     cardioActivityChoice,
                     sTime,

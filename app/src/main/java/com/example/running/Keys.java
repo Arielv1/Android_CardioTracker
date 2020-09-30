@@ -21,12 +21,19 @@ public interface Keys {
     public static final String SPINNER_CHOICE = "SPINNER_CHOICE";
     public static final String DEFAULT_SPINNER_CHOICE_VALUE = Utils.CardioActivityTypes.ALL;
 
-    public static String RADIO_HISTORY_CHOICE = "";
-    public static String DEFAULT_RADIO_BUTTONS_HISTORY_VALUE = Utils.CardioActivityTypes.ALL;
+    public static final String RADIO_HISTORY_CHOICE = "";
+    public static final String DEFAULT_RADIO_BUTTONS_HISTORY_VALUE = Utils.CardioActivityTypes.ALL;
 
-    public static String RADIO_HISTORY_CHOICE_EDIT = "";
-    public static String RADIO_CHOICE_NEW_RECORD = "";
+    public static final String RADIO_HISTORY_CHOICE_EDIT = "";
+    public static final String RADIO_CHOICE_NEW_RECORD = "";
 
-    public static String HISTORY_VIEW_OPTION = "HISTORY_VIEW_OPTION";
-    public static int DEFAULT_HISTORY_VIEW_OPTION_VALUE = Utils.AdapterViewOptions.LIST;
+    public static final String HISTORY_VIEW_OPTION = "HISTORY_VIEW_OPTION";
+    public static final int DEFAULT_HISTORY_VIEW_OPTION_VALUE = Utils.AdapterViewOptions.LIST;
+
+    public static final String WEIGHT_KEY = "WEIGHT_KEY";
+
+    public static final String WEIGHT_WARNING = "WEIGHT_WARNING";
+    public static final boolean DEFAULT_VALUE_WEIGHT_WARNING = false;
+
+
 }

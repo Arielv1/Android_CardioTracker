@@ -40,7 +40,18 @@
                 android:foregroundGravity="center"
                 android:textAlignment="center"
                 android:layout_marginStart="8dp"
+
                 style="@style/Widget.AppCompat.DropDownItem.Spinner"
+                />
+
+            <EditText
+                android:id="@+id/main_menu_EDT_weight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="My Weigh (kg)"
+                android:maxLines="1"
+                android:gravity="center"
+                android:inputType="numberDecimal"
                 />
 
         </LinearLayout>
@@ -139,8 +150,32 @@
                 android:textSize="18sp"
                 android:layout_marginLeft="4dp"
                 />
-
     </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Calories Burned:"
+                    android:textSize="18sp"
+                    />
+
+                <TextView
+                    android:id="@+id/main_menu_LBL_total_calories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="18sp"
+                    android:layout_marginStart="4dp"
+                    />
+
+            </LinearLayout>
+
+
             <LinearLayout
                 android:id="@+id/main_menu_LAY_activity_btns"
                 android:layout_width="match_parent"
@@ -184,21 +219,12 @@
             </LinearLayout>
         </LinearLayout>
 
-<!--        <LinearLayout-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:layout_toEndOf="@id/main_menu_LAY_pace_stats"-->
-<!--            >-->
-
-
-<!--        </LinearLayout>-->
         <com.jjoe64.graphview.GraphView
             android:id="@+id/main_menu_graph"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/main_menu_LAY_all"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="8dp"
             />
     </RelativeLayout>
 

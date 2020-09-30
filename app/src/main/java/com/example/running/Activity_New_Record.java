@@ -66,6 +66,8 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
     private BroadcastReceiver broadcastReceiver;
     private long timeInSeconds = 0;
     private double distance = 0;
+    private double caloriesBurned = 0;
+    private double pace = 0;
 
     private long savedChronometerState;
 
@@ -75,11 +77,11 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
     private final int ZOOM_VALUE = 13;
 
     private final int REQUEST_CODE = 101;
-    private static final String TAG = "GPSActivity";
+    private static final String TAG = "Activity_New_Record";
 
-    Calendar calendar;
-    SimpleDateFormat simpleTimeFormat = new SimpleDateFormat("HH:mm:ss");
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    private Calendar calendar;
+    private SimpleDateFormat simpleTimeFormat = new SimpleDateFormat("HH:mm:ss");
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
     private String sTime, eTime, date;
 
     private AllSportActivities allSportActivities;
@@ -122,17 +124,24 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
                         lastLocation = currentLocation;
                     }
 
+                    Log.d(TAG, "onReceive: timeInSeconds " + timeInSeconds);
+
+                    DecimalFormat df = new DecimalFormat("###.##");
                     float[] results = new float[1];
                     Location.distanceBetween(lastLocation.latitude, lastLocation.longitude, currentLocation.latitude, currentLocation.longitude,results);
+
                     distance += (results[0]/1000);
-                    calculateAndDisplayPerformance(distance, timeInSeconds);
+                    pace = Utils.getInstance().calculatePaceFromDistanceAndSeconds(distance, timeInSeconds);
+                    caloriesBurned += CaloriesCalculator.getInstance().calculateBurnedCalories(pace, 3);
+
+                    updateTextView(lblDistance, df.format(distance));
+                    updateTextView(lblPace, df.format(pace));
+                    updateTextView(lblCalories, df.format(caloriesBurned));
 
                     mGoogleMap.addPolyline(new PolylineOptions().add(currentLocation, lastLocation));
                     lastLocation = currentLocation;
 
                     lastLocationMarkerOnMap = mGoogleMap.addMarker(new MarkerOptions().position(currentLocation));
-
-                    Log.d(TAG, "currentLocation: " + currentLocation + " lastlocation " + lastLocation + " time: " + timeInSeconds + " distance " + distance);
 
                     mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
                     mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, ZOOM_VALUE));
@@ -145,12 +154,8 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
         registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
     }
 
-    private void calculateAndDisplayPerformance(double distance, double seconds) {
-        double pace = Utils.getInstance().calculatePaceFromDistanceAndSeconds(distance, seconds);
-        Log.d(TAG, "pace " + pace);
-        DecimalFormat df = new DecimalFormat("###.##");
-        updateTextView(lblDistance, df.format(distance));
-        updateTextView(lblPace, df.format(pace));
+    private double calculateAndDisplayPerformance(double distance, double seconds) {
+        return Utils.getInstance().calculatePaceFromDistanceAndSeconds(distance, seconds);
     }
 
     @Override
@@ -169,6 +174,8 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
 
         setUpViews();
         setUpFragments();
+
+        Log.d(TAG, "onCreate: Weight " + MySP.getInstance().getDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE));
 
         database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference(Keys.FIREBASE_ALL_RUNNING);
@@ -380,8 +387,9 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
         CardioActivity newCardioActivity = new CardioActivity(
                 date,
                 sDuration,
-                Double.parseDouble(lblDistance.getText().toString()),
-                Double.parseDouble(lblPace.getText().toString()),
+                distance,
+                pace,
+                caloriesBurned,
                 new Date().getTime(),
                 cardioType,
                 sTime,

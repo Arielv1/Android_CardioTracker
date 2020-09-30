@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -34,8 +35,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static kotlin.text.Typography.amp;
-
 public class Activity_Main_Menu extends AppCompatActivity{
 
     private static final String TAG = "ViewLogger";
@@ -43,12 +42,14 @@ public class Activity_Main_Menu extends AppCompatActivity{
     private GraphView graph;
     private Button btnNewActivity;
     private Button btnManualActivity;
+    private Button btnHistory;
 
     private TextView lblNumRuns;
     private TextView lblTotalDistance;
     private TextView lblAvgPace;
+    private TextView lblTotalCalories;
 
-    private Button btnHistory;
+    private EditText edtWeight;
 
     private LineGraphSeries<DataPoint> lineGraphSeries;
     private BarGraphSeries<DataPoint> barGraphSeries;
@@ -64,7 +65,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     private SimpleDateFormat sdf = new SimpleDateFormat("M");
     private String[] month_letters = {"Je"," Feb "," Mar ","Apr ","May ","Jun ","Jul ","Aug ","Sep ","Oct ","N","Dec"};
 
-
+    private boolean weightWarning = false;
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -81,6 +82,14 @@ public class Activity_Main_Menu extends AppCompatActivity{
     protected void onPause() {
         super.onPause();
         Log.d("ViewLogger", "MainMenu - onPause Invoked");
+        try{
+            MySP.getInstance().putDouble(Keys.WEIGHT_KEY, Double.parseDouble(edtWeight.getText().toString()));
+        }
+        catch (Exception e){
+            /*TODO - add alert when no weight is entered */
+            MySP.getInstance().putDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE);
+        }
+        CaloriesCalculator.getInstance().setWeight(MySP.getInstance().getDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE));
 
     }
 
@@ -88,15 +97,13 @@ public class Activity_Main_Menu extends AppCompatActivity{
     protected void onResume() {
         Log.d("ViewLogger", "MainMenu - onResume Invoked");
         super.onResume();
-
-
     }
 
     @Override
     protected void onStart() {
         Log.d("ViewLogger", "MainMenu - onStart Invoked");
         super.onStart();
-
+        setWeightEditText(MySP.getInstance().getDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE));
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         if (!(activeNetworkInfo != null && activeNetworkInfo.isConnected())) {
@@ -104,11 +111,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
             builder.setTitle("Internet Connection Problem");
             builder.setMessage("There's seems to be a problem connecting to the WiFi / Mobile Data, as such some services won't work properly or at all");
             builder.setPositiveButton("I UNDERSTAND", new DialogInterface.OnClickListener() {
-
-                public void onClick(DialogInterface dialog, int which) {
-                    // Do nothing but close the dialog
-                    reset();
-                }
+                public void onClick(DialogInterface dialog, int which) {}
             });
             AlertDialog alert = builder.create();
             alert.show();
@@ -116,7 +119,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
 
         getAllActivitiesFromFirebase();
-
     }
 
 
@@ -126,7 +128,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     protected void onStop() {
         Log.d("ViewLogger", "MainMenu - onStop Invoked");
         super.onStop();
-       //MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, Keys.DEFAULT_NEW_DATA_PACKAGE_VALUE);
+
         MySP.getInstance().putString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
 
     }
@@ -149,19 +151,15 @@ public class Activity_Main_Menu extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mainmenu);
 
-        database = FirebaseDatabase.getInstance();
-        myRefAll_Running = database.getReference(Keys.FIREBASE_ALL_RUNNING);
-
-        Log.d(TAG, "onCreate: from MySP " + Utils.getInstance().getAllCardioSportActivitiesFromSP());
-
         setUpViews();
         setUpSpinner();
-
-
-
+        database = FirebaseDatabase.getInstance();
+        myRefAll_Running = database.getReference(Keys.FIREBASE_ALL_RUNNING);
+        weightWarning = MySP.getInstance().getBoolean(Keys.WEIGHT_WARNING, Keys.DEFAULT_VALUE_WEIGHT_WARNING);
         btnNewActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                weightAlertDialog();
                 startActivity(new Intent(getApplicationContext(), Activity_New_Record.class));
             }
         });
@@ -169,6 +167,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
         btnManualActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                weightAlertDialog();
                 startActivity(new Intent(getApplicationContext(), Activity_Add_Manually.class));
             }
         });
@@ -182,6 +181,16 @@ public class Activity_Main_Menu extends AppCompatActivity{
                 startActivity(intent);
             }
         });
+
+    }
+
+    private void setWeightEditText(double weight) {
+        if (weight == Keys.DEFAULT_DOUBLE_VALUE){
+            edtWeight.setHint("My Weight (kg)");
+        }
+        else{
+            edtWeight.setText(weight + "");
+        }
     }
 
     private void setUpSpinner() {
@@ -233,11 +242,12 @@ public class Activity_Main_Menu extends AppCompatActivity{
         graph = findViewById(R.id.main_menu_graph);
         btnNewActivity = findViewById(R.id.main_menu_BTN_new_activity);
         btnManualActivity = findViewById(R.id.main_menu_BTN_manual_activity);
+        btnHistory = findViewById(R.id.main_menu_LBL_history);
         lblNumRuns = findViewById(R.id.main_menu_LBL_num_runs);
         lblTotalDistance = findViewById(R.id.main_menu_LBL_total_distance);
         lblAvgPace = findViewById(R.id.main_menu_LBL_avg_pace);
-//        btnReset = findViewById(R.id.main_menu_LBL_reset);
-        btnHistory = findViewById(R.id.main_menu_LBL_history);
+        lblTotalCalories = findViewById(R.id.main_menu_LBL_total_calories);
+        edtWeight = findViewById(R.id.main_menu_EDT_weight);
         spinner = findViewById(R.id.main_menu_spinner);
     }
 
@@ -258,7 +268,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     }
 
     private void updatePace() {
-        double totalPace = Keys.DEFAULT_DOUBLE_VALUE, avgPace = Keys.DEFAULT_DOUBLE_VALUE;
+        double totalPace = Keys.DEFAULT_DOUBLE_VALUE, avgPace;
         ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();
         for (CardioActivity cardioActivity :releventActivities) {
             totalPace += cardioActivity.getPace();
@@ -273,17 +283,54 @@ public class Activity_Main_Menu extends AppCompatActivity{
         updateTextView(lblAvgPace, df.format (avgPace));
     }
 
+    private void updateTotalCalories() {
+        ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();
+        double totalCaloriesBurned = 0;
+        for (CardioActivity cardioActivity :releventActivities) {
+            totalCaloriesBurned += cardioActivity.getCaloriesBurned();
+        }
+        lblTotalCalories.setText(totalCaloriesBurned+"");
+
+    }
+
     private void updateAllTextViewsAtributes() {
         updateNumRuns();
         updatePace();
         updateTotalDistance();
+        updateTotalCalories();
     }
 
     private void updateTextView(TextView tv, String update) {
         tv.setText(update);
     }
 
+    private void weightAlertDialog() {
+
+        /*if (CaloriesCalculator.getInstance().getWeight() == Keys.DEFAULT_DOUBLE_VALUE && !weightWarning){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("No Weight Value Detected");
+            builder.setMessage("No weight value was detected, you won't be able to view how many calories you have burned.");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            builder.setNegativeButton("Never Show Me This Again", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    weightWarning = true;
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+
+        }*/
+     
+    }
+
     private void showGraph() {
+        Log.d(TAG, "showGraph: " + allSportActivities);
+        
         graph.removeAllSeries();
 
         HashMap<Integer, Double> monthDistanceMap = new HashMap<>();
@@ -334,7 +381,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
         graph.getViewport().setMinX(1);
         graph.getViewport().setMaxX(12);
         graph.getViewport().setMaxY(100);
-//        graph.getViewport().setScalable(true);
         graph.getViewport().setScrollableY(true);
     }
 

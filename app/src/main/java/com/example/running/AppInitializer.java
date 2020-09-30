@@ -13,7 +13,9 @@ public class AppInitializer extends Application {
         Utils.init(this);
         Toaster.init(this);
         MySP.init(this);
+        CaloriesCalculator.init(this);
         FirebaseInitializer.init(this, getString(R.string.test_email),  getString(R.string.test_password));
+
 
     }
 }

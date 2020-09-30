@@ -23,9 +23,9 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
         void onItemDelete(int position);
     }
 
-    class ListViewHolder extends RecyclerView.ViewHolder implements  OnClickListener{
+    class ListViewHolder extends RecyclerView.ViewHolder {
 
-        TextView mDate, mActivityType, mPace, mDuration, mDistance;
+        TextView mDate, mActivityType, mPace, mDuration, mDistance, mCalories;
         ImageView mEdit, mDelete;
 
         OnItemClickListener listener;
@@ -36,10 +36,10 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
             mActivityType = itemView.findViewById(R.id.history_list_LBL_type);
             mPace = itemView.findViewById(R.id.history_list_LBL_pace);
             mDuration = itemView.findViewById(R.id.history_list_LBL_duration);
-            mDistance = itemView.findViewById(R.id.history_list_LBL_km);
+            mDistance = itemView.findViewById(R.id.history_list_LBL_distance);
             mEdit= itemView.findViewById(R.id.list_IMG_edit);
             mDelete= itemView.findViewById(R.id.list_IMG_delete);
-            itemView.setOnClickListener(this);
+            mCalories = itemView.findViewById(R.id.history_list_LBL_calories);
 
             mEdit.setOnClickListener(new OnClickListener() {
                 @Override
@@ -65,28 +65,25 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
                 }
             });
         }
-
-        @Override
-        public void onClick(View v) {
-
-        }
     }
 
     class CardViewHodler extends RecyclerView.ViewHolder {
 
-        TextView mDate, mDuration, mPace, mDistance;
+        TextView mDate, mDuration, mPace, mDistance, mCalories, mStartTime, mEndTime;
         ImageView mType;
         MaterialButton mEdit, nDelete;
 
 
         public CardViewHodler(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
-            mDate = (TextView) itemView.findViewById(R.id.card_LBL_date);
-            mDuration = (TextView) itemView.findViewById(R.id.card_LBL_duration);
-            mDistance = (TextView) itemView.findViewById(R.id.card_LBL_distance);
-            mPace = (TextView) itemView.findViewById(R.id.card_LBL_pace);
-
-            mType = (ImageView) itemView.findViewById(R.id.card_IMG_type);
+            mDate =itemView.findViewById(R.id.card_LBL_date);
+            mDuration = itemView.findViewById(R.id.card_LBL_duration);
+            mDistance = itemView.findViewById(R.id.card_LBL_distance);
+            mPace =  itemView.findViewById(R.id.card_LBL_pace);
+            mCalories = itemView.findViewById(R.id.card_LBL_calories);
+            mStartTime = itemView.findViewById(R.id.card_LBL_start_time);
+            mEndTime = itemView.findViewById(R.id.card_LBL_end_time);
+            mType = itemView.findViewById(R.id.card_IMG_type);
             mEdit =  itemView.findViewById(R.id.card_IMG_edit);
             nDelete = itemView.findViewById(R.id.card_IMG_delete);
 
@@ -172,13 +169,18 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
                 ((ListViewHolder) holder).mDate.setText(cardioActivity.getDate());
                 ((ListViewHolder) holder).mDistance.setText(cardioActivity.getDistance()+"");
                 ((ListViewHolder) holder).mPace.setText(cardioActivity.getPace()+"");
-                ((ListViewHolder) holder).mDuration.setText(cardioActivity.getDuration()+"");
+                ((ListViewHolder) holder).mCalories.setText(cardioActivity.getCaloriesBurned()+"");
+                ((ListViewHolder) holder).mDuration.setText(cardioActivity.getDuration());
                 break;
             case Utils.AdapterViewOptions.CARD:
                 ((CardViewHodler)holder).mDate.setText(cardioActivity.getDate());
                 ((CardViewHodler)holder).mDistance.setText(cardioActivity.getDistance()+"");
                 ((CardViewHodler)holder).mPace.setText(cardioActivity.getPace()+"");
-                ((CardViewHodler)holder).mDuration.setText(cardioActivity.getDuration()+"");
+                ((CardViewHodler) holder).mCalories.setText(cardioActivity.getCaloriesBurned()+"");
+                ((CardViewHodler)holder).mDuration.setText(cardioActivity.getDuration());
+                ((CardViewHodler)holder).mStartTime.setText(cardioActivity.getTimeStart());
+                ((CardViewHodler)holder).mEndTime.setText(cardioActivity.getTimeEnd());
+
                 if (cardioActivity.getCardioActivityType().equals(Utils.CardioActivityTypes.JOGGING)) {
                     ((CardViewHodler)holder).mType.setImageResource(R.drawable.ic_jogging);
                 }
@@ -201,3 +203,4 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
 
 
 }
+
