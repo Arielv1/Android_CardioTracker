@@ -174,6 +174,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
         MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE);
         MySP.getInstance().putString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
         MySP.getInstance().putString(Keys.RADIO_HISTORY_CHOICE, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
+        MySP.getInstance().putDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE);
         MySP.getInstance().putBoolean(Keys.WEIGHT_WARNING, Keys.DEFAULT_VALUE_WEIGHT_WARNING);
 
 

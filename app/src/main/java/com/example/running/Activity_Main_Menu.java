@@ -68,17 +68,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
     private boolean weightWarning = false;
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         Log.d("ViewLogger", "MainMenu - onPause Invoked");
@@ -131,6 +120,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     protected void onStop() {
         Log.d("ViewLogger", "MainMenu - onStop Invoked");
         super.onStop();
+        edtWeight.clearFocus();
         MySP.getInstance().putString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
 
     }
@@ -187,8 +177,10 @@ public class Activity_Main_Menu extends AppCompatActivity{
     }
 
     private void setWeightEditText(double weight) {
+        Log.d(TAG, "setWeightEditText: " + MySP.getInstance().getDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE));
         if (weight == Keys.DEFAULT_DOUBLE_VALUE){
             edtWeight.setHint("My Weight (kg)");
+            edtWeight.setText("");
         }
         else{
             edtWeight.setText(weight + "");
@@ -289,12 +281,12 @@ public class Activity_Main_Menu extends AppCompatActivity{
         for (CardioActivity cardioActivity :releventActivities) {
             totalCaloriesBurned += cardioActivity.getCaloriesBurned();
         }
-        lblTotalCalories.setText(totalCaloriesBurned+"");
+        lblTotalCalories.setText(df.format(totalCaloriesBurned));
 
     }
 
     private void updateAllTextViewsAttributes() {
-        if(allSportActivities == null)
+        /*if(allSportActivities == null)
         {
             resetAllTextViewsAttributes();
         }
@@ -303,7 +295,15 @@ public class Activity_Main_Menu extends AppCompatActivity{
             updatePace();
             updateTotalDistance();
             updateTotalCalories();
+        }*/
+
+        if (allSportActivities == null) {
+            allSportActivities = new AllSportActivities(new ArrayList<CardioActivity>());
         }
+        updateNumRuns();
+        updatePace();
+        updateTotalDistance();
+        updateTotalCalories();
     }
 
     private void resetAllTextViewsAttributes() {
@@ -347,6 +347,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
         graph.removeAllSeries();
         if(allSportActivities == null)
             return;
+
         HashMap<Integer, Double> monthDistanceMap = new HashMap<>();
         ArrayList <Integer> releventMonths = new ArrayList <>();
         ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();

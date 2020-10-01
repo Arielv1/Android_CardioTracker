@@ -106,9 +106,7 @@ public class Utils {
     }
 
     public Long calculateTimeDifference(String sTime, String eTime) {
-        /*
-        TODO - implement possibility of endTime < startTime
-         */
+
         String[] startTime =  splitEditTextByString(sTime,":");
         String[] endTime = splitEditTextByString(eTime, ":");
 

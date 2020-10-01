@@ -64,6 +64,8 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
     private boolean calledFromHistory = false;
     private CardioActivity theCurrentActivity;
 
+    private DecimalFormat df = new DecimalFormat("###.##");
+
     private Callback_RadioChoice callback = new Callback_RadioChoice() {
         @Override
         public void setRadioButtonChoice(String radioChoiceValue) {
@@ -144,11 +146,12 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
     private void displayCardioActivityInFields(CardioActivity cardioActivity) {
 
         edtDate.setText(cardioActivity.getDate());
-        edtDistance.setText(cardioActivity.getDistance() + "");
+        edtDistance.setText(df.format(cardioActivity.getDistance()));
         edtStartTime.setText(cardioActivity.getTimeStart());
         edtEndTime.setText(cardioActivity.getTimeEnd());
-        lblPace.setText(cardioActivity.getPace() + "");
+        lblPace.setText(df.format(cardioActivity.getPace()));
         lblDuration.setText(cardioActivity.getDuration());
+        lblCalories.setText(df.format(cardioActivity.getCaloriesBurned()));
         cardioActivityChoice = cardioActivity.getCardioActivityType();
         Log.d(TAG, "displayCardioActivityInFields: before calling SetRadio Button with: "+cardioActivityChoice);
         setRadioButtonChoice(cardioActivityChoice);
@@ -163,11 +166,10 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
 
     private void setLblPaceCaloriesAndDistance() {
         if (edtDistance.getText().length()!=0 && edtStartTime.getText().length()!=0 && edtEndTime.getText().length()!=0) {
-            DecimalFormat df = new DecimalFormat("###.##");
             distance = Double.parseDouble(edtDistance.getText().toString());
             pace = Utils.getInstance().calculatePaceFromDistanceAndSeconds(distance, Utils.getInstance().calculateTimeDifference(edtStartTime.getText().toString(), edtEndTime.getText().toString()));
             caloriesBurned = CaloriesCalculator.getInstance().calculateBurnedCalories(pace, duration);
-            lblPace.setText(df.format(pace% 100));
+            lblPace.setText(df.format(pace % 100));
             lblCalories.setText(df.format(caloriesBurned));
 
         }

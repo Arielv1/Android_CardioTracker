@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHolder> {
@@ -69,9 +70,9 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
 
     class CardViewHodler extends RecyclerView.ViewHolder {
 
-        TextView mDate, mDuration, mPace, mDistance, mCalories, mStartTime, mEndTime;
-        ImageView mType;
-        MaterialButton mEdit, nDelete;
+        private TextView mDate, mDuration, mPace, mDistance, mCalories, mStartTime, mEndTime;
+        private ImageView mType;
+        private MaterialButton mEdit, nDelete;
 
 
         public CardViewHodler(@NonNull View itemView, final OnItemClickListener listener) {
@@ -117,6 +118,8 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
     private int viewTypeRequset;
     private Context context;
     private OnItemClickListener mListener;
+    private DecimalFormat df = new DecimalFormat("###.##");
+
     public ListCardAdapter(Context context){
         this.context=context;
     }
@@ -167,16 +170,16 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
             case Utils.AdapterViewOptions.LIST:
                 ((ListViewHolder) holder).mActivityType.setText(cardioActivity.getCardioActivityType());
                 ((ListViewHolder) holder).mDate.setText(cardioActivity.getDate());
-                ((ListViewHolder) holder).mDistance.setText(cardioActivity.getDistance()+"");
-                ((ListViewHolder) holder).mPace.setText(cardioActivity.getPace()+"");
-                ((ListViewHolder) holder).mCalories.setText(cardioActivity.getCaloriesBurned()+"");
+                ((ListViewHolder) holder).mDistance.setText(df.format(cardioActivity.getDistance()));
+                ((ListViewHolder) holder).mPace.setText(df.format(cardioActivity.getPace()));
+                ((ListViewHolder) holder).mCalories.setText(df.format(cardioActivity.getCaloriesBurned()));
                 ((ListViewHolder) holder).mDuration.setText(cardioActivity.getDuration());
                 break;
             case Utils.AdapterViewOptions.CARD:
                 ((CardViewHodler)holder).mDate.setText(cardioActivity.getDate());
-                ((CardViewHodler)holder).mDistance.setText(cardioActivity.getDistance()+"");
-                ((CardViewHodler)holder).mPace.setText(cardioActivity.getPace()+"");
-                ((CardViewHodler) holder).mCalories.setText(cardioActivity.getCaloriesBurned()+"");
+                ((CardViewHodler)holder).mDistance.setText(df.format(cardioActivity.getDistance()));
+                ((CardViewHodler)holder).mPace.setText(df.format(cardioActivity.getPace()));
+                ((CardViewHodler) holder).mCalories.setText(df.format(cardioActivity.getCaloriesBurned()));
                 ((CardViewHodler)holder).mDuration.setText(cardioActivity.getDuration());
                 ((CardViewHodler)holder).mStartTime.setText(cardioActivity.getTimeStart());
                 ((CardViewHodler)holder).mEndTime.setText(cardioActivity.getTimeEnd());
