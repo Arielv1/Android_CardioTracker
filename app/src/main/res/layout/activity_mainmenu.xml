@@ -10,10 +10,33 @@
     android:layout_marginRight="8dp"
     >
 
+    <ProgressBar
+        android:id="@+id/main_menu_PB_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        style="@style/Widget.MaterialComponents.ProgressIndicator.Circular.Determinate"
+        android:progressDrawable="@drawable/progress_bar_animation"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/colorRed"
+
+        />
+
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:duration="1000"
+        >
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
+
+
+
         <LinearLayout
             android:id="@+id/main_menu_LAY_all"
             android:layout_width="match_parent"
@@ -217,15 +240,17 @@
                     />
 
             </LinearLayout>
-        </LinearLayout>
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/main_menu_graph"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="visible"
 
-        <com.jjoe64.graphview.GraphView
-            android:id="@+id/main_menu_graph"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/main_menu_LAY_all"
-            android:layout_marginTop="8dp"
-            />
+                />
+        </LinearLayout>
     </RelativeLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -36,8 +36,6 @@ public class FirebaseInitializer {
                     Log.d(TAG, "Firebase authentication Successful sign in");
                 } else {
                     Log.d(TAG, "Firebase authentication failed");
-
-                    Toaster.getInstance().showToast("No Internet Connection");
                 }
             }
         });
