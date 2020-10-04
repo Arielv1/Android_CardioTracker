@@ -18,6 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.ikovac.timepickerwithseconds.MyTimePickerDialog;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.text.DateFormat;
@@ -90,7 +91,8 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         * */
         theCurrentActivity = (CardioActivity)getIntent().getParcelableExtra(Keys.NEW_DATA_PACKAGE);
 
-        getAllActivitiesFromFirebase();
+        /* Get all sport activities sent by the main menu (from firebase) */
+        allSportActivities = getBundleFromMainMenu();
 
 
         /* if not null -> got here from History */
@@ -360,21 +362,12 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         MySP.getInstance().putString(Keys.RADIO_HISTORY_CHOICE_EDIT, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
     }
 
-    private void getAllActivitiesFromFirebase() {
-
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
-
-                allSportActivities = dataSnapshot.getValue(AllSportActivities.class);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.w(TAG, "loadPost:onCancelled", error.toException());
-            }
-        };
-        databaseReference.addListenerForSingleValueEvent(postListener);
+    private AllSportActivities getBundleFromMainMenu() {
+        allSportActivities =  getIntent().getParcelableExtra(Keys.ALL_CARDIO_ACTIVITIES);
+        if (allSportActivities  == null) {
+            allSportActivities = new AllSportActivities(new ArrayList<CardioActivity>());
+        }
+        return allSportActivities;
     }
 
     @Override

@@ -100,7 +100,8 @@ public class Activity_Main_Menu extends AppCompatActivity{
             builder.setPositiveButton("I UNDERSTAND", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     activateButtons();
-                    shimmer.stopShimmerAnimation();
+//                    shimmer.stopShimmerAnimation();
+                    shimmer.stopShimmer();
                     progressBar.setVisibility(View.INVISIBLE);
                 }
             });
@@ -159,7 +160,8 @@ public class Activity_Main_Menu extends AppCompatActivity{
     }
 
     private void getAllActivitiesFromFirebase() {
-        shimmer.startShimmerAnimation();
+//        shimmer.startShimmerAnimation();
+        shimmer.stopShimmer();
         progressBar.setVisibility(View.VISIBLE);
 
         ValueEventListener postListener = new ValueEventListener() {
@@ -172,7 +174,8 @@ public class Activity_Main_Menu extends AppCompatActivity{
                 activateButtons();
                 updateAllTextViewsAttributes();
                 showGraph();
-                shimmer.stopShimmerAnimation();
+//                shimmer.stopShimmerAnimation();
+                shimmer.stopShimmer();
                 progressBar.setVisibility(View.INVISIBLE);
             }
             @Override
@@ -240,7 +243,10 @@ public class Activity_Main_Menu extends AppCompatActivity{
             public void onClick(View v) {
 
                 weightAlertDialog();
-                startActivity(new Intent(getApplicationContext(), Activity_New_Record.class));
+//                startActivity(new Intent(getApplicationContext(), Activity_New_Record.class));
+                Intent intent = new Intent(getApplicationContext(), Activity_New_Record.class);
+                intent.putExtra(Keys.ALL_CARDIO_ACTIVITIES, allSportActivities);
+                startActivity(intent);
 
             }
         });
@@ -249,7 +255,10 @@ public class Activity_Main_Menu extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 weightAlertDialog();
-                startActivity(new Intent(getApplicationContext(), Activity_Add_Manually.class));
+//                startActivity(new Intent(getApplicationContext(), Activity_Add_Manually.class));
+                Intent intent = new Intent(getApplicationContext(), Activity_Add_Manually.class);
+                intent.putExtra(Keys.ALL_CARDIO_ACTIVITIES, allSportActivities);
+                startActivity(intent);
             }
         });
 

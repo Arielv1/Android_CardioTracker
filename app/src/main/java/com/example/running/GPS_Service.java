@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -43,16 +44,31 @@ public class GPS_Service extends Service {
             }
 
             @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-                    /*TODO - check this shit*/
-                Log.d(TAG, "onStatusChanged: ");
+            public void onStatusChanged(String provider, int status, Bundle bundle) {
+                /*TODO - check this shit*/
+                Log.d(TAG, "onStatusChanged: Provider is:  " + provider);
+                switch (status) {
+                    case LocationProvider.OUT_OF_SERVICE:
+                        Log.d(TAG, "Status Changed: Out of Service");
+                        Toaster.getInstance().showToast("Status Changed: Out of Service");
+                        break;
+                    case LocationProvider.TEMPORARILY_UNAVAILABLE:
+                        Log.d(TAG, "Status Changed: Temporarily Unavailable");
+                        Toaster.getInstance().showToast("Status Changed: Temporarily Unavailable");
+
+                        break;
+                    case LocationProvider.AVAILABLE:
+                        Log.d(TAG, "Status Changed: Available");
+                        Toaster.getInstance().showToast("Status Changed: Available");
+                        break;
+                }
             }
 
             @Override
-            public void onProviderEnabled(String s) {
+            public void onProviderEnabled(String provider) {
                 /*TODO - check this shit*/
-                Log.d(TAG, "onProviderEnabled: ");
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,3000,0,listener);
+                Log.d(TAG, "onProviderEnabled: Provider is: "+provider);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,Keys.INTERVAL,0,listener);
             }
 
             @Override
@@ -64,6 +80,7 @@ public class GPS_Service extends Service {
         };
 
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        // TODO - to remove it ?
       //  checkRequirement();
 
         //noinspection MissingPermission

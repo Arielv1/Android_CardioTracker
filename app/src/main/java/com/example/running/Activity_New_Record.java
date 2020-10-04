@@ -43,6 +43,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -187,7 +188,8 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
         database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference(Keys.FIREBASE_ALL_RUNNING);
 
-        getAllActivitiesFromFirebase();
+        /* Get all sport activities sent by the main menu (from firebase) */
+        allSportActivities = getBundleFromMainMenu();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -311,12 +313,12 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
     }
 
     private boolean confirmPermissions() {
+        Log.d(TAG, "confirmPermissions: called");
         if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE);
-
             return true;
         }
+        Log.d(TAG, "confirmPermissions: return false");
         return false;
     }
 
@@ -324,6 +326,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d(TAG, "onRequestPermissionsResult: called");
         if (requestCode == REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 fetchLastKnownLocation();
@@ -384,21 +387,11 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
         databaseReference.setValue(allSportActivities);
     }
 
-
-    private void getAllActivitiesFromFirebase() {
-
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
-                Log.w(TAG, "onDataChange Called !!!");
-                allSportActivities = dataSnapshot.getValue(AllSportActivities.class);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.w(TAG, "loadPost:onCancelled", error.toException());
-            }
-        };
-        databaseReference.addListenerForSingleValueEvent(postListener);
+    private AllSportActivities getBundleFromMainMenu() {
+        allSportActivities =  getIntent().getParcelableExtra(Keys.ALL_CARDIO_ACTIVITIES);
+        if (allSportActivities  == null) {
+            allSportActivities = new AllSportActivities(new ArrayList<CardioActivity>());
+        }
+        return allSportActivities;
     }
 }
