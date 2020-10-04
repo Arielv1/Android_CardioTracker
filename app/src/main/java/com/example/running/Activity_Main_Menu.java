@@ -43,7 +43,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     private GraphView graph;
     private Button btnNewActivity;
     private Button btnManualActivity;
-    private Button btnHistory; /* TODO - change icon*/
+    private Button btnHistory;
 
     private TextView lblNumRuns;
     private TextView lblTotalDistance;
@@ -130,7 +130,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("ViewLogger", "MainMenu - onCreate Invoked");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mainmenu);
+        setContentView(R.layout.activity_main_menu);
 
 
         setUpViews();
@@ -234,10 +234,11 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
 
     private void activateButtons() {
+        /*TODO - send allSportsActivity to all other activityes -> remove getFromFirebase function in them */
         btnNewActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /* */
+
                 weightAlertDialog();
                 startActivity(new Intent(getApplicationContext(), Activity_New_Record.class));
 
@@ -347,9 +348,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     }
 
     private void showGraph() {
-        /*TODO - add dynamic Y axis view */
-        Log.d(TAG, "showGraph: " + allSportActivities);
-        
+
         graph.removeAllSeries();
         if(allSportActivities == null)
             return;
@@ -359,15 +358,18 @@ public class Activity_Main_Menu extends AppCompatActivity{
         ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();
 
 
-        for (CardioActivity current : releventActivities) {
-            String[] date = current.getDate().split("/");
 
+        for (CardioActivity currentActivity : releventActivities) {
+
+            double currentDistance = currentActivity.getDistance();
+
+            String[] date = currentActivity.getDate().split("/");
             int month = Integer.parseInt(date[1]);
             if (monthDistanceMap.containsKey(month)){
-                monthDistanceMap.put(month, monthDistanceMap.get(month) + current.getDistance());
+                monthDistanceMap.put(month, monthDistanceMap.get(month) + currentDistance);
             }
             else{
-                monthDistanceMap.put(month, current.getDistance());
+                monthDistanceMap.put(month, currentDistance);
                 releventMonths.add(month);
             }
         }
@@ -378,8 +380,13 @@ public class Activity_Main_Menu extends AppCompatActivity{
             dp[i] = new DataPoint(i, 0);
         }
 
+        double maxDistance = 0;
+
         for (int month : releventMonths) {
             dp[month-1] = new DataPoint (month, monthDistanceMap.get(month));
+            if (monthDistanceMap.get(month) > maxDistance){
+                maxDistance = monthDistanceMap.get(month);
+            }
         }
         barGraphSeries = new BarGraphSeries<>(dp);
 
@@ -398,6 +405,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinX(1);
         graph.getViewport().setMaxX(13);
+        graph.getViewport().setMaxY(maxDistance);
         graph.getViewport().setScrollableY(true);
     }
 

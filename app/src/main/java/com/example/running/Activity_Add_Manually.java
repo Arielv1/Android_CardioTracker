@@ -2,7 +2,6 @@ package com.example.running;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,7 +10,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -19,10 +17,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.ikovac.timepickerwithseconds.MyTimePickerDialog;
-
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 public class Activity_Add_Manually extends AppCompatActivity implements Callback_RadioChoice {
 
@@ -76,7 +76,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_addmanually);
+        setContentView(R.layout.activity_add_manually);
 
         setUpViews();
         setUpFragments();
@@ -123,7 +123,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
             @Override
             public void onFocusChange(View view, boolean focus) {
                 enterDateHandler(focus);
-                            }
+            }
         });
 
         edtStartTime.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -157,15 +157,12 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
 
         edtDate.setText(cardioActivity.getDate());
         edtDistance.setText(df.format(cardioActivity.getDistance()));
-
-        /* TODO - disable keyboard for date, start and end time */
         edtStartTime.setText(cardioActivity.getTimeStart());
         edtEndTime.setText(cardioActivity.getTimeEnd());
         lblPace.setText(df.format(cardioActivity.getPace()));
         lblDuration.setText(cardioActivity.getDuration());
         lblCalories.setText(df.format(cardioActivity.getCaloriesBurned()));
         cardioActivityChoice = cardioActivity.getCardioActivityType();
-        Log.d(TAG, "displayCardioActivityInFields: before calling SetRadio Button with: "+cardioActivityChoice);
         setRadioButtonChoice(cardioActivityChoice);
     }
 
@@ -272,12 +269,48 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         return true;
     }
 
+
+    private boolean checkValidDate(String message) {
+        DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+
+        format.setLenient(false);
+
+        String date = edtDate.getText().toString();
+        try {
+            format.parse(date);
+            return true;
+        } catch (ParseException e) {
+            Toaster.getInstance().showToast(message);
+        }
+        return false;
+    }
+
+    private boolean checkValidTime(EditText editText, String message) {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+
+        format.setLenient(false);
+
+        String date = editText.getText().toString();
+        try {
+            format.parse(date);
+            return true;
+        } catch (ParseException e) {
+            Toaster.getInstance().showToast(message);
+        }
+        return false;
+    }
+
+
+
     private boolean verifyInputFields() {
 
         return  checkRadioBox("Please Select An Activity Type")&&
                 checkEdtField(edtDate, "Date Field Is Empty") &&
+                checkValidDate("Date Input Isn't Valid") &&
                 checkEdtField(edtStartTime, "Start Time Field Is Empty") &&
+                checkValidTime(edtStartTime, "Start Time Input Isn't Valid") &&
                 checkEdtField(edtEndTime, "End Time Field Is Empty") &&
+                checkValidTime(edtStartTime, "End Time Input Isn't Valid") &&
                 checkEdtField(edtDistance, "Distance Field Is Empty");
     }
 
@@ -306,7 +339,6 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
 
             Gson gson = new Gson();
             String json = gson.toJson(theCurrentActivity);
-            Log.d(TAG, "sending to history\n" + json);
             MySP.getInstance().putString(Keys.NEW_DATA_PACKAGE, json);
         }
         else{
@@ -334,7 +366,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
-                Log.w(TAG, "onDataChange Called !!!");
+
                 allSportActivities = dataSnapshot.getValue(AllSportActivities.class);
             }
             @Override

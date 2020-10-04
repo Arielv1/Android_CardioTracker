@@ -53,7 +53,7 @@ public class Fragment_Radio_Buttons extends Fragment {
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: called");
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment__radio__buttons, container, false);
+        View view = inflater.inflate(R.layout.fragment_radio_buttons, container, false);
 
         setUpViewsInFragment(view);
 

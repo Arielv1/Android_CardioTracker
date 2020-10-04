@@ -23,10 +23,8 @@
     <string name="start">start</string>
     <string name="pause">pause</string>
     <string name="stop">stop</string>
-    <string name="distance">Distance:</string>
     <string name="pace">Pace:</string>
     <string name="km_h">km/h</string>
-    <string name="calories_burned">Calories Burned:</string>
     <string name="confirm">Confirm</string>
     <string name="low_detail">Low Detail</string>
     <string name="high_detail">High Detail</string>
@@ -34,5 +32,27 @@
     <string name="total_distance">Total Distance:</string>
     <string name="km">km</string>
     <string name="average_pace">Average Pace:</string>
+    <string name="date">Date:</string>
+    <string name="click_here_to_pick_a_date">Click here to pick a date</string>
+    <string name="click_here_to_enter_the_start_time">Click here to enter the start time</string>
+    <string name="click_here_to_enter_the_end_time">Click here to enter the end time</string>
+    <string name="distance">Distance:</string>
+    <string name="distance_in_km">Distance in km</string>
+    <string name="end_time">End Time:</string>
+    <string name="activity_duration">Activity Duration:</string>
+    <string name="overall_pace">Overall Pace:</string>
+    <string name="_0_00">0.00</string>
+    <string name="calories_burned">Calories Burned:</string>
+    <string name="_0">0</string>
+    <string name="start_time">Start Time:</string>
+    <string name="i_want_to_view">I Want To View</string>
+    <string name="my_weigh_kg">My Weigh (kg)</string>
+    <string name="total_calories_burned">Total Calories Burned:</string>
+    <string name="_00_00">00:00</string>
+    <string name="makaf">-</string>
+    <string name="duration">Duration:</string>
+    <string name="km_h_">km/h:</string>
+    <string name="km_">Km:</string>
+    <string name="calories">Calories:</string>
 
 </resources>

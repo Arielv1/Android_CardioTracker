@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".Activity_History">
 
-
-
     <LinearLayout
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"

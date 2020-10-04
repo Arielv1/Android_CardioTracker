@@ -17,7 +17,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -88,7 +87,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity__history);
+        setContentView(R.layout.activity_history);
 
         chosenRadioButtonValue =  MySP.getInstance().getString(Keys.RADIO_HISTORY_CHOICE, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
 

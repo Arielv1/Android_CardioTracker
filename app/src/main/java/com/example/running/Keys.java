@@ -28,5 +28,5 @@ public interface Keys {
     public static final String WEIGHT_WARNING = "WEIGHT_WARNING";
     public static final boolean DEFAULT_VALUE_WEIGHT_WARNING = false;
 
-
+    public static final int INTERVAL = 3000;
 }

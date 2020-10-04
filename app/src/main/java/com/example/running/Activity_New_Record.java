@@ -134,7 +134,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
 
                     distance += (results[0]/1000);
                     pace = Utils.getInstance().calculatePaceFromDistanceAndSeconds(distance, timeInSeconds);
-                    caloriesBurned += CaloriesCalculator.getInstance().calculateBurnedCalories(pace, 3);
+                    caloriesBurned += CaloriesCalculator.getInstance().calculateBurnedCalories(pace, (Keys.INTERVAL / 1000));
 
                     updateTextView(lblDistance, df.format(distance));
                     updateTextView(lblPace, df.format(pace));
@@ -330,10 +330,6 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
                 enableButtons();
             } else {
                 Toaster.getInstance().showToast("Please Activate Location Services");
-                /*
-                TODO - imply to activate gps service
-                 */
-               // confirmPermissions();
             }
         }
     }
