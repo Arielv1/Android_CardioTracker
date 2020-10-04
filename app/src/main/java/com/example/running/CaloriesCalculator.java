@@ -13,9 +13,16 @@ public class CaloriesCalculator {
     private Context context;
     private LinkedHashMap<Double, Double> METSValues = new LinkedHashMap<Double, Double>();
 
+    private CaloriesCalculator(Context context) {
+        this.context = context;
+        initiateMETValues();
+    }
+
     public static CaloriesCalculator init(Context context) {
-        if (instance == null)
+        if (instance == null){
             instance = new CaloriesCalculator(context);
+        }
+
         return instance;
     }
 
@@ -23,10 +30,6 @@ public class CaloriesCalculator {
         return instance;
     }
 
-    private CaloriesCalculator(Context context) {
-        this.context = context;
-        initiateMETValues();
-    }
 
     private void initiateMETValues() {
         METSValues.put(17.54185, 18.0);
@@ -62,7 +65,6 @@ public class CaloriesCalculator {
                 break;
             }
         }
-        Log.d("Calories", "calculateBurnedCalories: weight " + weight + " pace " + pace + " seconds " + seconds + " result " +  (METSValue * ((double)seconds / 3600) * weight));
         return METSValue * ((double)seconds / 3600) * weight;
     }
 }

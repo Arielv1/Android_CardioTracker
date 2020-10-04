@@ -24,7 +24,6 @@ public class Fragment_Log_List extends Fragment {
     }
 
     public static Fragment_Log_List newInstance() {
-
         return new Fragment_Log_List();
     }
 

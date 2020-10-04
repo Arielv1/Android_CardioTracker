@@ -22,9 +22,8 @@ public class CardioActivity implements Parcelable, Comparable<CardioActivity> {
     private String timeEnd;
 
     public CardioActivity() {
-
     }
-//    public CardioActivity(String[] date, String duration, double distance, double pace, long createdTimestamp, String cardioActivityType, String timeStart, String timeEnd) {
+
     public CardioActivity(String date,String duration, double distance, double pace, double caloriesBurned, long createdTimestamp, String cardioActivityType, String timeStart, String timeEnd) {
     this.id = UUID.randomUUID().toString();
     this.date = date;

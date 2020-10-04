@@ -40,16 +40,6 @@ public class AllSportActivities implements Parcelable {
         this.activities = activities;
     }
 
-    public void addActivity(CardioActivity activity) {
-        this.activities.add(activity);
-    }
-
-    @Override
-    public String toString() {
-        return "AllSportActivities{" +
-                "activities=" + activities +
-                '}';
-    }
 
     @Override
     public int describeContents() {
@@ -59,5 +49,12 @@ public class AllSportActivities implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeTypedList(activities);
+    }
+
+    @Override
+    public String toString() {
+        return "AllSportActivities{" +
+                "activities=" + activities +
+                '}';
     }
 }

@@ -10,14 +10,17 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 
 public class GPS_Service extends Service {
 
+    private static final String TAG = "GPS_Service";
     private LocationListener listener;
     private LocationManager locationManager;
+    private boolean network_enabled, gps_enabled;
 
     @Nullable
     @Override
@@ -41,12 +44,15 @@ public class GPS_Service extends Service {
 
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {
-
+                    /*TODO - check this shit*/
+                Log.d(TAG, "onStatusChanged: ");
             }
 
             @Override
             public void onProviderEnabled(String s) {
-
+                /*TODO - check this shit*/
+                Log.d(TAG, "onProviderEnabled: ");
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,3000,0,listener);
             }
 
             @Override
@@ -58,8 +64,11 @@ public class GPS_Service extends Service {
         };
 
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+      //  checkRequirement();
 
         //noinspection MissingPermission
+
+        /*TODO - define time interval */
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,3000,0,listener);
 
     }
@@ -71,5 +80,20 @@ public class GPS_Service extends Service {
             //noinspection MissingPermission
             locationManager.removeUpdates(listener);
         }
+    }
+
+    private void checkRequirement() {
+
+        gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if(!gps_enabled){
+            Toaster.getInstance().showToast("GPS ARE NOT Enable");
+        }
+        network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if(!network_enabled) {
+            Toaster.getInstance().showToast("Network ARE NOT Enable");
+        }
+
+        Log.d(TAG, "checkRequirement: called" + gps_enabled + " " + network_enabled);
     }
 }

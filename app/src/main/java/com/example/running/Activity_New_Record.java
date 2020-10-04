@@ -48,53 +48,57 @@ import java.util.Date;
 
 public class Activity_New_Record extends AppCompatActivity implements OnMapReadyCallback {
 
+    private static final String TAG = "Activity_New_Record";
+    private AllSportActivities allSportActivities;
+
     private TextView lblDistance;
     private TextView lblPace;
     private TextView lblCalories;
-    private Button btnStart;
-    private Button btnPause;
-    private Button btnStop;
-    private Button btnConfirm;
-    private Button btnCancel;
-    private Chronometer tmrChronometer;
-    private long timeOfPause;
-    private boolean runningChronometer;
-    private boolean firstStartClick;
-    private String cardioType;
-    private GoogleMap mGoogleMap;
 
-    private BroadcastReceiver broadcastReceiver;
     private long timeInSeconds = 0;
     private double distance = 0;
     private double caloriesBurned = 0;
     private double pace = 0;
 
+    private Button btnStart;
+    private Button btnPause;
+    private Button btnStop;
+    private Button btnConfirm;
+    private Button btnCancel;
+
+    private Chronometer tmrChronometer;
+    private long timeOfPause;
+    private boolean runningChronometer;
+    private boolean firstStartClick;
     private long savedChronometerState;
 
+
+    private String cardioType;
+    private GoogleMap mGoogleMap;
+    private BroadcastReceiver broadcastReceiver;
     private Marker lastLocationMarkerOnMap;
     private LatLng lastLocation;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private final int ZOOM_VALUE = 13;
 
     private final int REQUEST_CODE = 101;
-    private static final String TAG = "Activity_New_Record";
+
 
     private Calendar calendar;
     private SimpleDateFormat simpleTimeFormat = new SimpleDateFormat("HH:mm:ss");
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
     private String sTime, eTime, date;
 
-    private AllSportActivities allSportActivities;
-
-
     private FirebaseDatabase database;
     private DatabaseReference databaseReference;
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(TAG, "NewRun - onSavedInstance " + tmrChronometer.getBase());
 
-    }
+    private Callback_RadioChoice callback = new Callback_RadioChoice() {
+        @Override
+        public void setRadioButtonChoice(String radioChoiceValue) {
+            cardioType = radioChoiceValue;
+            MySP.getInstance().putString(Keys.RADIO_CHOICE_NEW_RECORD, cardioType);
+        }
+    };
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
@@ -124,8 +128,6 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
                         lastLocation = currentLocation;
                     }
 
-                    Log.d(TAG, "onReceive: timeInSeconds " + timeInSeconds);
-
                     DecimalFormat df = new DecimalFormat("###.##");
                     float[] results = new float[1];
                     Location.distanceBetween(lastLocation.latitude, lastLocation.longitude, currentLocation.latitude, currentLocation.longitude,results);
@@ -148,21 +150,28 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
 
                 }
 
-
             };
         }
         registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
     }
 
-    private double calculateAndDisplayPerformance(double distance, double seconds) {
-        return Utils.getInstance().calculatePaceFromDistanceAndSeconds(distance, seconds);
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (broadcastReceiver != null) {
             unregisterReceiver(broadcastReceiver);
+        }
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!confirmPermissions()) {
+            fetchLastKnownLocation();
+            enableButtons();
         }
     }
 
@@ -175,32 +184,15 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
         setUpViews();
         setUpFragments();
 
-        Log.d(TAG, "onCreate: Weight " + MySP.getInstance().getDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE));
-
         database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference(Keys.FIREBASE_ALL_RUNNING);
 
         getAllActivitiesFromFirebase();
 
-        fetchLastKnownLocation();
-        if (!confirmPermissions()) {
-            enableButtons();
-
-        }
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-
-    Callback_RadioChoice callback = new Callback_RadioChoice() {
-        @Override
-        public void setRadioButtonChoice(String radioChoiceValue) {
-            cardioType = radioChoiceValue;
-            MySP.getInstance().putString(Keys.RADIO_CHOICE_NEW_RECORD, cardioType);
-        }
-    };
-
 
     private void setUpFragments() {
         Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.new_run_LAY_radio_buttons, false, Keys.RADIO_CHOICE_NEW_RECORD);
@@ -216,34 +208,6 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
         tmrChronometer = findViewById(R.id.new_run_TMR_chronometer);
         btnCancel = findViewById(R.id.new_run_BTN_cancel);
         btnConfirm = findViewById(R.id.new_run_BTN_confirm);
-    }
-
-    private void startChronometer() {
-        tmrChronometer.setBase(SystemClock.elapsedRealtime() - timeOfPause);
-        tmrChronometer.start();
-        runningChronometer = true;
-    }
-
-    private void pauseChronometer() {
-
-        if (runningChronometer) {
-            timeOfPause = SystemClock.elapsedRealtime() - tmrChronometer.getBase();
-            tmrChronometer.stop();
-            runningChronometer = false;
-        } else  {
-            tmrChronometer.setBase(SystemClock.elapsedRealtime() - timeOfPause);
-            tmrChronometer.start();
-            runningChronometer = true;
-        }
-    }
-
-    private void stopChronometer() {
-
-        tmrChronometer.stop();
-        runningChronometer = false;
-        btnCancel.setVisibility(View.VISIBLE);
-        btnConfirm.setVisibility(View.VISIBLE);
-
     }
 
     private void enableButtons() {
@@ -264,10 +228,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
                         String start = date.substring(0,3);
                         date = start + date.substring(4);
                     }
-
-
                 }
-                Log.d(TAG, "onClick: sTime " + sTime + " date " + date);
                 if (!runningChronometer){
                     btnPause.setEnabled(true);
                     btnStop.setEnabled(true);
@@ -292,10 +253,8 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
             public void onClick(View view) {
                 calendar = Calendar.getInstance();
                 eTime = (simpleTimeFormat.format(calendar.getTime()));
-                Log.d(TAG, "onClick: eTime " + eTime);
                 btnStart.setEnabled(false);
                 btnPause.setEnabled(false);
-                calculateAndDisplayPerformance(distance, timeInSeconds);
                 stopChronometer();
                 Intent i = new Intent(getApplicationContext(), GPS_Service.class);
                 stopService(i);
@@ -313,7 +272,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
             @Override
             public void onClick(View v) {
                 if(cardioType != null && !cardioType.equals(Utils.CardioActivityTypes.ALL)){
-                    addNewCartioActiviy();
+                    addNewCardioActiviy();
                     finish();
                 }
                 else {
@@ -322,6 +281,33 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
 
             }
         });
+    }
+
+    private void startChronometer() {
+        tmrChronometer.setBase(SystemClock.elapsedRealtime() - timeOfPause);
+        tmrChronometer.start();
+        runningChronometer = true;
+    }
+
+    private void pauseChronometer() {
+
+        if (runningChronometer) {
+            timeOfPause = SystemClock.elapsedRealtime() - tmrChronometer.getBase();
+            tmrChronometer.stop();
+            runningChronometer = false;
+        } else  {
+            tmrChronometer.setBase(SystemClock.elapsedRealtime() - timeOfPause);
+            tmrChronometer.start();
+            runningChronometer = true;
+        }
+    }
+
+    private void stopChronometer() {
+        tmrChronometer.stop();
+        runningChronometer = false;
+        btnCancel.setVisibility(View.VISIBLE);
+        btnConfirm.setVisibility(View.VISIBLE);
+
     }
 
     private boolean confirmPermissions() {
@@ -343,10 +329,11 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
                 fetchLastKnownLocation();
                 enableButtons();
             } else {
+                Toaster.getInstance().showToast("Please Activate Location Services");
                 /*
                 TODO - imply to activate gps service
                  */
-                confirmPermissions();
+               // confirmPermissions();
             }
         }
     }
@@ -381,7 +368,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
         textView.setText(text);
     }
 
-    private void addNewCartioActiviy() {
+    private void addNewCardioActiviy() {
         long durationValue = Utils.getInstance().calculateTimeDifference(sTime, eTime);
         String sDuration = Utils.getInstance().formatTimeToString(durationValue);
         CardioActivity newCardioActivity = new CardioActivity(

@@ -1,9 +1,7 @@
 package com.example.running;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Log;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;

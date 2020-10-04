@@ -26,8 +26,7 @@ import java.util.Date;
 
 public class Activity_Add_Manually extends AppCompatActivity implements Callback_RadioChoice {
 
-    private static final String TAG = "ViewLogger";
-
+    private static final String TAG = "Activity_Add_Manually";
 
     private Button btnAddSave;
     private Button btnCancel;
@@ -81,13 +80,20 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
 
         setUpViews();
         setUpFragments();
+
         database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference(Keys.FIREBASE_ALL_RUNNING);
 
+        /*
+        * This activity is accessed by both Main Menu and History
+        *  If it's history need to pass a CardioActivity back (not creating a new one)
+        * */
         theCurrentActivity = (CardioActivity)getIntent().getParcelableExtra(Keys.NEW_DATA_PACKAGE);
 
         getAllActivitiesFromFirebase();
 
+
+        /* if not null -> got here from History */
         if (theCurrentActivity != null) {
             displayCardioActivityInFields(theCurrentActivity);
             btnAddSave.setText("save");
@@ -104,7 +110,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         btnAddSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (verifyEdtFields()) {
+                if (verifyInputFields()) {
                     setLblDuration();
                     setLblPaceCaloriesAndDistance();
                     sendNewRunData();
@@ -124,6 +130,8 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
             @Override
             public void onFocusChange(View view, boolean focus) {
                 enterTimeHandler(view, focus);
+                setLblDuration();
+                setLblPaceCaloriesAndDistance();
 
                            }
         });
@@ -132,6 +140,8 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
             @Override
             public void onFocusChange(View view, boolean focus) {
                 enterTimeHandler(view, focus);
+                setLblDuration();
+                setLblPaceCaloriesAndDistance();
             }
         });
 
@@ -147,6 +157,8 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
 
         edtDate.setText(cardioActivity.getDate());
         edtDistance.setText(df.format(cardioActivity.getDistance()));
+
+        /* TODO - disable keyboard for date, start and end time */
         edtStartTime.setText(cardioActivity.getTimeStart());
         edtEndTime.setText(cardioActivity.getTimeEnd());
         lblPace.setText(df.format(cardioActivity.getPace()));
@@ -229,8 +241,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
                 @Override
                 public void onTimeSet(com.ikovac.timepickerwithseconds.TimePicker view, int hourOfDay, int minute, int seconds) {
                     edt.setText(hourOfDay + ":" + minute + ":" + seconds);
-                    setLblDuration();
-                    setLblPaceCaloriesAndDistance();
+
                 }
 
             },hour, minutes, seconds, true);
@@ -261,7 +272,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         return true;
     }
 
-    private boolean verifyEdtFields() {
+    private boolean verifyInputFields() {
 
         return  checkRadioBox("Please Select An Activity Type")&&
                 checkEdtField(edtDate, "Date Field Is Empty") &&
@@ -278,6 +289,11 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         String sTime = edtStartTime.getText().toString();
         String eTime = edtEndTime.getText().toString();
 
+
+        /*
+        * If calledFromHistory is True, then the instance of theCardioActivity is not null, thus we only need to edit its attributes
+        * Otherwise, the call was from Main Menu, so we need to create a new CardioActivity instance
+        * */
         if (calledFromHistory) {
             theCurrentActivity.setDate(edtDate.getText().toString());
             theCurrentActivity.setDuration(lblDuration.getText().toString());
