@@ -168,7 +168,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
                 // After getting all sport activities from firebase, update textfields, graph and stop shimmer, progressbar, activate buttons
                 allSportActivities = dataSnapshot.getValue(AllSportActivities.class);
                 Log.d(TAG, "onDataChange: " + allSportActivities);
-                Utils.getInstance().putAllCardioSportActivitiesInSP(allSportActivities);
+
                 activateButtons();
                 updateAllTextViewsAttributes();
                 showGraph();
@@ -211,8 +211,24 @@ public class Activity_Main_Menu extends AppCompatActivity{
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
-        spinner.setSelection(Utils.getInstance().getCardioActivityPositionIndexInSpinner(spinnerChoice));
+        spinner.setSelection(getCardioActivityPositionIndexInSpinner(spinnerChoice));
+
+
     }
+
+    public int getCardioActivityPositionIndexInSpinner(String cardioActivityName) {
+        if (cardioActivityName.equals(Utils.CardioActivityTypes.ALL)){
+            return Utils.SpinnerValues.ALL_INDEX;
+        }
+        else  if (cardioActivityName.equals(Utils.CardioActivityTypes.JOGGING)){
+            return Utils.SpinnerValues.JOGGING_INDEX;
+        }
+        else  if (cardioActivityName.equals(Utils.CardioActivityTypes.RUNNING)){
+            return Utils.SpinnerValues.RUNNING_INDEX;
+        }
+        return Utils.SpinnerValues.CYCLING_INDEX;
+    }
+
 
 
 

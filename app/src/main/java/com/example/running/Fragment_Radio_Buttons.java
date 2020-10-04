@@ -20,16 +20,14 @@ public class Fragment_Radio_Buttons extends Fragment {
     private RadioButton radioCycling;
     private RadioButton radioAll;
 
-    private String refrenceKey;
+    private String referenceKey;
     private boolean needAllRadioButton;
-
-    private String choice;
 
     private Callback_RadioChoice callback_radioChoice;
 
-    public Fragment_Radio_Buttons(boolean needAllRadioButton, String refrenceKey) {
+    public Fragment_Radio_Buttons(boolean needAllRadioButton, String referenceKey) {
         this.needAllRadioButton = needAllRadioButton;
-        this.refrenceKey = refrenceKey;
+        this.referenceKey = referenceKey;
     }
 
     public static Fragment_Radio_Buttons newInstance(boolean needAllRadioButton, String refrenceKey) {
@@ -56,13 +54,11 @@ public class Fragment_Radio_Buttons extends Fragment {
         Log.d(TAG, "onCreateView: called");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment__radio__buttons, container, false);
-        Context context = view.getContext();
 
         setUpViewsInFragment(view);
 
         if (!needAllRadioButton) {
             radioAll.setVisibility(View.INVISIBLE);
-            ViewGroup layout = (ViewGroup) radioAll.getParent();
         }
 
         radioJogging.setOnClickListener(new View.OnClickListener() {
@@ -97,7 +93,7 @@ public class Fragment_Radio_Buttons extends Fragment {
     }
 
     private void setLastPressedRadioButton() {
-        String lastChoice = MySP.getInstance().getString(refrenceKey, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
+        String lastChoice = MySP.getInstance().getString(referenceKey, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
 
         if(lastChoice.equals(Utils.CardioActivityTypes.ALL)){
             radioAll.performClick();
@@ -115,26 +111,12 @@ public class Fragment_Radio_Buttons extends Fragment {
 
     private void radioHandler(String radioChoiceValue) {
         if (callback_radioChoice != null) {
-            MySP.getInstance().putString(refrenceKey, radioChoiceValue);
+            MySP.getInstance().putString(referenceKey, radioChoiceValue);
             callback_radioChoice.setRadioButtonChoice(radioChoiceValue);
         }
     }
-    public void setRadioButton(String radioChoiceValue)
-    {
-        Log.d(TAG, "setRadioButton: called with: "+radioChoiceValue);
-        if(radioChoiceValue.equals(Utils.CardioActivityTypes.ALL)){
-            radioAll.performClick();
-        }
-        else if(radioChoiceValue.equals(Utils.CardioActivityTypes.JOGGING)){
-            radioJogging.performClick();
-        }
-        else if(radioChoiceValue.equals(Utils.CardioActivityTypes.RUNNING)){
-            radioRunning.performClick();
-        }
-        else {
-            radioCycling.performClick();
-        }
-    }
+
+
     private void setUpViewsInFragment(View view) {
         radioJogging = view.findViewById(R.id.fragment_RAD_jogging);
         radioRunning = view.findViewById(R.id.fragment_RAD_running);

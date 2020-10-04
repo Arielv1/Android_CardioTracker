@@ -29,8 +29,6 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
         TextView mDate, mActivityType, mPace, mDuration, mDistance, mCalories;
         ImageView mEdit, mDelete;
 
-        OnItemClickListener listener;
-
         public ListViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
             mDate = itemView.findViewById(R.id.history_list_LBL_date);
@@ -125,16 +123,12 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
     }
 
     public ListCardAdapter(ArrayList<CardioActivity> cardioActivities, OnItemClickListener listener, int viewTypeRequset) {
-        this.context = context;
         this.mListener = listener;
         this.cardioActivities = cardioActivities;
         this.viewTypeRequset = viewTypeRequset;
 
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
-        this.mListener = onItemClickListener;
-    }
 
     public void setCardioActivities(ArrayList<CardioActivity> cardioActivities) {
         this.cardioActivities = cardioActivities;

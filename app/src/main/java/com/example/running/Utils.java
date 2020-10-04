@@ -61,18 +61,6 @@ public class Utils {
         final int CARD = 1;
     }
 
-    public int getCardioActivityPositionIndexInSpinner(String cardioActivityName) {
-        if (cardioActivityName.equals(CardioActivityTypes.ALL)){
-            return SpinnerValues.ALL_INDEX;
-        }
-        else  if (cardioActivityName.equals(CardioActivityTypes.JOGGING)){
-            return SpinnerValues.JOGGING_INDEX;
-        }
-        else  if (cardioActivityName.equals(CardioActivityTypes.RUNNING)){
-            return SpinnerValues.RUNNING_INDEX;
-        }
-        return SpinnerValues.CYCLING_INDEX;
-    }
 
     public ArrayList<CardioActivity> filterCardioActivitiesByType(ArrayList <CardioActivity> cardioActivityList, String activityType){
         ArrayList <CardioActivity> filteredList = new ArrayList<CardioActivity>();
@@ -89,16 +77,6 @@ public class Utils {
         }
 
         return filteredList;
-    }
-
-    public void putAllCardioSportActivitiesInSP(AllSportActivities allSportActivities) {
-        Gson gson = new Gson();
-        MySP.getInstance().putString(Keys.ALL_CARDIO_ACTIVITIES, gson.toJson(allSportActivities));
-    }
-
-    public AllSportActivities getAllCardioSportActivitiesFromSP() {
-        Gson gson = new Gson();
-        return gson.fromJson(MySP.getInstance().getString(Keys.ALL_CARDIO_ACTIVITIES, Keys.DEFAULT_ALL_CARDIO_ACTIVITIES_VALUE), AllSportActivities.class);
     }
 
     private String[] splitEditTextByString(String str, String symbol){

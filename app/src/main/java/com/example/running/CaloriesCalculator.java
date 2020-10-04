@@ -15,7 +15,7 @@ public class CaloriesCalculator {
 
     private CaloriesCalculator(Context context) {
         this.context = context;
-        initiateMETValues();
+        initiateMETSValues();
     }
 
     public static CaloriesCalculator init(Context context) {
@@ -31,7 +31,8 @@ public class CaloriesCalculator {
     }
 
 
-    private void initiateMETValues() {
+    private void initiateMETSValues() {
+        /*               kmh ,   METS value       */
         METSValues.put(17.54185, 18.0);
         METSValues.put(16.09344, 16.0);
         METSValues.put(14.4841, 15.0);
