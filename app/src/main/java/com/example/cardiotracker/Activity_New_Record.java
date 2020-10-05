@@ -1,16 +1,20 @@
-package com.example.running;
+package com.example.cardiotracker;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.os.PersistableBundle;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +23,7 @@ import android.widget.Chronometer;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -35,11 +40,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -80,7 +82,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
     private Marker lastLocationMarkerOnMap;
     private LatLng lastLocation;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private final int ZOOM_VALUE = 13;
+    private final int ZOOM_VALUE = 14;
 
     private final int REQUEST_CODE = 101;
 
@@ -100,6 +102,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
             MySP.getInstance().putString(Keys.RADIO_CHOICE_NEW_RECORD, cardioType);
         }
     };
+
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
@@ -170,10 +173,30 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
     protected void onStart() {
         super.onStart();
 
-        if (!confirmPermissions()) {
-            fetchLastKnownLocation();
-            enableButtons();
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (!(activeNetworkInfo != null && activeNetworkInfo.isConnected())) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Internet Connection Problem");
+            builder.setMessage("There's seems to be a problem connecting to the WiFi / Mobile Data - this activity won't work until connection is restored");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
         }
+        else{
+            if (!confirmPermissions()) {
+                fetchLastKnownLocation();
+                enableButtons();
+            }
+        }
+
+
+
     }
 
     @SuppressLint("MissingPermission")
@@ -189,7 +212,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
         databaseReference = database.getReference(Keys.FIREBASE_ALL_RUNNING);
 
         /* Get all sport activities sent by the main menu (from firebase) */
-        allSportActivities = getBundleFromMainMenu();
+        allSportActivities = Utils.getInstance().getAllSportsActivitiesBundleFromActivity(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);

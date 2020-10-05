@@ -1,4 +1,4 @@
-package com.example.running;
+package com.example.cardiotracker;
 
 import android.content.Context;
 import android.util.Log;

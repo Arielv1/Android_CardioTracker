@@ -20,20 +20,13 @@
         android:indeterminateTint="@color/colorRed"
 
         />
-
-    <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/shimmer"
+    <LinearLayout
+        android:id="@+id/main_menu_LAY_all"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:duration="1000"
+        android:orientation="vertical"
+        android:visibility="invisible"
         >
-
-
-        <LinearLayout
-            android:id="@+id/main_menu_LAY_all"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -69,31 +62,31 @@
                 />
 
         </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="4dp"
-                >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
+            >
 
-                <TextView
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/total_runs"
                 android:textSize="18sp"
                 />
 
-                <TextView
-                    android:id="@+id/main_menu_LBL_num_runs"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/_0"
-                    android:textSize="18sp"
-                    android:layout_marginStart="4dp"
-                    />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/main_menu_LBL_num_runs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_0"
+                android:textSize="18sp"
+                android:layout_marginStart="4dp"
+                />
+        </LinearLayout>
 
-            <LinearLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -156,81 +149,81 @@
                 android:layout_marginStart="4dp"
                 />
 
-    </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/total_calories_burned"
-                    android:textSize="18sp"
-                    />
-
-                <TextView
-                    android:id="@+id/main_menu_LBL_total_calories"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/_0"
-                    android:textSize="18sp"
-                    android:layout_marginStart="4dp"
-                    />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                >
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/main_menu_BTN_new_activity"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/start_new_activity"
-                    android:textAlignment="viewStart"
-                    app:backgroundTint="@color/colorPrimary"
-                    app:icon="@drawable/ic_timer"
-                    app:iconGravity="start"
-                    />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/main_menu_BTN_manual_activity"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/manually_add_activity"
-                    android:textAlignment="viewStart"
-                    app:backgroundTint="@color/colorPrimary"
-                    app:icon="@drawable/ic_add"
-                    app:iconGravity="start"
-                    />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/main_menu_LBL_history"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/progress_history"
-                    style="@style/Widget.MaterialComponents.Button"
-                    android:textSize="15sp"
-                    android:textAlignment="viewStart"
-                    app:icon="@drawable/ic_history"
-                    app:iconGravity="start"
-                    />
-
-            </LinearLayout>
-            <com.jjoe64.graphview.GraphView
-                android:id="@+id/main_menu_graph"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:visibility="visible"
-
-                />
         </LinearLayout>
-    </com.facebook.shimmer.ShimmerFrameLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/total_calories_burned"
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:id="@+id/main_menu_LBL_total_calories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_0"
+                android:textSize="18sp"
+                android:layout_marginStart="4dp"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/main_menu_BTN_new_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/start_new_activity"
+                android:textAlignment="viewStart"
+                app:backgroundTint="@color/colorPrimary"
+                app:icon="@drawable/ic_timer"
+                app:iconGravity="start"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/main_menu_BTN_manual_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/manually_add_activity"
+                android:textAlignment="viewStart"
+                app:backgroundTint="@color/colorPrimary"
+                app:icon="@drawable/ic_add"
+                app:iconGravity="start"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/main_menu_LBL_history"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/progress_history"
+                style="@style/Widget.MaterialComponents.Button"
+                android:textSize="15sp"
+                android:textAlignment="viewStart"
+                app:icon="@drawable/ic_history"
+                app:iconGravity="start"
+                />
+
+        </LinearLayout>
+        <com.jjoe64.graphview.GraphView
+            android:id="@+id/main_menu_graph"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:visibility="visible"
+
+            />
+    </LinearLayout>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

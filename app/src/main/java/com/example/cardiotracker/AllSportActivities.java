@@ -1,4 +1,4 @@
-package com.example.running;
+package com.example.cardiotracker;
 
 import android.os.Parcel;
 import android.os.Parcelable;

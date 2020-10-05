@@ -1,4 +1,4 @@
-package com.example.running;
+package com.example.cardiotracker;
 
 public interface Keys {
 
@@ -29,4 +29,9 @@ public interface Keys {
     public static final boolean DEFAULT_VALUE_WEIGHT_WARNING = false;
 
     public static final int INTERVAL = 3000;
+
+    public static final String WEIGHT_ALERT_DIALOG = "WEIGHT_ALERT_DIALOG";
+    public static final boolean DEFAULT_VALUE_SHOW_WEIGHT_ALERT_DIALOG = true;
+
+    public static final String NOTIFICATION_CHANNEL = "Notification_Channel";
 }

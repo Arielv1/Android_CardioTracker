@@ -1,4 +1,4 @@
-package com.example.running;
+package com.example.cardiotracker;
 
 public interface Callback_RadioChoice {
 

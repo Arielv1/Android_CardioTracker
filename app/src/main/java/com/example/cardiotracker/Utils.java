@@ -1,16 +1,12 @@
-package com.example.running;
+package com.example.cardiotracker;
 
+import android.app.Activity;
 import android.content.Context;
-import android.widget.EditText;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.gson.Gson;
-
-import java.security.Key;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 
 public class Utils {
@@ -146,5 +142,12 @@ public class Utils {
 
     }
 
+    public AllSportActivities getAllSportsActivitiesBundleFromActivity(Activity activity){
+        AllSportActivities allSportActivities =  activity.getIntent().getParcelableExtra(Keys.ALL_CARDIO_ACTIVITIES);
+        if (allSportActivities  == null) {
+            allSportActivities = new AllSportActivities(new ArrayList<CardioActivity>());
+        }
+        return allSportActivities;
+    }
 
 }

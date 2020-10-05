@@ -1,4 +1,4 @@
-package com.example.running;
+package com.example.cardiotracker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -16,11 +16,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,7 +31,6 @@ import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -62,11 +60,12 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
     private FirebaseDatabase database;
     private DatabaseReference databaseReference;
-    private SimpleDateFormat sdf = new SimpleDateFormat("M");
     private String[] month_letters = {"Ja"," Feb "," Mar ","Apr ","May ","Jun ","Jul ","Aug ","Sep ","Oc ","N","Dec"};
 
-    private ShimmerFrameLayout shimmer;
     private ProgressBar progressBar;
+
+    private LinearLayout mainMenuLayout;
+
 
     @Override
     protected void onPause() {
@@ -76,8 +75,8 @@ public class Activity_Main_Menu extends AppCompatActivity{
             MySP.getInstance().putDouble(Keys.WEIGHT_KEY, Double.parseDouble(edtWeight.getText().toString()));
         }
         catch (Exception e){
-            /*TODO - add alert when no weight is entered */
             MySP.getInstance().putDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE);
+            weightAlert();
         }
         CaloriesCalculator.getInstance().setWeight(MySP.getInstance().getDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE));
 
@@ -88,7 +87,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     protected void onStart() {
         Log.d(TAG , "onStart Invoked");
         super.onStart();
-        
+
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         
@@ -99,9 +98,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
             builder.setMessage("There's seems to be a problem connecting to the WiFi / Mobile Data, as such some services won't work properly or at all");
             builder.setPositiveButton("I UNDERSTAND", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    activateButtons();
-//                    shimmer.stopShimmerAnimation();
-                    shimmer.stopShimmer();
+                    mainMenuLayout.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.INVISIBLE);
                 }
             });
@@ -121,6 +118,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     protected void onStop() {
         Log.d(TAG, "onStop: ");
         super.onStop();
+        mainMenuLayout.setVisibility(View.INVISIBLE);
         edtWeight.clearFocus();
         MySP.getInstance().putString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
 
@@ -129,7 +127,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("ViewLogger", "MainMenu - onCreate Invoked");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
@@ -141,6 +138,37 @@ public class Activity_Main_Menu extends AppCompatActivity{
         database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference(Keys.FIREBASE_ALL_RUNNING);
 
+        /* Each of the activities can modify the CardioActivity list, so we pass allSportsActivity
+        * so we won't have to connect to firebase from each activity
+        *  */
+        btnNewActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), Activity_New_Record.class);
+                intent.putExtra(Keys.ALL_CARDIO_ACTIVITIES, allSportActivities);
+                startActivity(intent);
+
+            }
+        });
+
+        btnManualActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), Activity_Add_Manually.class);
+                intent.putExtra(Keys.ALL_CARDIO_ACTIVITIES, allSportActivities);
+                startActivity(intent);
+            }
+        });
+
+
+        btnHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), Activity_History.class);
+                intent.putExtra(Keys.ALL_CARDIO_ACTIVITIES, allSportActivities);
+                startActivity(intent);
+            }
+        });
     }
 
     private void setUpViews() {
@@ -154,37 +182,11 @@ public class Activity_Main_Menu extends AppCompatActivity{
         lblTotalCalories = findViewById(R.id.main_menu_LBL_total_calories);
         edtWeight = findViewById(R.id.main_menu_EDT_weight);
         spinner = findViewById(R.id.main_menu_spinner);
-        shimmer = findViewById(R.id.shimmer);
         progressBar = findViewById(R.id.main_menu_PB_progress_bar);
-
+        mainMenuLayout = findViewById(R.id.main_menu_LAY_all);
     }
 
-    private void getAllActivitiesFromFirebase() {
-//        shimmer.startShimmerAnimation();
-        shimmer.stopShimmer();
-        progressBar.setVisibility(View.VISIBLE);
 
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // After getting all sport activities from firebase, update textfields, graph and stop shimmer, progressbar, activate buttons
-                allSportActivities = dataSnapshot.getValue(AllSportActivities.class);
-                Log.d(TAG, "onDataChange: " + allSportActivities);
-
-                activateButtons();
-                updateAllTextViewsAttributes();
-                showGraph();
-//                shimmer.stopShimmerAnimation();
-                shimmer.stopShimmer();
-                progressBar.setVisibility(View.INVISIBLE);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.w(TAG, "loadPost:onCancelled", error.toException());
-            }
-        };
-        databaseReference.addListenerForSingleValueEvent(postListener);
-    }
 
     private void setWeightEditText(double weight) {
         Log.d(TAG, "setWeightEditText: " + MySP.getInstance().getDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE));
@@ -230,49 +232,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
             return Utils.SpinnerValues.RUNNING_INDEX;
         }
         return Utils.SpinnerValues.CYCLING_INDEX;
-    }
-
-
-
-
-
-    private void activateButtons() {
-        /*TODO - send allSportsActivity to all other activityes -> remove getFromFirebase function in them */
-        btnNewActivity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                weightAlertDialog();
-//                startActivity(new Intent(getApplicationContext(), Activity_New_Record.class));
-                Intent intent = new Intent(getApplicationContext(), Activity_New_Record.class);
-                intent.putExtra(Keys.ALL_CARDIO_ACTIVITIES, allSportActivities);
-                startActivity(intent);
-
-            }
-        });
-
-        btnManualActivity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                weightAlertDialog();
-//                startActivity(new Intent(getApplicationContext(), Activity_Add_Manually.class));
-                Intent intent = new Intent(getApplicationContext(), Activity_Add_Manually.class);
-                intent.putExtra(Keys.ALL_CARDIO_ACTIVITIES, allSportActivities);
-                startActivity(intent);
-            }
-        });
-
-
-        btnHistory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                /* Passing allSportActivities to History so it won't have to connect to firebase to import them  */
-                Intent intent = new Intent(getApplicationContext(), Activity_History.class);
-                intent.putExtra(Keys.ALL_CARDIO_ACTIVITIES, allSportActivities);
-                startActivity(intent);
-            }
-        });
-
     }
 
     private void updateLblNumRuns() {
@@ -332,42 +291,42 @@ public class Activity_Main_Menu extends AppCompatActivity{
         tv.setText(update);
     }
 
-    private void weightAlertDialog() {
-        /* TODO - consider deleting this */
-        /*if (CaloriesCalculator.getInstance().getWeight() == Keys.DEFAULT_DOUBLE_VALUE && !weightWarning){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("No Weight Value Detected");
-            builder.setMessage("No weight value was detected, you won't be able to view how many calories you have burned.");
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-
-                }
-            });
-            builder.setNegativeButton("Never Show Me This Again", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    weightWarning = true;
-                }
-            });
-            AlertDialog alert = builder.create();
-            alert.show();
-
-        }*/
-     
+    private void getAllActivitiesFromFirebase() {
+        progressBar.setVisibility(View.VISIBLE);
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                allSportActivities = dataSnapshot.getValue(AllSportActivities.class);
+                Log.d(TAG, "onDataChange: " + allSportActivities);
+                mainMenuLayout.setVisibility(View.VISIBLE);
+                updateAllTextViewsAttributes();
+                showGraph();
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w(TAG, "loadPost:onCancelled", error.toException());
+            }
+        };
+        databaseReference.addListenerForSingleValueEvent(postListener);
+    }
+    private void weightAlert() {
+        Toaster.getInstance().showToast("No Weight Detected - Cannot Calculate Burnt Calories");
     }
 
     private void showGraph() {
 
         graph.removeAllSeries();
-        if(allSportActivities == null)
-            return;
+        if(allSportActivities.getActivities() == null) {
+            allSportActivities.setActivities(new ArrayList<CardioActivity>());
+
+        }
 
         HashMap<Integer, Double> monthDistanceMap = new HashMap<>();
         ArrayList <Integer> releventMonths = new ArrayList <>();
         ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();
 
-
-
+        /* Creates HashMap <month, kmForThatMonth>*/
         for (CardioActivity currentActivity : releventActivities) {
 
             double currentDistance = currentActivity.getDistance();
@@ -414,7 +373,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinX(1);
         graph.getViewport().setMaxX(13);
-        graph.getViewport().setMaxY(maxDistance);
+        graph.getViewport().setMaxY(((maxDistance/40)+1)*40);
         graph.getViewport().setScrollableY(true);
     }
 

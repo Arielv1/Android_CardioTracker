@@ -1,7 +1,6 @@
-package com.example.running;
+package com.example.cardiotracker;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

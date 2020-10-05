@@ -1,6 +1,9 @@
-package com.example.running;
+package com.example.cardiotracker;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -8,12 +11,15 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.text.NoCopySpan;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 
 public class GPS_Service extends Service {
@@ -22,6 +28,9 @@ public class GPS_Service extends Service {
     private LocationListener listener;
     private LocationManager locationManager;
     private boolean network_enabled, gps_enabled;
+
+
+
 
     @Nullable
     @Override
@@ -32,6 +41,8 @@ public class GPS_Service extends Service {
     @SuppressLint("MissingPermission")
     @Override
     public void onCreate() {
+
+        initNotification();
 
         listener = new LocationListener() {
             @Override
@@ -44,30 +55,7 @@ public class GPS_Service extends Service {
             }
 
             @Override
-            public void onStatusChanged(String provider, int status, Bundle bundle) {
-                /*TODO - check this shit*/
-                Log.d(TAG, "onStatusChanged: Provider is:  " + provider);
-                switch (status) {
-                    case LocationProvider.OUT_OF_SERVICE:
-                        Log.d(TAG, "Status Changed: Out of Service");
-                        Toaster.getInstance().showToast("Status Changed: Out of Service");
-                        break;
-                    case LocationProvider.TEMPORARILY_UNAVAILABLE:
-                        Log.d(TAG, "Status Changed: Temporarily Unavailable");
-                        Toaster.getInstance().showToast("Status Changed: Temporarily Unavailable");
-
-                        break;
-                    case LocationProvider.AVAILABLE:
-                        Log.d(TAG, "Status Changed: Available");
-                        Toaster.getInstance().showToast("Status Changed: Available");
-                        break;
-                }
-            }
-
-            @Override
             public void onProviderEnabled(String provider) {
-                /*TODO - check this shit*/
-                Log.d(TAG, "onProviderEnabled: Provider is: "+provider);
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,Keys.INTERVAL,0,listener);
             }
 
@@ -80,36 +68,29 @@ public class GPS_Service extends Service {
         };
 
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        // TODO - to remove it ?
-      //  checkRequirement();
-
-        //noinspection MissingPermission
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Keys.INTERVAL,0,listener);
 
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void initNotification() {
+        Intent notificationIntent = new Intent(this, Activity_New_Record.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        Notification notification = new Notification.Builder(this, Keys.NOTIFICATION_CHANNEL)
+                .setSmallIcon(R.drawable.ic_location_on)
+                .setContentText("CardioTracker is using location & GPS services")
+                .build();
+        startForeground(1, notification);
+        stopSelf();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         if(locationManager != null){
-            //noinspection MissingPermission
             locationManager.removeUpdates(listener);
         }
     }
 
-    private void checkRequirement() {
-
-        gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if(!gps_enabled){
-            Toaster.getInstance().showToast("GPS ARE NOT Enable");
-        }
-        network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        if(!network_enabled) {
-            Toaster.getInstance().showToast("Network ARE NOT Enable");
-        }
-
-        Log.d(TAG, "checkRequirement: called" + gps_enabled + " " + network_enabled);
-    }
 }

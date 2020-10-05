@@ -1,4 +1,4 @@
-package com.example.running;
+package com.example.cardiotracker;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;

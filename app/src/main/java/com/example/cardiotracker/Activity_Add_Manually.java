@@ -1,4 +1,4 @@
-package com.example.running;
+package com.example.cardiotracker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,8 +50,6 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
     private double distance = 0;
     private double pace = 0;
     private double caloriesBurned = 0;
-
-    private Fragment_Radio_Buttons fragment_radio_buttons;
 
     private String cardioActivityChoice;
     private AllSportActivities allSportActivities;
@@ -187,8 +185,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
     }
 
     private void setUpFragments() {
-        fragment_radio_buttons = Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.manual_fragment_radio_group, false, Keys.RADIO_HISTORY_CHOICE_EDIT);
-
+        Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.manual_fragment_radio_group, false, Keys.RADIO_HISTORY_CHOICE_EDIT);
     }
 
 

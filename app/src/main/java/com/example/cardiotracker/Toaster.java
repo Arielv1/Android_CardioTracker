@@ -1,4 +1,4 @@
-package com.example.running;
+package com.example.cardiotracker;
 
 import android.content.Context;
 import android.os.Handler;
@@ -28,7 +28,7 @@ public class Toaster {
                new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             }
         });
     }
