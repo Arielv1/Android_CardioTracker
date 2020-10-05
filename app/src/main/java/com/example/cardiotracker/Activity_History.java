@@ -148,7 +148,6 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
-                // Do nothing but close the dialog
                 reset();
             }
         });

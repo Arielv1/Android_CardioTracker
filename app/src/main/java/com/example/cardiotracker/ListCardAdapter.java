@@ -1,6 +1,7 @@
 package com.example.cardiotracker;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -144,8 +145,10 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
         View view;
         switch (viewTypeRequset) {
             case Utils.AdapterViewOptions.LIST:
+
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_list, parent, false);
                 return new ListViewHolder(view, mListener);
+
             case Utils.AdapterViewOptions.CARD:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_card, parent, false);
                 return new CardViewHodler(view, mListener);
@@ -166,6 +169,7 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
                 ((ListViewHolder) holder).mDate.setText(cardioActivity.getDate());
                 ((ListViewHolder) holder).mDistance.setText(df.format(cardioActivity.getDistance()));
                 ((ListViewHolder) holder).mPace.setText(df.format(cardioActivity.getPace()));
+
                 ((ListViewHolder) holder).mCalories.setText(df.format(cardioActivity.getCaloriesBurned()));
                 ((ListViewHolder) holder).mDuration.setText(cardioActivity.getDuration());
                 break;
@@ -173,7 +177,7 @@ public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHold
                 ((CardViewHodler)holder).mDate.setText(cardioActivity.getDate());
                 ((CardViewHodler)holder).mDistance.setText(df.format(cardioActivity.getDistance()));
                 ((CardViewHodler)holder).mPace.setText(df.format(cardioActivity.getPace()));
-                ((CardViewHodler) holder).mCalories.setText(df.format(cardioActivity.getCaloriesBurned()));
+                ((CardViewHodler)holder).mCalories.setText(df.format(cardioActivity.getCaloriesBurned()));
                 ((CardViewHodler)holder).mDuration.setText(cardioActivity.getDuration());
                 ((CardViewHodler)holder).mStartTime.setText(cardioActivity.getTimeStart());
                 ((CardViewHodler)holder).mEndTime.setText(cardioActivity.getTimeEnd());

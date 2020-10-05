@@ -82,7 +82,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
     private Marker lastLocationMarkerOnMap;
     private LatLng lastLocation;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private final int ZOOM_VALUE = 14;
+    private final int ZOOM_VALUE = 16;
 
     private final int REQUEST_CODE = 101;
 
@@ -115,6 +115,45 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
     @Override
     protected void onResume() {
         super.onResume();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (broadcastReceiver != null) {
+            unregisterReceiver(broadcastReceiver);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo ();
+        if (!(activeNetworkInfo != null && activeNetworkInfo.isConnected())) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Internet Connection Problem");
+            builder.setMessage("There's seems to be a problem connecting to the WiFi / Mobile Data - this activity won't work until connection is restored");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+        else{
+            if (!confirmPermissions()) {
+                fetchLastKnownLocation();
+                enableButtons();
+            }
+        }
+
+
+
         if (broadcastReceiver == null) {
             broadcastReceiver = new BroadcastReceiver() {
 
@@ -157,45 +196,6 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
             };
         }
         registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (broadcastReceiver != null) {
-            unregisterReceiver(broadcastReceiver);
-        }
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-
-        if (!(activeNetworkInfo != null && activeNetworkInfo.isConnected())) {
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Internet Connection Problem");
-            builder.setMessage("There's seems to be a problem connecting to the WiFi / Mobile Data - this activity won't work until connection is restored");
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
-            AlertDialog alert = builder.create();
-            alert.show();
-        }
-        else{
-            if (!confirmPermissions()) {
-                fetchLastKnownLocation();
-                enableButtons();
-            }
-        }
-
-
 
     }
 
@@ -236,6 +236,8 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
     }
 
     private void enableButtons() {
+
+        
 
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -289,7 +291,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                closingDialog();
             }
         });
 
@@ -303,9 +305,27 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
                 else {
                     Toaster.getInstance().showToast("Please Select Type");
                 }
-
             }
         });
+    }
+
+    private void closingDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm");
+        builder.setMessage("Are you sure you want to discard this activity?");
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void startChronometer() {

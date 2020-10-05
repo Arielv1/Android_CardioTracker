@@ -73,16 +73,21 @@ public class GPS_Service extends Service {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     private void initNotification() {
         Intent notificationIntent = new Intent(this, Activity_New_Record.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        Notification notification = new Notification.Builder(this, Keys.NOTIFICATION_CHANNEL)
-                .setSmallIcon(R.drawable.ic_location_on)
-                .setContentText("CardioTracker is using location & GPS services")
-                .build();
-        startForeground(1, notification);
-        stopSelf();
+        Notification notification = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            notification = new Notification.Builder(this, Keys.NOTIFICATION_CHANNEL)
+                    .setSmallIcon(R.drawable.ic_location_on)
+                    .setContentText("CardioTracker is using location & GPS services")
+                    .build();
+            startForeground(1, notification);
+
+        }
+
+
     }
 
     @Override

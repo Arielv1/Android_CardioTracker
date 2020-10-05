@@ -84,7 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-               >
+                >
                <TextView
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
@@ -170,21 +170,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-               >
-                  <TextView
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:text="@string/calories_burned"
-                      android:textSize="16sp"
-                     />
+                >
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="@string/calories_burned"
+                   android:textSize="16sp"
+                   />
 
-                  <TextView
-                      android:id="@+id/card_LBL_calories"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textSize="16sp"
-                      android:layout_marginStart="4dp"
-                     />
+               <TextView
+                   android:id="@+id/card_LBL_calories"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:textSize="16sp"
+                   android:layout_marginStart="4dp"
+                   />
 
             </LinearLayout>
          </LinearLayout>
@@ -192,7 +192,7 @@
              android:layout_width="0dp"
              android:layout_height="0dp"
              android:layout_weight="1"
-            />
+             />
 
          <LinearLayout
              android:layout_width="match_parent"
