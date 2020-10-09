@@ -28,7 +28,7 @@
     <string name="confirm">Confirm</string>
     <string name="low_detail">Low Detail</string>
     <string name="high_detail">High Detail</string>
-    <string name="total_runs">Total Runs:</string>
+    <string name="total_activities">Total Activities:</string>
     <string name="total_distance">Total Distance:</string>
     <string name="km">km</string>
     <string name="average_pace">Average Pace:</string>

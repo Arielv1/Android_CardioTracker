@@ -246,15 +246,6 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
                     calendar = Calendar.getInstance();
                     sTime = (simpleTimeFormat.format(calendar.getTime()));
                     date = simpleDateFormat.format(calendar.getTime());
-
-                    if (date.charAt(0)=='0'){
-                        date = date.substring(1);
-                    }
-
-                    if (date.charAt(3)=='0'){
-                        String start = date.substring(0,3);
-                        date = start + date.substring(4);
-                    }
                 }
                 if (!runningChronometer){
                     btnPause.setEnabled(true);

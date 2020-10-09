@@ -323,27 +323,20 @@ public class Activity_Main_Menu extends AppCompatActivity{
     private void showGraph() {
 
         graph.removeAllSeries();
-        if(allSportActivities.getActivities() == null) {
-            allSportActivities.setActivities(new ArrayList<CardioActivity>());
-
-        }
 
         HashMap<Integer, Double> monthDistanceMap = new HashMap<>();
         ArrayList <Integer> releventMonths = new ArrayList <>();
         ArrayList <CardioActivity> releventActivities = getCardioActivitiesBySpinnerChoice();
 
-        /* Creates HashMap <month, kmForThatMonth>*/
-        for (CardioActivity currentActivity : releventActivities) {
+        for (CardioActivity current : releventActivities) {
+            String[] date = current.getDate().split("/");
 
-            double currentDistance = currentActivity.getDistance();
-
-            String[] date = currentActivity.getDate().split("/");
             int month = Integer.parseInt(date[1]);
             if (monthDistanceMap.containsKey(month)){
-                monthDistanceMap.put(month, monthDistanceMap.get(month) + currentDistance);
+                monthDistanceMap.put(month, monthDistanceMap.get(month) + current.getDistance());
             }
             else{
-                monthDistanceMap.put(month, currentDistance);
+                monthDistanceMap.put(month, current.getDistance());
                 releventMonths.add(month);
             }
         }
@@ -362,7 +355,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
                 maxDistance = monthDistanceMap.get(month);
             }
         }
-        barGraphSeries = new BarGraphSeries<>(dp);
+        barGraphSeries = new BarGraphSeries<DataPoint>(dp);
 
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
         barGraphSeries.setDataWidth(0.5);
@@ -372,15 +365,16 @@ public class Activity_Main_Menu extends AppCompatActivity{
         staticLabelsFormatter.setHorizontalLabels(month_letters);
         graph.getGridLabelRenderer().setNumHorizontalLabels(12);
         graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
-        graph.setTitle("Km For Each Month");
+        graph.setTitle("Total Km For Each Month");
         graph.setClickable(false);
         graph.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
         graph.setVerticalScrollBarEnabled(false);
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinX(1);
-        graph.getViewport().setMaxX(13);
+        graph.getViewport().setMaxX(12);
         graph.getViewport().setMaxY(((maxDistance/40)+1)*40);
         graph.getViewport().setScrollableY(true);
+
     }
 
     private ArrayList <CardioActivity> getCardioActivitiesBySpinnerChoice() {

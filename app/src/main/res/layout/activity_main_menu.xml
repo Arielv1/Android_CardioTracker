@@ -72,7 +72,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/total_runs"
+                android:text="@string/total_activities"
                 android:textSize="18sp"
                 />
 
