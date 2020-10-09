@@ -1,4 +1,4 @@
-package com.example.cardiotracker;
+package com.example.cardiotracker.utilities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,7 +7,7 @@ import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
 
-class MySP {
+public class MySP {
 
     private SharedPreferences prefs;
     private static MySP mySPInstance;

@@ -1,6 +1,5 @@
-package com.example.cardiotracker;
+package com.example.cardiotracker.activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -10,11 +9,17 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.example.cardiotracker.models.AllSportActivities;
+import com.example.cardiotracker.interfaces.Callback_RadioChoice;
+import com.example.cardiotracker.utilities.CaloriesCalculator;
+import com.example.cardiotracker.models.CardioActivity;
+import com.example.cardiotracker.interfaces.Keys;
+import com.example.cardiotracker.utilities.MySP;
+import com.example.cardiotracker.R;
+import com.example.cardiotracker.utilities.Toaster;
+import com.example.cardiotracker.utilities.Utils;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.ikovac.timepickerwithseconds.MyTimePickerDialog;
 import java.text.DecimalFormat;

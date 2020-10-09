@@ -1,4 +1,4 @@
-package com.example.cardiotracker;
+package com.example.cardiotracker.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -13,21 +13,27 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-
-import android.os.PersistableBundle;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
+import com.example.cardiotracker.models.AllSportActivities;
+import com.example.cardiotracker.interfaces.Callback_RadioChoice;
+import com.example.cardiotracker.utilities.CaloriesCalculator;
+import com.example.cardiotracker.models.CardioActivity;
+import com.example.cardiotracker.services.GPS_Service;
+import com.example.cardiotracker.interfaces.Keys;
+import com.example.cardiotracker.utilities.MySP;
+import com.example.cardiotracker.R;
+import com.example.cardiotracker.utilities.Toaster;
+import com.example.cardiotracker.utilities.Utils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -42,7 +48,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

@@ -1,10 +1,16 @@
-package com.example.cardiotracker;
+package com.example.cardiotracker.utilities;
 
 import android.app.Activity;
 import android.content.Context;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.example.cardiotracker.interfaces.Callback_RadioChoice;
+import com.example.cardiotracker.interfaces.Keys;
+import com.example.cardiotracker.models.AllSportActivities;
+import com.example.cardiotracker.models.CardioActivity;
+import com.example.cardiotracker.fragments.Fragment_Radio_Buttons;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,14 +43,14 @@ public class Utils {
         return fragment;
     }
 
-    interface CardioActivityTypes {
+    public interface CardioActivityTypes {
         final String ALL = "All";
         final String JOGGING = "Jogging";
         final String RUNNING = "Running";
         final String CYCLING = "Cycling";
     }
 
-    interface SpinnerValues {
+    public interface SpinnerValues {
         final int ALL_INDEX = 0;
         final int JOGGING_INDEX = 1;
         final int RUNNING_INDEX = 2;
@@ -52,7 +58,7 @@ public class Utils {
 
     }
 
-    interface AdapterViewOptions {
+    public interface AdapterViewOptions {
         final int LIST = 0;
         final int CARD = 1;
     }

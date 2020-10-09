@@ -1,8 +1,7 @@
-package com.example.cardiotracker;
+package com.example.cardiotracker.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import java.util.Date;
 import java.util.UUID;
 

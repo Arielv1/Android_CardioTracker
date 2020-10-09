@@ -1,7 +1,6 @@
-package com.example.cardiotracker;
+package com.example.cardiotracker.utilities;
 
 import android.content.Context;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 

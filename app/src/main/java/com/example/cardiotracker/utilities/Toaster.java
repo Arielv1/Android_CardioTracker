@@ -1,4 +1,4 @@
-package com.example.cardiotracker;
+package com.example.cardiotracker.utilities;
 
 import android.content.Context;
 import android.os.Handler;

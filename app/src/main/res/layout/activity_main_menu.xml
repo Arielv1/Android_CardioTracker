@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activity_Main_Menu"
+    tools:context=".activities.Activity_Main_Menu"
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
     >

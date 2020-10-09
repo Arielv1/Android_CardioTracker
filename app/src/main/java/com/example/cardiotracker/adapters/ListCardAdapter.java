@@ -1,26 +1,25 @@
-package com.example.cardiotracker;
+package com.example.cardiotracker.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.example.cardiotracker.R;
+import com.example.cardiotracker.utilities.Utils;
+import com.example.cardiotracker.models.CardioActivity;
 import com.google.android.material.button.MaterialButton;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class ListCardAdapter extends RecyclerView.Adapter <RecyclerView.ViewHolder> {
 
 
-    interface OnItemClickListener {
+    public interface OnItemClickListener {
         void onItemEdit(int position);
         void onItemDelete(int position);
     }

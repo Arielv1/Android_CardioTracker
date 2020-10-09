@@ -1,17 +1,13 @@
-package com.example.cardiotracker;
+package com.example.cardiotracker.activities;
 
-import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +19,14 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import com.example.cardiotracker.models.AllSportActivities;
+import com.example.cardiotracker.utilities.CaloriesCalculator;
+import com.example.cardiotracker.models.CardioActivity;
+import com.example.cardiotracker.interfaces.Keys;
+import com.example.cardiotracker.utilities.MySP;
+import com.example.cardiotracker.R;
+import com.example.cardiotracker.utilities.Toaster;
+import com.example.cardiotracker.utilities.Utils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,7 +36,6 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;

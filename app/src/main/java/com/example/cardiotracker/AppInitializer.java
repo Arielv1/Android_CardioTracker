@@ -5,6 +5,12 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
+import com.example.cardiotracker.interfaces.Keys;
+import com.example.cardiotracker.utilities.CaloriesCalculator;
+import com.example.cardiotracker.utilities.MySP;
+import com.example.cardiotracker.utilities.Toaster;
+import com.example.cardiotracker.utilities.Utils;
+
 public class AppInitializer extends Application {
 
     private static final String TAG = "AppInitializer";

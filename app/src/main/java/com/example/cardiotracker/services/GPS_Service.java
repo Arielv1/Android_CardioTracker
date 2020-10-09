@@ -1,25 +1,19 @@
-package com.example.cardiotracker;
+package com.example.cardiotracker.services;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
-import android.os.Build;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.text.NoCopySpan;
-import android.util.Log;
-
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
+import com.example.cardiotracker.R;
+import com.example.cardiotracker.activities.Activity_New_Record;
+import com.example.cardiotracker.interfaces.Keys;
 
 
 public class GPS_Service extends Service {
@@ -27,7 +21,6 @@ public class GPS_Service extends Service {
     private static final String TAG = "GPS_Service";
     private LocationListener listener;
     private LocationManager locationManager;
-    private boolean network_enabled, gps_enabled;
 
 
 
@@ -56,7 +49,7 @@ public class GPS_Service extends Service {
 
             @Override
             public void onProviderEnabled(String provider) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,Keys.INTERVAL,0,listener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Keys.INTERVAL,0,listener);
             }
 
             @Override

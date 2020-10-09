@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment_Radio_Buttons">
+    tools:context=".fragments.Fragment_Radio_Buttons">
 
     <RadioGroup
         android:id="@+id/fragment_radio_group"

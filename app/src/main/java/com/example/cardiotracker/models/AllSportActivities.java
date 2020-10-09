@@ -1,4 +1,4 @@
-package com.example.cardiotracker;
+package com.example.cardiotracker.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

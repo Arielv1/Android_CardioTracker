@@ -1,4 +1,6 @@
-package com.example.cardiotracker;
+package com.example.cardiotracker.interfaces;
+
+import com.example.cardiotracker.utilities.Utils;
 
 public interface Keys {
 
