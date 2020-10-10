@@ -23,18 +23,16 @@ public class Fragment_Radio_Buttons extends Fragment {
     private RadioButton radioCycling;
     private RadioButton radioAll;
 
-    private String referenceKey;
     private boolean needAllRadioButton;
 
     private Callback_RadioChoice callback_radioChoice;
 
-    public Fragment_Radio_Buttons(boolean needAllRadioButton, String referenceKey) {
+    public Fragment_Radio_Buttons(boolean needAllRadioButton) {
         this.needAllRadioButton = needAllRadioButton;
-        this.referenceKey = referenceKey;
     }
 
-    public static Fragment_Radio_Buttons newInstance(boolean needAllRadioButton, String refrenceKey) {
-        return new Fragment_Radio_Buttons(needAllRadioButton, refrenceKey);
+    public static Fragment_Radio_Buttons newInstance(boolean needAllRadioButton) {
+        return new Fragment_Radio_Buttons(needAllRadioButton);
     }
 
     public void setActivityCallback(Callback_RadioChoice callback_radioChoice) {
@@ -96,7 +94,7 @@ public class Fragment_Radio_Buttons extends Fragment {
     }
 
     private void setLastPressedRadioButton() {
-        String lastChoice = MySP.getInstance().getString(referenceKey, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
+        String lastChoice = MySP.getInstance().getString(Keys.RADIO_HISTORY_CHOICE, Keys.DEFAULT_RADIO_BUTTONS_HISTORY_VALUE);
 
         if(lastChoice.equals(Utils.CardioActivityTypes.ALL)){
             radioAll.performClick();
@@ -114,7 +112,7 @@ public class Fragment_Radio_Buttons extends Fragment {
 
     private void radioHandler(String radioChoiceValue) {
         if (callback_radioChoice != null) {
-            MySP.getInstance().putString(referenceKey, radioChoiceValue);
+            MySP.getInstance().putString(Keys.RADIO_HISTORY_CHOICE, radioChoiceValue);
             callback_radioChoice.setRadioButtonChoice(radioChoiceValue);
         }
     }

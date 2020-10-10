@@ -74,30 +74,11 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause: ");
-        try{
-            MySP.getInstance().putDouble(Keys.WEIGHT_KEY, Double.parseDouble(edtWeight.getText().toString()));
-        }
-        catch (Exception e){
-            MySP.getInstance().putDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE);
-            weightAlert();
-        }
-        CaloriesCalculator.getInstance().setWeight(MySP.getInstance().getDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE));
-
-    }
-
-
-    @Override
     protected void onStart() {
         Log.d(TAG , "onStart Invoked");
         super.onStart();
 
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        boolean b = cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
         final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         
         if (!(activeNetworkInfo != null && activeNetworkInfo.isConnected())) {
@@ -127,7 +108,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     protected void onStop() {
         Log.d(TAG, "onStop: ");
         super.onStop();
-        mainMenuLayout.setVisibility(View.INVISIBLE);
+        weightAlert();
         edtWeight.clearFocus();
         MySP.getInstance().putString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
 
@@ -301,6 +282,7 @@ public class Activity_Main_Menu extends AppCompatActivity{
     }
 
     private void getAllActivitiesFromFirebase() {
+        mainMenuLayout.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
@@ -319,6 +301,19 @@ public class Activity_Main_Menu extends AppCompatActivity{
         };
         databaseReference.addListenerForSingleValueEvent(postListener);
     }
+
+    private void handleEdtWeight() {
+        try{
+            MySP.getInstance().putDouble(Keys.WEIGHT_KEY, Double.parseDouble(edtWeight.getText().toString()));
+        }
+        catch (Exception e){
+            MySP.getInstance().putDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE);
+            weightAlert();
+        }
+        CaloriesCalculator.getInstance().setWeight(MySP.getInstance().getDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE));
+
+    }
+
     private void weightAlert() {
         Toaster.getInstance().showToast("No Weight Detected - Cannot Calculate Burnt Calories");
     }

@@ -143,7 +143,7 @@ public class Activity_History extends AppCompatActivity implements ListCardAdapt
     }
 
     private void setUpFragments() {
-        Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.history_LAY_radio_buttons, true, Keys.RADIO_HISTORY_CHOICE);
+        Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.history_LAY_radio_buttons, true);
     }
 
     private void createAlertReset() {

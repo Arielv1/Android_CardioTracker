@@ -225,7 +225,7 @@ public class Activity_New_Record extends AppCompatActivity implements OnMapReady
     }
 
     private void setUpFragments() {
-        Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.new_run_LAY_radio_buttons, false, Keys.RADIO_CHOICE_NEW_RECORD);
+        Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.new_run_LAY_radio_buttons, false);
     }
 
     private void setUpViews() {

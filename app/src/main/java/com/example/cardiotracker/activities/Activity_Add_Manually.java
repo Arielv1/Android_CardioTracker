@@ -30,7 +30,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
-public class Activity_Add_Manually extends AppCompatActivity implements Callback_RadioChoice {
+public class Activity_Add_Manually extends AppCompatActivity {
 
     private static final String TAG = "Activity_Add_Manually";
 
@@ -168,7 +168,6 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         lblDuration.setText(cardioActivity.getDuration());
         lblCalories.setText(df.format(cardioActivity.getCaloriesBurned()));
         cardioActivityChoice = cardioActivity.getCardioActivityType();
-        setRadioButtonChoice(cardioActivityChoice);
     }
 
     private void setLblDuration() {
@@ -190,7 +189,7 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
     }
 
     private void setUpFragments() {
-        Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.manual_fragment_radio_group, false, Keys.RADIO_HISTORY_CHOICE_EDIT);
+        Utils.getInstance().createFragmentRadioButtons(this, callback, R.id.manual_fragment_radio_group, false);
     }
 
 
@@ -372,8 +371,4 @@ public class Activity_Add_Manually extends AppCompatActivity implements Callback
         return allSportActivities;
     }
 
-    @Override
-    public void setRadioButtonChoice(String radioChoiceValue) {
-        Log.d(TAG, "setRadioButtonChoice called with:" +radioChoiceValue);
-    }
 }

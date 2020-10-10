@@ -34,8 +34,8 @@ public class Utils {
         return utils;
     }
 
-    public Fragment_Radio_Buttons createFragmentRadioButtons(FragmentActivity fragmentActivity, Callback_RadioChoice callback, int replecedId, boolean allButtons, String refrenceSPKey) {
-        Fragment_Radio_Buttons fragment = Fragment_Radio_Buttons.newInstance(allButtons, refrenceSPKey);
+    public Fragment_Radio_Buttons createFragmentRadioButtons(FragmentActivity fragmentActivity, Callback_RadioChoice callback, int replecedId, boolean allButtons) {
+        Fragment_Radio_Buttons fragment = Fragment_Radio_Buttons.newInstance(allButtons);
         fragment.setActivityCallback(callback);
         FragmentTransaction transaction = fragmentActivity.getSupportFragmentManager().beginTransaction();
         transaction.replace(replecedId, fragment);
