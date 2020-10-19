@@ -1,6 +1,8 @@
 package com.example.cardiotracker.utilities;
 
 import android.content.Context;
+import android.util.Log;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -55,9 +57,11 @@ public class CaloriesCalculator {
         return weight;
     }
 
+    private static final String TAG = "CaloriesCalculator";
+
+
     public double calculateBurnedCalories(double pace, long seconds){
         double METSValue = 1.5;
-
         for (Map.Entry<Double, Double> entry : METSValues.entrySet()) {
             if(pace > entry.getKey()){
                 METSValue = entry.getValue();

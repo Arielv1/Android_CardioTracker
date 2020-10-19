@@ -108,10 +108,9 @@ public class Activity_Main_Menu extends AppCompatActivity{
     protected void onStop() {
         Log.d(TAG, "onStop: ");
         super.onStop();
-        weightAlert();
+        handleEdtWeight();
         edtWeight.clearFocus();
         MySP.getInstance().putString(Keys.SPINNER_CHOICE, Keys.DEFAULT_SPINNER_CHOICE_VALUE);
-
     }
 
 
@@ -179,7 +178,6 @@ public class Activity_Main_Menu extends AppCompatActivity{
 
 
     private void setWeightEditText(double weight) {
-        Log.d(TAG, "setWeightEditText: " + MySP.getInstance().getDouble(Keys.WEIGHT_KEY, Keys.DEFAULT_DOUBLE_VALUE));
         if (weight == Keys.DEFAULT_DOUBLE_VALUE){
             edtWeight.setHint("My Weight (kg)");
             edtWeight.setText("");
